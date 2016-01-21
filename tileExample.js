@@ -43,7 +43,6 @@ function create() {
 
     // Set up the land
     land = game.add.tileSprite(0, 0, 2000, 2000, 'background');
-    land.fixedToCamera = true;
 
     // Add the agent
     agent = game.add.sprite(200, 250, 'agent', 'tank1');
@@ -78,10 +77,6 @@ function update() {
     } else {
         currentSpeed = -40;
     }
-
-    // Keeps the camera centered on the agent... 
-    land.tilePosition.x = -game.camera.x;
-    land.tilePosition.y = -game.camera.y;
 
     // Handle Edge Hitting Events
     bounceOffBounds();
