@@ -11,7 +11,7 @@
 // 
 var land;
 var agent;
-var currentSpeed = 0;
+var currentSpeed;
 var cursors;
 
 //
@@ -29,8 +29,9 @@ var game = new Phaser.Game(500,500, Phaser.AUTO, 'canvasContainer', {
 // Pre-load  assets
 //
 function preload() {
-    game.load.atlas('agent', 'assets/tanks.png', 'assets/tanks.json');
-    game.load.image('background', 'assets/light_grass.png');
+    // Getting rid of tank.  The empty box is nicer until we have actual agents.
+    // game.load.atlas('agent', 'assets/tanks.png', 'assets/tanks.json');
+    game.load.image('background', 'assets/grass.jpg');
 }
 
 //
@@ -44,10 +45,10 @@ function create() {
     // Set up the land
     land = game.add.tileSprite(0, 0, 2000, 2000, 'background');
 
-    // Add the agent
-    agent = game.add.sprite(200, 250, 'agent', 'tank1');
+    // Add the agent at an initial location and with an initial heading
+    agent = game.add.sprite(200, 200, 'agent', 'tank1');
     agent.angle = -135;
-    agent.anchor.setTo(0.5, 0.5);  // Related to center of rotation
+    agent.anchor.setTo(0.5, 0.5);  // Sets the center of rotation, I think in the coordinates of the sprite
 
     // Make camera follow the agent
     game.camera.follow(agent);
