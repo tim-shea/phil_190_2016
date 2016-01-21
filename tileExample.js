@@ -2,60 +2,86 @@
 // Simple Canvas program adapted from this demo:
 // http://phaser.io/examples/v2/games/tanks
 //
-var game = new Phaser.Game(500, 500, Phaser.AUTO, 'phaser-example', {
-    preload: preload,
-    create: create,
-    update: update,
-    render: render
-});
+// NOTE: This is highly provisional, and may completely evolve to something
+//      else before we start making regular use of it
+//
 
-function preload() {
-    game.load.atlas('agent', 'assets/tanks.png', 'assets/tanks.json');
-    game.load.image('earth', 'assets/light_grass.png');
-}
-
+//
+// Main Variables
+// 
 var land;
 var agent;
 var currentSpeed = 0;
 var cursors;
 
+//
+// Main game object. Size of visible region.
+//
+var game = new Phaser.Game(500,500, Phaser.AUTO, 'canvasContainer', {
+    preload: preload,
+    create: create,
+    update: update,
+    render: render
+});
+// TODO: String height and width not working above
+
+//
+// Pre-load  assets
+//
+function preload() {
+    game.load.atlas('agent', 'assets/tanks.png', 'assets/tanks.json');
+    game.load.image('background', 'assets/light_grass.png');
+}
+
+//
+// Set up the simulation
+//
 function create() {
 
+    // Set world size
+    game.world.setBounds(0, 0, 2000, 2000);
+
     // Set up the land
-    land = game.add.tileSprite(0, 0, 800, 600, 'earth');
+    land = game.add.tileSprite(0, 0, 2000, 2000, 'background');
     land.fixedToCamera = true;
 
     // Add the agent
-    agent = game.add.sprite(150, 150, 'agent', 'tank1');
+    agent = game.add.sprite(200, 250, 'agent', 'tank1');
     agent.angle = -135;
-    agent.anchor.setTo(0.5, 0.5); 
-    // TODO: Not clear on anchor.  Related to center of rotation.
-    //  See http://www.html5gamedevs.com/topic/2985-how-to-set-center-of-rotation/
+    agent.anchor.setTo(0.5, 0.5);  // Related to center of rotation
+
+    // Make camera follow the agent
+    game.camera.follow(agent);
+    // game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+    // game.camera.focusOnXY(0, 0);
 
     // Randomly change agent's heading every second
-    game.time.events.loop(Phaser.Timer.SECOND * 1, updateAgentAngle, this);
+    game.time.events.loop(Phaser.Timer.SECOND * .5, updateAgentAngle, this);
 
-
+    // Other world parameters
     game.physics.enable(agent, Phaser.Physics.ARCADE);
     agent.body.collideWorldBounds = true;
-
 
     // Set up keyboard input
     cursors = game.input.keyboard.createCursorKeys();
 
 }
 
+//
+// Main update function
+//
 function update() {
 
-    // Crazy behavior
-    // currentSpeed += 20 * (2 * Math.random() - 1);
-    // agent.angle += 10 * (2 * Math.random() - 1);        
-
-    // Random straights and turns at fixed intervals
-    currentSpeed = 100
-    if(Math.random() > .8) {
-        currentSpeed = -50;        
+    // Set Speed
+    if(Math.random() < .8) {
+        currentSpeed = 100;        
+    } else {
+        currentSpeed = -40;
     }
+
+    // Keeps the camera centered on the agent... 
+    land.tilePosition.x = -game.camera.x;
+    land.tilePosition.y = -game.camera.y;
 
     // Handle Edge Hitting Events
     bounceOffBounds();
@@ -76,6 +102,9 @@ function update() {
     game.physics.arcade.velocityFromRotation(agent.rotation, currentSpeed, agent.body.velocity);
 }
 
+//
+// Handle wall events
+//
 function bounceOffBounds() {
     // console.log(game.world.bounds);
     // console.log(agent.body.x+','+agent.body.y);
@@ -95,10 +124,16 @@ function bounceOffBounds() {
 
 }
 
+//
+// Update heading of main agent
+//
 function updateAgentAngle() {
         agent.angle += 20 * (2 * Math.random() - 1);
 }
 
+//
+// Currently just used for debugging
+//
 function render() {
 
     // game.debug.text('Active Bullets: ' + bullets.countLiving() + ' / ' + bullets.length, 32, 32);
