@@ -18,7 +18,7 @@ var bots = [jeff, test];
 // For now keeping the phaser sprites and logical objects separate;
 //   extending sprite ended up being too complex after 20 minutes of effort
 var sprites = [];
-var currentBotIndex = 0; // Todo; control using combobox in page
+var currentBotIndex = 0;
 
 //
 // Main game object. Size of visible region.
@@ -127,6 +127,17 @@ function bounceOffBounds() {
             bots[i].angle += 180;
         }
     }
+}
+
+//
+// Select the current bot to focus on.  Called by html.
+//
+function botSelect() {
+    var e = document.getElementById("botSelect");
+    newIndex = e.selectedIndex;
+    console.log(newIndex);
+    game.camera.follow(sprites[newIndex]);
+    currentBotIndex = newIndex;
 }
 
 //
