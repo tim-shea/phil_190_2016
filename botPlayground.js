@@ -14,7 +14,7 @@ var override;
 //
 // Arrays of bots
 //
-var bots = [jeff, test];
+var bots = [jeff, test, sharAI];
 // For now keeping the phaser sprites and logical objects separate;
 //   extending sprite ended up being too complex after 20 minutes of effort
 var sprites = [];
