@@ -10,6 +10,8 @@ var land;
 var cursors;
 var speedOverride;
 var override;
+var textArea;
+
 
 //
 // Arrays of bots
@@ -67,6 +69,10 @@ function create() {
 
     // Set up keyboard input
     cursors = game.input.keyboard.createCursorKeys();
+
+    // Text area to log agent states
+    textArea = document.getElementById("textArea");
+
 }
 
 //
@@ -93,6 +99,8 @@ function update() {
         override = false;
     }
 
+    
+
     // Update bots
     for (var i = 0; i < sprites.length; i++) {
         sprites[i].angle = bots[i].angle;
@@ -104,7 +112,12 @@ function update() {
         }
     }
 
+    // Update the text area
+    document.textArea.logText.value = bots[currentBotIndex].getStatus();
+    // Todo. text history
+
 }
+
 
 //
 // Handle wall events
@@ -138,6 +151,7 @@ function botSelect() {
     console.log(newIndex);
     game.camera.follow(sprites[newIndex]);
     currentBotIndex = newIndex;
+
 }
 
 //

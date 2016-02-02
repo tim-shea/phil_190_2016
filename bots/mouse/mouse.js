@@ -6,4 +6,11 @@ mouse.update = function() {
     if (Math.random() < .1) {
         mouse.angle += 5;
     }
+    if (Math.random() < .02) {
+    	if (Math.random() < .5) {
+	        mouse.speed = 50;
+    	} else {
+     		mouse.speed = -50;
+    	}
+    }
 };
