@@ -1,4 +1,0 @@
-    // game.load.atlas('mouse', 'bots/jeff/mouse.png', 'bots/jeff/mouse.json');
-    // agent = game.add.sprite(200, 200,'mouse','Mouse_180');
-    // agent.animations.add('mouse', Phaser.Animation.generateFrameNames('Mouse_', 0, 23, ''),20,true);
-    // agent.animations.play('mouse');

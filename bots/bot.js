@@ -10,7 +10,11 @@ function Bot(x, y, name, path) {
 };
 
 Bot.prototype.getStatus = function() {
-	return "Not yet defined for: " + this.name;
+	return "Status function not yet defined for bot: " + this.name;
+};
+
+// TODO: Return a string with angle and speed stats.
+Bot.prototype.getBasicStats = function() {
 };
 
 Bot.prototype.init = function(game) {
