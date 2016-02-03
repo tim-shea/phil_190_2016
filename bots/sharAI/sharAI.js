@@ -6,11 +6,12 @@ sharAI.stateText = "sharAI says: Hello!";
 var turnRandom = 0;
 
 sharAI.talk = function(array) {
-    return array[Math.floor(Math.random() * array.length)]
+    var string = array[Math.floor(Math.random() * array.length)];
+    return string;
 };
 
 var likeStrings = ["video games", "my mom"];
-var talkStrings = ["Beep boop!", ("I miss " + sharAI.talk(likeStrings) )];
+var talkStrings = ["Beep boop!", ("I miss " + sharAI.talk(likeStrings))];
 
 sharAI.getStatus = function() {
     return sharAI.stateText;
@@ -28,10 +29,8 @@ sharAI.update = function() {
 
     if (turnRandom < .01) {
         sharAI.speed = 0;
-        if (Math.random() < .1) {
-            sharAI.stateText = ("sharAI says: " + sharAI.talk(talkStrings) );
+        if (Math.random() < .5) {
+            sharAI.stateText = ("sharAI says: " + sharAI.talk(talkStrings));
         }
     }
 }
-
-
