@@ -12,8 +12,6 @@ sharAI.anger = 0;
 var turnRandom = 0;
 var currentStatus = "SYSTEMS NORMAL \n";
 var currentDiscussion = "Hello!";
-var walkSprite = ['bots/sharAI/sharAI.png', 'bots/sharAI/sharAI WALK 1.png'];
-var walkIndex = 0;
 
 //
 // MOVEMENT
@@ -26,14 +24,6 @@ sharAI.move = function() {
     } else if (turnRandom >= .1 && turnRandom < .2) {
         sharAI.angle -= 5;
     }
-
-    // Sprite cycling
-    walkIndex++;
-    if (walkIndex % walkSprite.length == 0) {
-        walkIndex = 0;
-    }
-    sharAI.imagePath = walkSprite[walkIndex];
-
 }
 
 //
