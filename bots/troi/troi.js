@@ -1,4 +1,4 @@
-var troi = new Bot(250, 250, 'troi', 'bots/troi/umbreon.gif');
+var troi = new Bot(250, 250, 'troi', 'bots/troi/umbreon_2.0.png');
 troi.angle = 50;
 troi.speed = 100;
 
