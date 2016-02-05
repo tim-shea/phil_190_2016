@@ -55,12 +55,12 @@ sharAI.talk = function(array) {
 };
 
 var stateStrings = ["STATE ERROR FOUND. PLEASE DEBUG! ", "sharAI is doing ok.", "sharAI is taking a nap."];
-var identityStrings = ["a robot", "a bot", "a mind \(maybe?\)", "a person \(possibly?\)", "neither a man nor a woman", "nihilistic"];
+var identityStrings = ["am a robot", "am a bot", "have a mind \(maybe?\)", "am a person \(possibly?\)", "am neither a man nor a woman", "am nihilistic"];
 var likeStrings = ["video games", "my family", "my friends", "bugs", "slugs", "snails", "monsters", "robots", "computers", "programming", "sleeping", "food", "ingesting fluids", "swearing"];
 var cursePrefixes = ["God ", "Jesus ", "Ass", "Shit", "Fuck", "Son of a ", "Mother", "Father", "Goat", "Butt", "Anus", "Monkey", "Bull", "Bumble", "Cock", "Dick", "Weasel", "Horse", "Sweet", "Baby", "Christ ", "Holy", "Bitch", "Bastard", "Dip", "Douche", "Dumb", "Fucker", "Suck", "Fudge", "Hacker ", "Jack", "Jerk", "Lame", "Camel", "Piss", "Prick", "Schlong", "Scrote", "Shitty ", "Uncle", "Aunt", "Boob", "Nerd", "Noob", "Beard", "Cauldron", "Banshee", "Dragon", "Rabble", "Broom", "Taint", "Turd", "Unicorn", "Sock", "Nipple", "Goblin", "Crotch", "\*\@\$\#"];
 var curseSuffixes = ["er", "damn", " Christ", "fucker", "hole", "ass", "goat", "gun", "shit", "anus", "hat", "pirate", "bag", "clown", "butt", "face", "goblin", "muncher", "head", "licker", "monkey", "wad", "wipe", "boner", "poop", "cock", "booty", "burger", "master", "nugget", "smith", "waffle", "bubble", "monger", "mongrel", "dick", "weasel", "dong", "dildo", "nerd", "weed", " on a pogo", " on a bike", " on a cracker", " Jesus", "baby", "bitch", "bastard", "tickler", "whisperer", "douche", "butter", "boy", "man", "sucker", "nut", "up", "wit", "fudge", "camel", "piss", "prick", "schlong", "scrote", "shitter", "uncle", "aunt", "vagina", "boob", "wanker", "noob", "beard", "bum", "banshee", "dragon", "bougies", "rouser", "broom", "crack", "taint", "turd", "unicorn", "polisher", "sock", "nipple", "crotch", "\*\@\$\#"]; // Wow, I didn't think you'd read this line all the way through! Congratulations!
 var curseStrings = ["Fuck!", "Shit!", "Ass!", "Damn!", "Hell!", "Butt!", "Dick!", "Bastard!", "Fudge!", "Piss!", "Dingleberry!", "\*\@\$\#!", "Gadzooks!", (sharAI.talk(cursePrefixes) + sharAI.talk(curseSuffixes) + "!")];
-var factStrings = [("I am " + sharAI.talk(identityStrings) + "?"), "snails. talk. really. slowly?", ("I like " + sharAI.talk(likeStrings) + "?"), "nothing matters?"];
+var factStrings = [("I " + sharAI.talk(identityStrings) + "?"), "snails. talk. really. slowly?", ("I like " + sharAI.talk(likeStrings) + "?"), "nothing matters?"];
 var talkStrings = ["Beep boop!", ("Did you know that " + sharAI.talk(factStrings)), ("I like " + sharAI.talk(likeStrings) + "!")];
 
 
