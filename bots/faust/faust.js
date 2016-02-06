@@ -1,4 +1,4 @@
-var faust = new Bot(240, 220, 'faust', 'bots/faust/faust.gif');
+var faust = new Bot(240, 220, 'faust', 'bots/faust/faust.png');
 faust.angle = 100; // Initial Angle
 faust.speed = 100; // Initial Speed
 
@@ -15,10 +15,10 @@ faust.update = function() {
     }
     if (Math.random() < .01) {
         if (Math.random() < .5) {
-            faust.speed = 500;
-	        faust.stateText = "Spastic!";
+            faust.speed = 100;
+	        faust.stateText = "Normal";
         } else {
-            faust.speed = -100;
+            faust.speed = 100;
 	        faust.stateText = "Backwards....";
         }
     }
