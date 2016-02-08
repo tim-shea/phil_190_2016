@@ -30,7 +30,7 @@ dylan.update = function() {
 	} else {
 		dylan.speed < 0;
 			dylan.stateText = "Reversing...";
-		dylan.speed = 0;
+		dylan.speed == 0;
 			dylan.ststeText = "Collision!";	
 
 		}
