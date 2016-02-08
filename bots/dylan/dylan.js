@@ -27,7 +27,7 @@ dylan.update = function() {
 		
 	}
  
-	if dylan.speed = 0 {
+	if (dylan.speed() = 0) {
 		dylan.stateText = "Collision!"
 	
 	} else {
