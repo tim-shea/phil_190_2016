@@ -25,14 +25,13 @@ dylan.update = function() {
 			dylan.speed = 575;
 				dylan.stateText = "Punch it!";
 		
-	}
- 
-	if (dylan.speed() = 0) {
-		dylan.stateText = "Collision!"
+
 	
 	} else {
 		dylan.speed < 0;
 			dylan.stateText = "Reversing...";
+		dylan.speed = 0;
+			dylan.ststeText = "Collision!";	
 
 		}
 
