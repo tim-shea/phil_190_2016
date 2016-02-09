@@ -16,7 +16,8 @@ var textArea;
 //
 // Arrays of bots
 //
-var bots = [jeff, mouse, sharAI, troi, yang, faust, maria, dylan, Daniel];
+var bots = [jeff, mouse, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen];
+
 // For now keeping the phaser sprites and logical objects separate;
 //   extending sprite ended up being too complex after 20 minutes of effort
 var sprites = [];
