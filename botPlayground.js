@@ -8,18 +8,13 @@
 // 
 var land;
 var cursors;
-var speedOverride;
-var override;
+var cursorDown;
 var textArea;
-
 
 //
 // Arrays of bots
 //
-var bots = [jeff, mouse, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen];
-
-// For now keeping the phaser sprites and logical objects separate;
-//   extending sprite ended up being too complex after 20 minutes of effort
+var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey];
 var sprites = [];
 var currentBotIndex = 0;
 
@@ -32,7 +27,6 @@ var game = new Phaser.Game(500, 500, Phaser.AUTO, 'canvasContainer', {
     update: update,
     render: render
 });
-// TODO: String height and width not working above
 
 //
 // Pre-load  assets
@@ -58,11 +52,13 @@ function create() {
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
         var newSprite = game.add.sprite(bots[i].x, bots[i].y, bots[i].name);
-        newSprite.angle = bots[i].angle;
         newSprite.anchor.setTo(0.5, 0.5); // Sets the center of rotation, I think in the coordinates of the sprite
-        bots[i].init(game);
+        bots[i].sprite = newSprite;
+        bots[i].body = newSprite.body;
         game.physics.enable(newSprite, Phaser.Physics.ARCADE);
         sprites.push(newSprite);
+        newSprite.body.collideWorldBounds = true;
+        bots[i].init();
     }
 
     // Make camera follow the agent
@@ -81,35 +77,31 @@ function create() {
 //
 function update() {
 
-    // Handle Edge Hitting Events
-    bounceOffBounds();
-
     // Arrow keys
     if (cursors.left.isDown) {
-        bots[currentBotIndex].angle -= 4;
+        cursorDown = true;
+        sprites[currentBotIndex].body.rotation -= 4;
     } else if (cursors.right.isDown) {
-        bots[currentBotIndex].angle += 4;
+        override = true;
+        sprites[currentBotIndex].body.rotation += 4;
     }
     if (cursors.up.isDown) {
-        override = true;
-        speedOverride = 300;
+        cursorDown = true;
+        sprites[currentBotIndex].body.speed = 300;
     } else if (cursors.down.isDown) {
-        override  = true;
-        speedOverride = -300;
-    } else {
-        override = false;
+        cursorDown = true;
+        sprites[currentBotIndex].body.speed = 0;
     }
 
-    
-
     // Update bots
-    for (var i = 0; i < sprites.length; i++) {
-        sprites[i].angle = bots[i].angle;
-        if(i === currentBotIndex & (override === true)) {
-            game.physics.arcade.velocityFromRotation(sprites[i].rotation, speedOverride, sprites[i].body.velocity);
-        } else {
+    for (var i = 0; i < bots.length; i++) {
+        // When cursor is down, perform "cursor override" update
+        //   for current bot
+        if (cursorDown && i == currentBotIndex) {
+            bots[i].basicUpdate();
+            cursorDown = false;
+        } else {               
             bots[i].update();
-            game.physics.arcade.velocityFromRotation(sprites[i].rotation, bots[i].speed, sprites[i].body.velocity);
         }
     }
 
@@ -119,40 +111,16 @@ function update() {
 
 }
 
-
-//
-// Handle wall events
-//
-function bounceOffBounds() {
-    // console.log(game.world.bounds);
-    // console.log(agent.body.x+','+agent.body.y);
-    // TODO: Redo without the 10/50 fudges, based on the size of the agent
-    for (var i = 0; i < sprites.length; i++) {
-        if (sprites[i].body.x < (game.world.bounds.x + 10)) {
-            bots[i].angle += 180;
-        }
-        if (sprites[i].body.y < (game.world.bounds.y + 10)) {
-            bots[i].angle += 180;
-        }
-        if (sprites[i].body.x > game.world.bounds.width - 60) {
-            bots[i].angle += 180;
-        }
-        if (sprites[i].body.y > game.world.bounds.height - 60) {
-            bots[i].angle += 180;
-        }
-    }
-}
-
 //
 // Select the current bot to focus on.  Called by html.
+// TODO: This function is unresponsive.   Sometimes have to use dropdown
+//  twice.
 //
 function botSelect() {
     var e = document.getElementById("botSelect");
     newIndex = e.selectedIndex;
-    console.log(newIndex);
     game.camera.follow(sprites[newIndex]);
     currentBotIndex = newIndex;
-
 }
 
 //
