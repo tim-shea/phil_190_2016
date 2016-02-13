@@ -82,7 +82,7 @@ function update() {
         cursorDown = true;
         sprites[currentBotIndex].body.rotation -= 4;
     } else if (cursors.right.isDown) {
-        override = true;
+        cursorDown = true;
         sprites[currentBotIndex].body.rotation += 4;
     }
     if (cursors.up.isDown) {
