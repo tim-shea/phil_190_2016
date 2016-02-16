@@ -11,18 +11,22 @@ dylan.getStatus = function() {
 	return dylan.stateText;
 }
 
-//getStats & init for later?? 
-
+//getStats & init for later??
+dylan.init= function(){ 
+this.body = this.sprite.body; 
+    dylan.body.rotation = 100; 
+    dylan.body.speed = 100;
+}
 dylan.update = function() {
 	if (Math.random() <.1) {
-		dylan.angle += 5;
-		dylan.angle = dylan.angle % 270;
+		dylan.incrementangle += 5;
+		dylan.incrementangle = dylan.incrementangle % 270;
 
 	}
 
 	if (Math.random() < .03) {
 		if (Math.random() < .7) {
-			dylan.speed = 575;
+			dylan.body.speed = 575;
 				dylan.stateText = "Punch it!";
 		
 
