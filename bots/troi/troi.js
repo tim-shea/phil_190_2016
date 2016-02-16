@@ -26,3 +26,4 @@ troi.update = function() {
             troi.basicUpdate();
 
         };
+    };
