@@ -1,25 +1,39 @@
 var faust = new Bot(240, 220, 'faust', 'bots/faust/faust.png');
-faust.angle = 100; // Initial Angle
-faust.speed = 100; // Initial Speed
 
-faust.stateText = "mighty";
+faust.stateText = "dragon";
+
+faust.init = function() {
+    this.body = this.sprite.body;  // Todo:  a way to automate this?
+    faust.body.rotation = 100; // Initial Angle
+    faust.body.speed = 100; // Initial Speed
+    // Do something every n seconds.
+    // game.time.events.loop(Phaser.Timer.SECOND * 1, faust.timedEvend, this);
+}
+
+
+//
+// Example of a timed event
+//
+faust.timedEvend = function() {
+    console.log(game.time.totalElapsedSeconds());   
+}
 
 faust.getStatus = function() {
-	return faust.stateText;
+    return faust.stateText;
 }
 
 faust.update = function() {
-    if (Math.random() < .1) {
-        faust.angle += 10;
-        faust.angle = faust.angle % 180;
+    if (Math.random() < .05) {
+        faust.incrementAngle(10);
     }
     if (Math.random() < .01) {
         if (Math.random() < .5) {
-            faust.speed = 100;
-	        faust.stateText = "Normal";
+            faust.body.speed = 500;
+            faust.stateText = "Normal";
         } else {
-            faust.speed = 100;
-	        faust.stateText = "Backwards....";
+            faust.body.speed = 0;
+            faust.stateText = "Backwards";
         }
     }
+    faust.basicUpdate();
 };
