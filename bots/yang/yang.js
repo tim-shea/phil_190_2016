@@ -57,7 +57,7 @@ yang.update = function() {// a reoccouring event...
     yang.motionText = "Speed: " + yang.body.speed;
     yang.control = (cursors.up.isDown || cursors.down.isDown || 
         cursors.left.isDown || cursors.right.isDown);
-    yang.preupdate(); //this function construct next deer_main
+    //yang.preupdate(); //this function construct next deer_main
     //Main Cycle
     yang.state.test = true; //comment this line to disable test mode
     if (yang.state.test && (!yang.control)) {
