@@ -1,5 +1,5 @@
 var troi = new Bot(250, 250, 'troi', 'bots/troi/umbreon_2.0.png');
-troi.increment.angle = 50;
+troi.incrementAngle = 50;
 troi.body.speed = 100;
 
 
@@ -13,9 +13,9 @@ troi.init = function() {
 }
 troi.update = function() {
         if (Math.random() < .1) {
-            troi.increment.angle += .5;
+            troi.incrementAngle += .5;
         } else {
-            troi.increment.angle -= 2;
+            troi.incrementAngle -= 2;
         }
         if (Math.random() < 0.1) {
             if (Math.random() < 0.05) {
