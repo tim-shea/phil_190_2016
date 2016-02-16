@@ -26,5 +26,5 @@ maria.update = function() {
             maria.stateText = "Back";
         }
     }
-    maria.basicupdate();
+    maria.basicUpdate();
 };
