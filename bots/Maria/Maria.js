@@ -14,7 +14,7 @@ maria.init = function() {
 
 maria.update = function() {
     if (Math.random() < .1) {
-        maria.incrementAngle(10);;
+        maria.incrementAngle(10);
         maria.angle = maria.angle % 180;
     }
     if (Math.random() < .01) {
