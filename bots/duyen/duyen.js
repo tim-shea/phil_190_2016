@@ -5,6 +5,16 @@ duyen.speed = 100;
 
 duyen.stateText = "just flowing around";
 
+duyen.init = function() {
+	this.body = this.sprite.body;
+	duyen.body.rotation = 50;
+	duyen.body.speed = 50;
+}
+
+duyen.timedEvend = function() {
+    console.log(game.time.totalElapsedSeconds());   
+    }
+
 duyen.getStatus = function() {
  	return duyen.stateText;
 }
@@ -23,4 +33,6 @@ if (Math.random() < 0.1) {
  			duyen.speed = 100;
  		}
  	}
+
+ 	duyen.basicUpdate();
  };
