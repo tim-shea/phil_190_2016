@@ -1,4 +1,4 @@
-//
+1//
 // Simple Canvas program adapted from this demo:
 // http://phaser.io/examples/v2/games/tanks
 //
@@ -16,7 +16,7 @@ var textArea;
 //
 var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey];
 var sprites = [];
-var currentBotIndex = 0;
+var currentBotIndex = defaultBotIndex;
 
 //
 // Main game object. Size of visible region.
@@ -32,7 +32,10 @@ var game = new Phaser.Game(500, 500, Phaser.AUTO, 'canvasContainer', {
 // Pre-load  assets
 //
 function preload() {
+    // Load all assets
     game.load.image('background', 'assets/grass.jpg');
+
+    // Load bot images as assets
     for (var i = 0; i < bots.length; i++) {
         game.load.image(bots[i].name, bots[i].imagePath);
     };
@@ -69,6 +72,9 @@ function create() {
 
     // Text area to log agent states
     textArea = document.getElementById("textArea");
+
+    // Update selection box
+    document.getElementById("botSelect").selectedIndex = defaultBotIndex;
 
 }
 
@@ -113,8 +119,6 @@ function update() {
 
 //
 // Select the current bot to focus on.  Called by html.
-// TODO: This function is unresponsive.   Sometimes have to use dropdown
-//  twice.
 //
 function botSelect() {
     var e = document.getElementById("botSelect");
@@ -127,7 +131,6 @@ function botSelect() {
 // Can be used to render text to the canvas
 //
 function render() {
-
     // game.debug.text('Bots: ' + bots.length, 32, 32);
-
 }
+

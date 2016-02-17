@@ -24,7 +24,7 @@ Bot.prototype.getStatus = function() {
 
 Bot.prototype.getBasicStats = function() {};
 
-Bot.prototype.init = function(game) {};
+Bot.prototype.init = function() {};
 
 Bot.prototype.update = function() {};
 
