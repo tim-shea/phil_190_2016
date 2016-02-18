@@ -1,4 +1,4 @@
-1//
+//
 // Simple Canvas program adapted from this demo:
 // http://phaser.io/examples/v2/games/tanks
 //

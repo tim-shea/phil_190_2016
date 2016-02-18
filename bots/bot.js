@@ -18,15 +18,40 @@ function Bot(x, y, name, path) {
 
 };
 
+//
+// Returns a status string that describes the bot's internal state
+//
 Bot.prototype.getStatus = function() {
     return "Status function not yet defined for bot: " + this.name;
 };
 
-Bot.prototype.getBasicStats = function() {};
-
+//
+// Override to initialize the bot
+//
 Bot.prototype.init = function() {};
 
+//
+// Called every time the game is updated.  
+//
 Bot.prototype.update = function() {};
+
+//
+// Returns true if the bot is at the boundary of the world, false otherwise
+//
+Bot.prototype.atBoundary = function(amount) {
+    // Not sure why onWall fails on top and bottom,
+    //  so adding in cases manually
+    if (this.body.onWall()) {
+        return true;
+    }
+    if (this.body.onFloor()) {
+        return true;
+    }
+    if (this.body.y < 1) {
+        return true;
+    }
+    return false;
+}
 
 //
 // Helper function to update angle
