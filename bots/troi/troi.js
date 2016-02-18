@@ -28,7 +28,7 @@ troi.walking = {
                 return troi.resting;
             }
         }
-    }
+    },
     update: function() {
         // Slight tilting when moving
         if (Math.random() < .5) {
