@@ -58,7 +58,7 @@ dylan.calm = {
             return dylan.parked;
         }
         // TODO: Must return something here.
-        return dylan.calm;
+        return dylan.parked;
     }
 }
 
