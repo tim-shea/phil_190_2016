@@ -8,7 +8,8 @@ dylan.init = function() {
     this.body.speed = 100;
 
     game.time.events.loop(Phaser.Timer.SECOND * 5, dylan.update5Sec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * .5, dylan.updateHalfSec, this);
+    // game.time.events.loop(Phaser.Timer.SECOND * .5, dylan.updateHalfSec, this);
+    // TODO: updateHalfSec was not defined.
 
 }
 
@@ -54,6 +55,8 @@ dylan.calm = {
         if (Math.random() < .4) {
             return dylan.parked;
         }
+        // TODO: Must return something here.
+        return dylan.calm;
     }
 }
 
