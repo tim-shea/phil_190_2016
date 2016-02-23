@@ -50,7 +50,7 @@ maria.sleep = {
 maria.happy = {
     name: "Happy",
     transitionProbability: .03,
-    transtion: function() {
+    transition: function() {
         if (Math.random() < .3) {
             return maria.hyper;
         } else {
@@ -122,6 +122,7 @@ maria.updateTenthSec = function() {
 // Called every second
 maria.update1Sec = function() {
     if (Math.random() < maria.emotion.transitionProbability) {
+        maria.emotion = maria.emotion.transition();
     }
     maria.motionMode = maria.emotion.getMotionMode();
 }
