@@ -49,7 +49,9 @@ dylan.calm = {
     transition: function() {
         if (Math.random() < .8) {
             return dylan.angry;
-        }
+        } 
+        //TODO: Add somethign here too
+        return dylan.calm;
     },
     getMotionMode: function() {
         if (Math.random() < .4) {
