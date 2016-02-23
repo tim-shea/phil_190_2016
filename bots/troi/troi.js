@@ -1,5 +1,6 @@
 var troi = new Bot(540, 520, 'troi', 'bots/troi/umbreon_2.0.png');
-
+var STAMINA_MAX = 1500,
+    STAMINA_MIN = 0;
 
 
 // (Override) Initialize Bot
@@ -7,7 +8,7 @@ troi.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
     this.body.speed = 100; // Initial Speed
-    troi.stamina = 100; // initial stamina
+    troi.stamina = 1000; // initial stamina
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, troi.update1Sec, this);
@@ -18,14 +19,25 @@ troi.init = function() {
 // Motion modes
 //
 troi.walking = {
-    description: "walking",
-    transitionProbability: .20,
+    description: "Walking",
     transition: function() {
-        if (Math.random  <= .15) {  //Probability of being startled
-            if(Math.random > .20){    //Probability of running away
-                return troi.sprinting;
-            }else{
-                return troi.resting;
+        if (troi.stamina <= 100) { //Pass stamina threshold
+            return troi.exhausted;
+        } else {
+            if (Math.random <= .20) {
+                if (Math.random <= .10) { //Probability of being startled
+                    if (Math.random > .20) { //Probability of running away
+                        return troi.sprinting;
+                    } else { //Probably of freezing in fear
+                        return troi.resting;
+                    }
+                } else { // Probability of choosing to transition states
+                    if (Math.random <= .50) { //Probability of choosing to sprint 
+                        return troi.sprinting;
+                    } else { //Probability of resting
+                        return troi.resting;
+                    }
+                }
             }
         }
     },
@@ -33,23 +45,43 @@ troi.walking = {
         // Slight tilting when moving
         if (Math.random() < .5) {
             troi.incrementAngle(10 * Math.random() - 5);
-
         }
         // A leisurely place
         troi.body.speed = 200;
-        troi.stamina--;
+        if (troi.stamina > STAMINA_MIN) {
+            troi.stamina -= 10; //energy spent walking
+        }
     }
 }
 troi.resting = {
-    description: "at rest",
+    description: "Resting",
+    transitionProbability: .30, //Probability of transition states
+    transition: function() {
+        if (troi.stamina > 20) {
+            return troi.walking; //resume walking
+        }
+    },
     update: function() {
-        // Stand still
+        // Standing still
         troi.body.speed = 0;
-        troi.stamina += 5;
+        if (troi.stamina < STAMINA_MAX) {
+            troi.stamina += 5; //energy recharging while walking
+        } else {
+            troi.stamina = STAMINA_MAX;
+        }
     }
 }
 troi.sprinting = {
-    description: "sprinting",
+    description: "Sprinting",
+    transition: function() {
+        if (troi.stamina <= 100) {
+            return troi.exhausted;
+        } else {
+            if (Math.random() < 0.15) {
+                return troi.walking;
+            }
+        }
+    },
     update: function() {
         // Wilder steering changes
         if (Math.random() < .5) {
@@ -57,94 +89,293 @@ troi.sprinting = {
         }
         // Fast
         troi.body.speed = 500;
+        if (troi.stamina > STAMINA_MIN) {
+            troi.stamina -= 50;
+        } else {
+            troi.stamina = STAMINA_MIN;
+
+        }
     }
 }
-troi.moping = {
-    description: "moping",
+troi.exhausted = {
+    description: "Exhausted",
+    transition: function() {
+        if (troi.stamina <= 0) {
+            return troi.recovering;
+        }
+    },
     update: function() {
-        // Change angle rarely and just a bit
-        if (Math.random() < .05) {
-            troi.incrementAngle(10 * Math.random() - 5);
-        }
         // Slow
-        troi.body.speed = 50;
+        troi.body.speed -= 5;
+        if (troi.stamina > STAMINA_MIN) {
+            troi.stamina -= 10;
+        } else {
+            troi.stamina = STAMINA_MIN;
+        }
     }
 }
-
-//
-// Emotion states
-//
-troi.calm = {
-    name: "Calm",
-    transitionProbability: .05,
+troi.recovering = {
+    description: "Recovering",
     transition: function() {
-        if (Math.random() < .8) {
-            return troi.happy;
-        } else {
-            return troi.angry;
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .4) {
+        if (troi.stamina >= 20) {
             return troi.resting;
+        }
+    },
+    update: function() {
+        troi.body.speed = 0;
+        if (troi.stamina < STAMINA_MAX) {
+            troi.stamina += 20;
         } else {
-            return troi.moping;
+            troi.stamina = STAMINA_MAX;
         }
     }
 }
-troi.angry = {
-    name: "Angry",
-    transitionProbability: .2,
+
+//// Emotion states
+
+// events
+var I1 = 0.20; //random encounter with "antagonist"
+var I2 = 0.30; //Probability of "being alone"
+var I3 = 0.15; //Probability of finding food
+var I4 = 0.02; //Probability of finding treasure
+var I5 = 0.01; //Probabilty triggering a trap
+var rand = 0; //variable for random event if multiple can occur
+
+troi.euphoric = {
+    name: "Euphoric",
+    transitionProbability: 0.45, //Probabilty of event occuring
     transition: function() {
-        // Leave this state 80% of the time
-        if (Math.random() < .8) {
-            // If exiting, go to back to calm
-            return troi.calm;
-        } else {
-            return troi.angry;
+        if (Math.random() < I5) {
+            rand = Math.random();
+            if (rand < .10) { //10% chance to stay euphoric
+                return troi.euphoric;
+            } else if (rand < .25) { //15% chance to just become happy
+                return troi.happy;
+            } else if (rand < .55) { //30% chance to become neutral
+                return troi.neutral;
+            } else if (rand < .80) { //25% chance to become agitated
+                return troi.agitated;
+            } else { //20% chance to become angry
+                return troi.angry;
+            }
+
+        } else if (Math.random() < I4) {
+            return troi.euphoric;
+        } else if (Math.random < I3) {
+            return troi.euphoric;
+        } else if (Math.random() < I2) {
+            rand = Math.random;
+            if (rand < .75) {
+                return troi.happy;
+            } else {
+                return troi.euphoric;
+            }
+        } else { //random encounter
+            rand = Math.random();
+            if (rand < .80) {
+                return troi.happy;
+            } else {
+                return troi.euphoric;
+            }
         }
     },
     getMotionMode: function() {
-        return troi.sprinting;
+        //when euphoric sprint or walk if stamina is sufficient
+        if (troi.stamina <= 0) {
+            return troi.resting;
+        } else if (troi.stamina <= 100) {
+            return troi.exhausted;
+        } else {
+            rand = Math.random();
+            if (rand < .75) {
+                return troi.sprinting;
+            } else {
+                return troi.walking;
+            }
+        }
     }
-
 }
+
 troi.happy = {
     name: "Happy",
-    transitionProbability: .01,
+    transitionProbability: .25,
     transition: function() {
-        if (Math.random() < .8) {
-            return troi.calm;
+        if (Math.random() < I1) {
+            if (Math.random < .40) {
+                return troi.neutral;
+            } else {
+                return troi.walking;
+            }
+        } else if (Math.random < I2) {
+            if (Math.random < .80) {
+                return troi.neutral;
+            } else {
+                return troi.happy;
+            }
+        } else if (Math.random() < I3) {
+            if (Math.random < .75) {
+                return troi.happy;
+            }
+        } else if (Math.random < I4) {
+            return troi.euphoric;
         } else {
-            return troi.angry;
+            rand = Math.random();
+            if (rand < .40) {
+                return troi.agitated;
+            } else if (rand < .95) {
+                return troi.angry;
+            } else {
+                return troi.neutral;
+            }
         }
     },
     getMotionMode: function() {
-        // When happy, either walk or spaz
-        if (Math.random() < .8) {
-            return troi.walking;
+        // When happy, either walk or sprint if stamina is sufficient
+        if (troi.stamina <= 0) {
+            return troi.resting;
+        } else if (troi.stamina <= 100) {
+            return troi.exhausted;
         } else {
-            return troi.sprinting;
+            rand = Math.random();
+            if (rand < .65) {
+                return troi.walking;
+            } else {
+                return troi.sprintin;
+            }
         }
-    }
-}
-troi.sad = {
-    name: "Sad",
-    transitionProbability: .3,
-    transition: function() {
-        if (Math.random() < .8) {
-            return troi.calm;
-        } else {
-            return troi.angry;
-        }
-    },
-    getMotionMode: function() {
-        return troi.moping;
     }
 }
 
+troi.neutral = {
+    name: "Neutral",
+    transitionProbability: .10,
+    transition: function() {
+        if (Math.random() < I1) {
+            if (Math.random() < .60) {
+                return troi.agitated;
+            }
+        } else if (Math.random < I2) {
+            if (Math.random() < .20) {
+                return troi.agitated;
+            }
+        } else if (Math.random < I3) {
+            if (Math.random < .80) {
+                return troi.happy;
+            }
+        } else if (Math.random < I4) {
+            if (Math.random() < .95) {
+                return troi.euphoric;
+            } else {
+                return troi.happy;
+            }
+        } else {
+            if (Math.random < .95) {
+                return troi.angry;
+            } else {
+                return troi.agitated;
+            }
+        }
+
+    },
+    getMotionMode: function() {
+        // When neutral, either walk or sprint if stamina is sufficient
+        if (troi.stamina <= 0) {
+            return troi.resting;
+        } else if (troi.stamina <= 100) {
+            return troi.exhausted;
+        } else {
+            rand = Math.random();
+            if (rand < .20) {
+                return troi.sprinting;
+            } else {
+                return troi.walking;
+            }
+        }
+    }
+}
+troi.agitated = {
+    name: "Agitated",
+    transitionProbability: .25,
+    transition: function() {
+        if (Math.random() < I1) {
+            if (Math.random() < .80) {
+                return troi.angry;
+            }
+        } else if (Math.random < I2) {
+            if (Math.random() < .80) {
+                return troi.neutral;
+            }
+        } else if (Math.random < I3) {
+            return troi.neutral;
+        } else if (Math.random < I4) {
+            rand = Math.random();
+            if (rand < .50) {
+                return troi.neutral;
+            } else if (rand < .30) {
+                return troi.happy;
+            } else {
+                return troi.euphoric;
+            }
+        } else {
+            return troi.angry;
+        }
+    },
+    getMotionMode: function() {
+        // When agitated, walk if stamina is sufficient
+        if (troi.stamina <= 0) {
+            return troi.resting;
+        } else if (troi.stamina <= 100) {
+            return troi.exhausted;
+        } else {
+            return troi.walking;
+
+        }
+    }
+}
+
+troi.angry = {
+    name: "Angry",
+    transitionProbability: .25,
+    transition: function() {
+        if (Math.random < I2) {
+            if (Math.random() < .20) {
+                return troi.agitated;
+            }
+        } else if (Math.random < I3) {
+            return troi.agitated;
+        } else {
+            rand = Math.random();
+            if (rand < .70) {
+                return troi.neutral;
+            } else if (rand < .90) {
+                return troi.happy;
+            } else {
+                return troi.euphoric;
+            }
+        }
+    },
+    getMotionMode: function() {
+        // When angry, either walk or rest if stamina is sufficient
+        if (troi.stamina <= 0) {
+            return troi.resting;
+        } else if (troi.stamina <= 100) {
+            return troi.exhausted;
+        } else {
+            rand = Math.random();
+            if (rand < .60) {
+                return troi.walking;
+            } else {
+                return troi.resting;
+            }
+        }
+    }
+
+}
+
+
+
 // Current States
-troi.emotion = troi.calm;
+troi.emotion = troi.neutral;
 troi.motionMode = troi.walking;
 
 
@@ -152,7 +383,8 @@ troi.motionMode = troi.walking;
 troi.getStatus = function() {
     var statusString = troi.emotion.name;
     statusString += "\n-------";
-    statusString += "\nMotion mode: " + troi.motionMode.description;
+    statusString += "\nMotion mode: " + troi.motionMode.description + "\nEmotion mode: " + troi.emotion.description;
+    statusString += "\nStamina : " + troi.stamina;
     return statusString;
 }
 
@@ -167,13 +399,9 @@ troi.update = function() {
 
 // Called every tenth of a second
 troi.updateTenthSec = function() {
-    console.log("ten");
 
 }
 
-troi.update1Sec = function() {
-    console.log("one");
-}
 
 // Called every second
 troi.update1Sec = function() {

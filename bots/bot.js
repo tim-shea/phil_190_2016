@@ -58,6 +58,18 @@ Bot.prototype.atBoundary = function(amount) {
 //
 // Todo: not totally clear why angle can't be used here. I have to use rotation.
 //
+
+Bot.prototype.getRandom = function(floor, ceiling) {
+    var midpoint = (ceiling+floor)/2;
+    var difference = ceiling-floor;
+    var randomBetween = difference * Math.random() - (difference/2) + midpoint;
+    return randomBetween;
+}
+//
+// Calculates midpoint and difference between the given amounts to calculate a random number between the amounts
+// Example of how to use:  "Daniel.incrementAngle(Daniel.getRandom(-5, 5));"
+//
+
 Bot.prototype.incrementAngle = function(amount) {
 	this.sprite.body.rotation += amount;
     this.sprite.body.rotation = this.sprite.body.rotation % 180;
