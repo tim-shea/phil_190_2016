@@ -24,7 +24,7 @@ rey.walking = {
         }
         // A leisurely place
         rey.body.speed = 200;
-        console.log("Someone join me!!!!");
+        // console.log("Someone join me!!!!");
 
     }
 }
@@ -33,7 +33,7 @@ rey.still = {
     update: function() {
         // Stand still
         rey.body.speed = 0;
-        console.log("Taking a break!");
+        // console.log("Taking a break!");
     }
 }
 rey.dancing = {
@@ -45,7 +45,7 @@ rey.dancing = {
         }
         // Fast
         rey.body.speed = 1000;
-        console.log("Dun Dun Dun Dun");
+        // console.log("Dun Dun Dun Dun");
     }
 }
 

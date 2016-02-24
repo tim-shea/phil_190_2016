@@ -393,7 +393,9 @@ troi.update = function() {
     if (troi.atBoundary() === true) {
         troi.incrementAngle(45);
     }
-    troi.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.
+    if (troi.motionMode) {
+        troi.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.        
+    }
     this.basicUpdate();
 };
 
@@ -405,8 +407,12 @@ troi.updateTenthSec = function() {
 
 // Called every second
 troi.update1Sec = function() {
-    if (Math.random() < troi.emotion.transitionProbability) {
-        troi.emotion = troi.emotion.transition();
+    if (troi.emotion) {
+        if (Math.random() < troi.emotion.transitionProbability) {
+            troi.emotion = troi.emotion.transition();
+        }
     }
-    troi.motionMode = troi.emotion.getMotionMode();
+    if (troi.emotion && troi.motionMode) {
+        troi.motionMode = troi.emotion.getMotionMode();
+    }
 }

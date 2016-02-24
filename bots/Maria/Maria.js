@@ -121,9 +121,12 @@ maria.updateTenthSec = function() {
 
 // Called every second
 maria.update1Sec = function() {
-    if (Math.random() < maria.emotion.transitionProbability) {
-        maria.emotion = maria.emotion.transition();
-    }
-    maria.motionMode = maria.emotion.getMotionMode();
-}
+    if (maria.emotion && maria.motionMode) {
+        if (Math.random() < maria.emotion.transitionProbability) {
+            maria.emotion = maria.emotion.transition();
 
+        }
+        maria.motionMode = maria.emotion.getMotionMode();
+    }
+
+}
