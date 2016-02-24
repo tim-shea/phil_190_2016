@@ -39,6 +39,10 @@ function preload() {
     for (var i = 0; i < bots.length; i++) {
         game.load.image(bots[i].name, bots[i].imagePath);
     };
+
+    // Load all entity sprites.  The first argument (e.g. 'oakTree')
+    //   will be used as the name of this image below.
+    game.load.image('oakTree', 'assets/oakTree.png');
 }
 
 //
@@ -47,10 +51,10 @@ function preload() {
 function create() {
 
     // Set world size
-    game.world.setBounds(0, 0, 1000, 1000);
+    game.world.setBounds(0, 0, 3000, 3000);
 
     // Set up the land
-    land = game.add.tileSprite(0, 0, 1000, 1000, 'background');
+    land = game.add.tileSprite(0, 0, 3000, 3000, 'background');
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
@@ -63,6 +67,13 @@ function create() {
         newSprite.body.collideWorldBounds = true;
         bots[i].init();
     }
+
+    // Set up static entities.  Give it an x and y coordinate.  
+    //      The thir argument (e.g. 'oakTree') must match the name used
+    //      above in the pre-load function 
+    var oakTree1 = new Entity(400, 400, 'oakTree', game);
+    var oakTree2 = new Entity(1000, 2000, 'oakTree', game);
+
 
     // Make camera follow the agent
     game.camera.follow(sprites[currentBotIndex]);
