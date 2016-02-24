@@ -76,7 +76,7 @@ maria.hyper = {
         }
     },
     getMotionMode: function() {
-        return maria.skipping
+        return maria.skipping;
     }
 }
 maria.sleepy = {
@@ -90,10 +90,11 @@ maria.sleepy = {
             }
         },
         getMotionMode: function() {
-            return maria.sleep
+            return maria.sleep;
         }
     }
-    //Current States
+
+//Current States
 maria.emotion = maria.happy;
 maria.motionMode = maria.dancing;
 
@@ -121,12 +122,12 @@ maria.updateTenthSec = function() {
 
 // Called every second
 maria.update1Sec = function() {
-    if (maria.emotion && maria.motionMode) {
+    if (maria.emotion) {
         if (Math.random() < maria.emotion.transitionProbability) {
             maria.emotion = maria.emotion.transition();
 
         }
-        maria.motionMode = maria.emotion.getMotionMode();
+        maria.motionMode = maria.emotion.getMotionMode();            
     }
 
 }
