@@ -84,7 +84,7 @@ maria.sleepy = {
         transitionProbability: .3,
         transition: function() {
             if (Math.random() < .6) {
-                return maria.stop;
+                return maria.sleepy;
             } else {
                 return maria.hyper;
             }
