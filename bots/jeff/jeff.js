@@ -9,6 +9,36 @@ jeff.init = function() {
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, jeff.update1Sec, this);
     game.time.events.loop(Phaser.Timer.SECOND * .01, jeff.updateTenthSec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 60*2, jeff.update2min, this);
+}
+
+// Hunger 
+jeff.hunger = {
+    amount: 0,
+    eat: function(food_amount) {
+        this.amount -= food_amount;
+        this.amount = Math.max(0,this.amount); // Don't allow hunger to go below 0
+    },
+    update: function() {
+        if(this.amount >= 100) {
+            // Do nothing.  Hunger is capped. 
+        } else {
+            this.amount++;
+        }
+    },
+    toString: function() {
+        var hungerLevel = "";
+        if (this.amount < 20) {
+            hungerLevel = "Not hungry";
+        } else if (this.amount < 60) {            
+            hungerLevel = "Hungry";
+        } else if (this.amount < 80) {            
+            hungerLevel = "Starving!!";
+        } else {            
+            hungerLevel = "FEED ME!";
+        }
+        return hungerLevel + " (Hunger = " + this.amount + ")";
+    }
 }
 
 //
@@ -134,9 +164,9 @@ jeff.motionMode = jeff.walking;
 
 // (Override) Populate status field
 jeff.getStatus = function() {
-    var statusString = jeff.emotion.name;
-    statusString += "\n-------";
-    statusString += "\nMotion mode: " + jeff.motionMode.description;
+    var statusString = "Emotion: " + jeff.emotion.name;
+    statusString += "\nMotion: " + jeff.motionMode.description;
+    statusString += "\n" + jeff.hunger.toString();
     return statusString;
 }
 
@@ -156,8 +186,14 @@ jeff.updateTenthSec = function() {
 
 // Called every second
 jeff.update1Sec = function() {
+    jeff.hunger.update();
     if (Math.random() < jeff.emotion.transitionProbability) {
         jeff.emotion = jeff.emotion.transition();
     }
     jeff.motionMode = jeff.emotion.getMotionMode();
+}
+
+// Called every two minutes
+jeff.update2min = function() {
+    jeff.hunger.eat(101);
 }
