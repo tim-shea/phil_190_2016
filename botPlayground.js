@@ -43,6 +43,11 @@ function preload() {
     // Load all entity sprites.  The first argument (e.g. 'oakTree')
     //   will be used as the name of this image below.
     game.load.image('oakTree', 'assets/oakTree.png');
+    game.load.image('web', 'assets/web.png');
+    game.load.image('cocoon', 'assets/cocoon.png');
+
+    // Load sounds
+    game.load.audio('doozer', 'assets/doos.wav');
 }
 
 //
@@ -55,6 +60,9 @@ function create() {
 
     // Set up the land
     land = game.add.tileSprite(0, 0, 3000, 3000, 'background');
+
+    // Background static entities load before everything else
+    var web = new Entity (2755, 0, 'web', game);
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
@@ -73,7 +81,9 @@ function create() {
     //      above in the pre-load function 
     var oakTree1 = new Entity(400, 400, 'oakTree', game);
     var oakTree2 = new Entity(1000, 2000, 'oakTree', game);
+    var cocoon = new Entity (2900, 130, 'cocoon', game);
 
+    
 
     // Make camera follow the agent
     game.camera.follow(sprites[currentBotIndex]);
