@@ -133,9 +133,9 @@ faust.update = function() {
     this.basicUpdate();
 }
 
-faust.updateP1Sec = function() {
-	faust.energy.update();
-	faust.movement();
+faust.update1Sec = function() {
+	// faust.emotion.update(); // TODO: Emotions not fully implemented yet
+	faust.movement.update();
 }
 
 /*faust.getStatus = function() {
