@@ -45,6 +45,8 @@ function preload() {
     game.load.image('oakTree', 'assets/oakTree.png');
     game.load.image('web', 'assets/web.png');
     game.load.image('cocoon', 'assets/cocoon.png');
+    game.load.image('rock', 'assets/rock_formation.png');
+    game.load.image('statue', 'assets/statue_man.png'); 
     game.load.image('stray dog', 'assets/dog.png');
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
 
@@ -61,18 +63,24 @@ function preload() {
 //
 function create() {
 
+    // Enable Arcade Physics
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
     // Set world size
     game.world.setBounds(0, 0, 3000, 3000);
 
     // Set up the land
     land = game.add.tileSprite(0, 0, 3000, 3000, 'background');
 
+    // Add group for bots
+    var botGroup = game.add.group();
+
     // Background static entities load before everything else
     var web = new Entity (2755, 0, 'web', game);
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
-        var newSprite = game.add.sprite(bots[i].x, bots[i].y, bots[i].name);
+        var newSprite = botGroup.create(bots[i].x, bots[i].y, bots[i].name);
         newSprite.anchor.setTo(0.5, 0.5); // Sets the center of rotation, I think in the coordinates of the sprite
         bots[i].sprite = newSprite;
         bots[i].body = newSprite.body;
@@ -88,12 +96,18 @@ function create() {
     var oakTree1 = new Entity(400, 400, 'oakTree', game);
     var oakTree2 = new Entity(1000, 2000, 'oakTree', game);
     var cocoon = new Entity (2900, 130, 'cocoon', game);
+    var rock = new Entity (730 , 320, 'rock', game);
+    var statue = new Entity(600, 2000, 'statue', game);
     var dog = new Entity (1000, 1000, 'stray dog', game);
     var Blossom = new Entity (1200, 1200, 'Cherry Blossom Tree', game);
+<<<<<<< HEAD
     //by Troi
     var EasternCastle = new Entity(25, 2700, 'Eastern Castle', game);
     var treasure_1 = new Entity(10, 2930, 'Treasure', game);
     //
+=======
+
+>>>>>>> origin/master
     
 
     // Make camera follow the agent
@@ -107,6 +121,7 @@ function create() {
 
     // Update selection box
     document.getElementById("botSelect").selectedIndex = defaultBotIndex;
+
 
 }
 
