@@ -39,21 +39,24 @@ troi.walking = {
         if (troi.stamina <= 100) { //Pass stamina threshold
             return troi.exhausted;
         } else {
-            if (Math.random <= .20) {
-                if (Math.random <= .10) { //Probability of being startled
-                    if (Math.random > .20) { //Probability of running away
+            if (Math.random() <= .20) {
+                if (Math.random() <= .10) { //Probability of being startled
+                    if (Math.random() > .20) { //Probability of running away
                         return troi.sprinting;
                     } else { //Probably of freezing in fear
                         return troi.resting;
                     }
                 } else { // Probability of choosing to transition states
-                    if (Math.random <= .50) { //Probability of choosing to sprint 
+                    if (Math.random() <= .50) { //Probability of choosing to sprint 
                         return troi.sprinting;
                     } else { //Probability of resting
                         return troi.resting;
                     }
+                    return troi.walking;
                 }
+
             }
+
         }
     },
     update: function() {
@@ -72,6 +75,8 @@ troi.resting = {
     transition: function() {
         if (troi.stamina > 200) {
             return troi.walking; //resume walking
+        } else {
+            return troi.resting;
         }
     },
     update: function() {
@@ -88,6 +93,8 @@ troi.sprinting = {
         } else {
             if (Math.random() < 0.15) {
                 return troi.walking;
+            } else {
+                return troi.sprinting;
             }
         }
     },
@@ -150,10 +157,10 @@ troi.euphoric = { //Really happy
 
         } else if (Math.random() < troi.I4) { //find treasure
             return troi.euphoric;
-        } else if (Math.random < troi.I3) { //find food
+        } else if (Math.random() < troi.I3) { //find food
             return troi.euphoric;
         } else if (Math.random() < troi.I2) { //isolation causes sadness
-            troi.rand = Math.random;
+            troi.rand = Math.random();
             if (troi.rand < .75) { //mental state becomes less happy
                 return troi.happy;
             } else {
@@ -166,6 +173,8 @@ troi.euphoric = { //Really happy
             } else {
                 return troi.euphoric;
             }
+        } else {
+            return troi.euphoric;
         }
     },
     getMotionMode: function() {
@@ -190,24 +199,24 @@ troi.happy = {
     transitionProbability: .25,
     transition: function() {
         if (Math.random() < troi.I1) { //random encouter
-            if (Math.random < .40) {
+            if (Math.random() < .40) {
                 return troi.neutral;
             } else {
                 return troi.agitated;
             }
-        } else if (Math.random < troi.I2) { //isolation causes sadness
-            if (Math.random < .80) {
+        } else if (Math.random() < troi.I2) { //isolation causes sadness
+            if (Math.random() < .80) {
                 return troi.neutral;
             } else {
                 return troi.happy;
             }
         } else if (Math.random() < troi.I3) {
-            if (Math.random < .25) {
+            if (Math.random() < .25) {
                 return troi.euphoric;
             } else {
                 return troi.happy;
             }
-        } else if (Math.random < troi.I4) {
+        } else if (Math.random() < troi.I4) {
             return troi.euphoric;
         } else {
             troi.rand = Math.random();
@@ -247,26 +256,26 @@ troi.neutral = {
             } else {
                 return troi.neutral;
             }
-        } else if (Math.random < troi.I2) { //isolation causes sadness
+        } else if (Math.random() < troi.I2) { //isolation causes sadness
             if (Math.random() < .20) {
                 return troi.agitated;
             } else {
                 return troi.neutral;
             }
-        } else if (Math.random < troi.I3) {
-            if (Math.random < .80) {
+        } else if (Math.random() < troi.I3) {
+            if (Math.random() < .80) {
                 return troi.happy;
             } else {
                 return troi.neutral;
             }
-        } else if (Math.random < troi.I4) {
+        } else if (Math.random() < troi.I4) {
             if (Math.random() < .95) {
                 return troi.euphoric;
             } else {
                 return troi.happy;
             }
         } else {
-            if (Math.random < .95) {
+            if (Math.random() < .95) {
                 return troi.angry;
             } else {
                 return troi.agitated;
@@ -300,15 +309,15 @@ troi.agitated = {
             } else {
                 return troi.agitated;
             }
-        } else if (Math.random < troi.I2) {
+        } else if (Math.random() < troi.I2) {
             if (Math.random() < .80) {
                 return troi.neutral;
             } else {
                 return troi.agitated;
             }
-        } else if (Math.random < troi.I3) {
+        } else if (Math.random() < troi.I3) {
             return troi.neutral;
-        } else if (Math.random < troi.I4) {
+        } else if (Math.random() < troi.I4) {
             troi.rand = Math.random();
             if (troi.rand < .50) {
                 return troi.neutral;
@@ -344,7 +353,7 @@ troi.angry = {
             } else {
                 return troi.angry;
             }
-        } else if (Math.random < troi.I3) {
+        } else if (Math.random() < troi.I3) {
             return troi.agitated;
         } else {
             rand = Math.random();
@@ -383,12 +392,13 @@ troi.hunger = {
     eat: function(food_amount) {
         this.amount -= food_amount; //this. refers to specific class
         this.amount = Math.max(0, this.amount); // Don't allow hunger to go below 0
+
     },
     update: function() {
         if (this.amount >= 500) {
             // Do nothing.  Hunger is capped. 
         } else {
-            this.amount += 5;
+            this.amount += 10;
         }
     },
     toString: function() {
@@ -421,7 +431,8 @@ troi.amuse = {
     time: 500,
     play: function(play_time) {
         this.time += play_time; //increases playtime
-        this.time = Math.min(0, this.time);
+        this.time = Math.min(this.time, 0);
+
     },
     update: function() {
         if (this.time <= 0) {
@@ -435,18 +446,18 @@ troi.amuse = {
 
         if (this.time >= 250) {
             amuse_level = "WOOOOOOOOOOOOOT!";
-            //troi.emotion = troi.euphoric; //ecstatic emotion    		//#// code currently stands as responsible for crashing
+            troi.emotion = troi.euphoric; //#// code currently stands as responsible for crashing
             troi.stamina -= 5; //playtime takes energy
         } else if (this.time >= 100) {
             amuse_level = "YAAAY!!!";
-           	troi.emotion = troi.happy;
+            troi.emotion = troi.happy;
             troi.stamina -= 3;
         } else if (this.time >= 50) {
             amuse_level = "...awe...";
             troi.emotion = troi.neutral;
             troi.stamina--;
         } else {
-            amuse.level = "Sooooooooooooooooooooooooo Boooooooooooooooooooooooooooooooooored.";
+            amuse_level = "Sooooooooooooooooooooooooo Boooooooooooooooooooooooooooooooooored.";
             troi.emotion = troi.agitated; //Boredom is painful
         }
         return amuse_level + " (Amusement Level = " + this.time + ")";
@@ -506,13 +517,14 @@ troi.update1Sec = function() {
     if (troi.emotion && troi.motionMode) {
         troi.motionMode = troi.emotion.getMotionMode();
     }
-    // console.log(troi.motionMode.description);
-    // console.log(troi.emotion.name);
-
-    troi.hunger.update();
+    //console.log(troi.motionMode.description);
+    //console.log(troi.emotion.name);
     troi.amuse.update();
+    troi.hunger.update();
+
 }
 troi.update_1_30_sec = function() {
     troi.hunger.eat(501); //food for troi
     troi.amuse.play(500); //playtime increment
+    troi.stamina = troi.STAMINA_MAX;
 }

@@ -47,6 +47,11 @@ function preload() {
     game.load.image('cocoon', 'assets/cocoon.png');
     game.load.image('stray dog', 'assets/dog.png');
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
+
+    //by Troi
+    game.load.image('Eastern Castle', 'assets/eastCastle.png');
+    game.load.image('Treasure', 'assets/treasurechest.gif')
+    //
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
 }
@@ -85,6 +90,10 @@ function create() {
     var cocoon = new Entity (2900, 130, 'cocoon', game);
     var dog = new Entity (1000, 1000, 'stray dog', game);
     var Blossom = new Entity (1200, 1200, 'Cherry Blossom Tree', game);
+    //by Troi
+    var EasternCastle = new Entity(25, 2700, 'Eastern Castle', game);
+    var treasure_1 = new Entity(10, 2930, 'Treasure', game);
+    //
     
 
     // Make camera follow the agent
