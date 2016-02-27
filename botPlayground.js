@@ -47,7 +47,8 @@ function preload() {
     game.load.image('cocoon', 'assets/cocoon.png');
     game.load.image('rock', 'assets/rock_formation.png');
     game.load.image('statue', 'assets/statue_man.png'); 
-
+    game.load.image('stray dog', 'assets/dog.png');
+    game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
 }
@@ -86,6 +87,9 @@ function create() {
     var cocoon = new Entity (2900, 130, 'cocoon', game);
     var rock = new Entity (730 , 320, 'rock', game);
     var statue = new Entity(600, 2000, 'statue', game);
+    var dog = new Entity (1000, 1000, 'stray dog', game);
+    var Blossom = new Entity (1200, 1200, 'Cherry Blossom Tree', game);
+
     
 
     // Make camera follow the agent
