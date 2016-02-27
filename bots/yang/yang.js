@@ -1,4 +1,6 @@
-var yang = new Bot(500, 500, 'yang','bots/yang/yang.png');
+var yang_home = [2700, 2700];
+
+var yang = new Bot(yang_home[0], yang_home[1], 'yang','bots/yang/yang.png');
 
 yang.init = function() {//all variables are here
     //setup body
@@ -18,7 +20,7 @@ yang.init = function() {//all variables are here
     yang.rotationText = "No Message";
     yang.motionText = "No Message";
     //state machine
-    yang.state = new state_machine_input();//initialize state inputs
+    yang.state = new yang.state_machine_input();//initialize state inputs
     //nodes
     yang.current_testnode = yang.def_node;
     //mental nodes
@@ -32,8 +34,8 @@ yang.init = function() {//all variables are here
     yang.basespeed = 0;
     yang.acceleration = 0;
 
-    yang.tag = new tag_game_obj(); // see helper
-    yang.berry = new berry_game_obj(); // see helper
+    yang.tag = new yang.tag_game_obj(); // see helper
+    yang.berry = new yang.berry_game_obj(); // see helper
 
     yang.chance;
     //test
@@ -117,7 +119,7 @@ yang.timedEvend = function() {
 };
 
 //-------Additional Helper functions-----------
-function state_machine_input () { //default constructor
+yang.state_machine_input = function() { //default constructor
     this.test = false; //for test
     this.inspiration = 0; // accumulate through contact event
     this.emptyness = 0; // accumulate through time
@@ -126,12 +128,12 @@ function state_machine_input () { //default constructor
     this.randomness = 0; // stack over time and randomly empty into emptyness/inspiration    
 }
 
-function tag_game_obj () {
+yang.tag_game_obj = function () {
     this.it; //index in the bots
     this.tagger_list = ["jeff", "sharAI"];//the name tags
 }
 
-function berry_game_obj () {
+yang.berry_game_obj = function () {
     this.berry_coord = [yang.x, yang.x];//[x,y] initialized as starting location
     this.berry_distance = 0;
     this.create_new_berry = function () {
@@ -184,7 +186,7 @@ yang.def_node = {
         yang.current_testnode = yang.def_node;
         yang.def_node.initial();
     }
-}
+};
 
 //--------Base Speed Nodes
 // Base speed is completely depends on meta resources
@@ -207,7 +209,7 @@ yang.stop_node = { //stop -extremly low prime meta resources
         yang.current_speed_node = yang.stop_node;
         yang.current_speed_node.initial();
     }
-}
+};
 
 yang.slow_node = {
     description : "Deer's body still has fuel.",
@@ -227,7 +229,7 @@ yang.slow_node = {
         yang.current_speed_node = yang.slow_node;
         yang.current_speed_node.initial();
     }
-}
+};
 
 yang.fast_node = {
     description : "Deer's body feels lighter than usual.",
@@ -248,7 +250,7 @@ yang.fast_node = {
         yang.current_speed_node = yang.fast_node;
         yang.current_speed_node.initial();
     }
-}
+};
 //--------Acceleration Nodes
 
 yang.lay = {
@@ -261,7 +263,7 @@ yang.lay = {
         yang.current_acceleration_node = yang.lay;
         yang.current_acceleration_node.initial();
     }
-}
+};
 
 yang.wander = {
     description : "Deer wanders.",
@@ -280,7 +282,7 @@ yang.wander = {
         yang.current_acceleration_node = yang.wander;
         yang.current_acceleration_node.initial();
     }
-}
+};
 
 yang.gallop = {
     description : "Deer is in motion.",
@@ -301,7 +303,7 @@ yang.gallop = {
         yang.current_acceleration_node = yang.gallop;
         yang.current_acceleration_node.initial();
     }
-}
+};
 
 yang.leap = {
     leap_loop : false,
@@ -342,7 +344,7 @@ yang.leap = {
         yang.current_acceleration_node = yang.leap;
         yang.current_acceleration_node.initial();
     }
-}
+};
 //--------Rotation Nodes
 
 //--------mental_task_Nodes
@@ -377,7 +379,7 @@ yang.primeres_focus = {
         yang.current_mentaltask_node = yang.primeres_focus;
         yang.current_mentaltask_node.initial();
     }
-}
+};
 
 yang.brood_focus = { //uses primary resources to transform emptyness into inspiration 
     description : "The life is in general disappointing, but Deer is still appreciating. What are holy and profane?",
@@ -398,7 +400,7 @@ yang.brood_focus = { //uses primary resources to transform emptyness into inspir
         yang.current_mentaltask_node = yang.brood_focus;
         yang.current_mentaltask_node.initial();
     }
-}
+};
 
 yang.drain_focus = {//uses secondary resources for inspiration at high cost
     description : "The life has been fair, but the Deer always desires better.",
@@ -420,7 +422,7 @@ yang.drain_focus = {//uses secondary resources for inspiration at high cost
         yang.current_mentaltask_node = yang.drain_focus;
         yang.current_mentaltask_node.initial();
     }
-}
+};
 
 yang.secondary_focus = {//gain secondary resources from social
     description : "No one catches Deer~",
@@ -440,7 +442,7 @@ yang.secondary_focus = {//gain secondary resources from social
         yang.current_mentaltask_node = yang.secondary_focus;
         yang.def_node.initial();
     }
-}
+};
 
 
 
@@ -460,6 +462,11 @@ yang.secondary_focus = {//gain secondary resources from social
 //
 //movement :
 //yang.body.rotation = game.physics.arcade.moveToObject(yang.sprite, jeff.sprite, 500, 1);
+//
+// add objects:
+// this.sprite = game.add.sprite(x, y, name);
+
+
 
 /*overrideable basic functions of prototype bot
 /*nothing yet overwrite prototype 
@@ -480,9 +487,31 @@ botplayground.html
 <script src="bots/yang/yang.js"></script>
 <option value="yang">Yang</option>
 
+/*under preload function
+game.load.image('oakTree', 'assets/oakTree.png');
+
+/*under create function
+var troll_garden
+var philoberry_bush
+var predator
+var troll
+
+
+
+
+
+
 botplayground.js
 var bots = [jeff, mouse, yang];
 */
+
+
+
+
+
+
+
+
 
 /*extra resources
 http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
