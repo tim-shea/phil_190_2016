@@ -468,8 +468,8 @@ troi.update1Sec = function() {
     if (troi.emotion && troi.motionMode) {
         troi.motionMode = troi.emotion.getMotionMode();
     }
-    console.log(troi.motionMode.description);
-    console.log(troi.emotion.name);
+    // console.log(troi.motionMode.description);
+    // console.log(troi.emotion.name);
 
     troi.hunger.update();
 }
