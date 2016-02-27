@@ -4,12 +4,13 @@
 //
 
 //
-// Main Variables
+// Global Variables
 // 
 var land;
 var cursors;
 var cursorDown;
 var textArea;
+var botGroup;
 
 //
 // Arrays of bots
@@ -50,10 +51,8 @@ function preload() {
     game.load.image('statue', 'assets/statue_man.png'); 
     game.load.image('stray dog', 'assets/dog.png');
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
-    //by Troi
     game.load.image('Eastern Castle', 'assets/eastCastle.png');
     game.load.image('Treasure', 'assets/treasurechest.gif')
-    //
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
@@ -74,7 +73,7 @@ function create() {
     land = game.add.tileSprite(0, 0, 3000, 3000, 'background');
 
     // Add group for bots
-    var botGroup = game.add.group();
+    botGroup = game.add.group();
 
     // Background static entities load before everything else
     var web = new Entity (2755, 0, 'web', game);
