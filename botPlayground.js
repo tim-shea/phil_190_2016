@@ -58,18 +58,24 @@ function preload() {
 //
 function create() {
 
+    // Enable Arcade Physics
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
     // Set world size
     game.world.setBounds(0, 0, 3000, 3000);
 
     // Set up the land
     land = game.add.tileSprite(0, 0, 3000, 3000, 'background');
 
+    // Add group for bots
+    var botGroup = game.add.group();
+
     // Background static entities load before everything else
     var web = new Entity (2755, 0, 'web', game);
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
-        var newSprite = game.add.sprite(bots[i].x, bots[i].y, bots[i].name);
+        var newSprite = botGroup.create(bots[i].x, bots[i].y, bots[i].name);
         newSprite.anchor.setTo(0.5, 0.5); // Sets the center of rotation, I think in the coordinates of the sprite
         bots[i].sprite = newSprite;
         bots[i].body = newSprite.body;
@@ -103,6 +109,7 @@ function create() {
 
     // Update selection box
     document.getElementById("botSelect").selectedIndex = defaultBotIndex;
+
 
 }
 
