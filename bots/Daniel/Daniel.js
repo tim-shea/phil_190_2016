@@ -7,6 +7,78 @@ Daniel.init = function() {
 
     //Initialized timed events
     game.time.events.loop(Phaser.Timer.SECOND * 1, Daniel.updateOneSecond, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 60, Daniel.updateMin, this);
+}
+
+//
+// Fear State
+//
+Daniel.fear = {
+    amount: 0,
+    reassure: function(ease_amount) {
+        this.amount -= ease_amount;
+        this.amount = Math.max(-25, this.amount);
+    },
+    update: function() {
+        if (this.amount >= 100) {
+            //cry alot
+        } else {
+            this.amount++;
+        }
+    },
+    toString: function() {
+        var fearLevel = "Fear Level: ";
+        if (this.amount < 0) {
+            fearLevel += "No Fear/Maximum Overconfidence!";
+        } else if (this.amount < 30) {
+            fearLevel += "I'm not afraid!";
+        } else if (this.amount < 50) {
+            fearLevel += "Getting scared now...";
+        } else if (this.amount < 70) {
+            fearLevel += "Now I'm actually scared";
+        } else if (this.amount < 90) {
+            fearLevel += "Now I am TERRIFIED TIME TO GO HOME";
+        }
+        return fearLevel + " (Fear = " + this.amount + "%)";
+    }
+}
+
+
+//
+// Hunger State
+//
+Daniel.hunger = {
+    amount: 0,
+    eat: function(food_amount) {
+        this.amount -= food_amount;
+        this.amount = Math.max(0, this.amount);
+    },
+    update: function() {
+        if (this.amount >= 100) {
+            //do nothing
+        } else if (Daniel.motionMode == Daniel.baseline) {
+            this.amount += 1;;
+        } else if (Daniel.motionMode == Daniel.powerwalking) {
+            this.amount += 2;
+        } else if (Daniel.motionMode == Daniel.sonic) {
+            this.amount += 5;
+        } else {
+            this.amount += 0.5;
+        }
+    },
+    toString: function() {
+        var hungerLevel = "Hunger Level: ";
+        if (this.amount < 20) {
+            hungerLevel += "Not hungry";
+        } else if (this.amount < 60) {
+            hungerLevel += "Hungry";
+        } else if (this.amount < 80) {
+            hungerLevel += "Starving!!";
+        } else {
+            hungerLevel += "FEED ME!";
+        }
+        return hungerLevel + " (Hunger = " + this.amount + "%)";
+    }
 }
 
 //
@@ -112,6 +184,8 @@ Daniel.getStatus = function() {
     var statusString = "I am feeling " + Daniel.emotion.name;
     statusString += "\n>------<";
     statusString += "\nSpeed: " + Daniel.motionMode.description;
+    statusString += "\n" + Daniel.hunger.toString();
+    statusString += "\n" + Daniel.fear.toString();
     return statusString;
 }
 
@@ -124,8 +198,16 @@ Daniel.update = function() {
 };
 
 Daniel.updateOneSecond = function() {
+    Daniel.hunger.update();
+    Daniel.fear.update();
     if (Math.random() < Daniel.emotion.transitionProb) {
         Daniel.emotion = Daniel.emotion.transition();
     }
     Daniel.motionMode = Daniel.emotion.getMotionMode();
+}
+
+//feeds every minute
+Daniel.updateMin = function() {
+    Daniel.hunger.eat(75);
+    Daniel.fear.reassure(100);
 }
