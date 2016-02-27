@@ -1,4 +1,4 @@
-var dylan = new Bot(240, 220, 'dylan', 'bots/dylan/player_car.png');
+var dylan = new Bot(1021, 1000, 'dylan', 'bots/dylan/player_car.png');
 
 
 //getStats & init for later??
@@ -9,8 +9,37 @@ dylan.init = function() {
 
     game.time.events.loop(Phaser.Timer.SECOND * 5, dylan.update5Sec, this);
     // game.time.events.loop(Phaser.Timer.SECOND * .5, dylan.updateHalfSec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 60 * 4, dylan.update4min, this);
     // TODO: updateHalfSec was not defined.
 
+}
+//Using units of fuel instead of hunger since I have a car
+dylan.fuel = {
+    amount: 0,
+    fill: function(fuel_amount) {
+        this.amount -= fuel_amount;
+        this.amount = Math.max(0, this.amount); // Don't allow fuel to go below 0
+    },
+    update: function() {
+        if (this.amount >= 100) {
+            // Do nothing.  Fuel is capped. 
+        } else {
+            this.amount++;
+        }
+    },
+    toString: function() {
+        var fuelLevel = "";
+        if (this.amount < 20) {
+            fuelLevel = "Tank full";
+        } else if (this.amount < 60) {
+            fuelLevel = "Half tank";
+        } else if (this.amount < 80) {
+            fuelLevel = "FUEL LOW";
+        } else {
+            fuelLevel = "FUEL DEPLETION IMMENENT";
+        }
+        return fuelLevel + " (Fuel = " + this.amount + ")";
+    }
 }
 
 dylan.cruising = {
@@ -25,7 +54,7 @@ dylan.cruising = {
 dylan.parked = {
     description: "parked",
     update: function() {
-        
+
         dylan.body.speed = 0;
     }
 }
@@ -42,6 +71,18 @@ dylan.speeding = {
     }
 }
 
+dylan.reckless = {
+    description: "reckless",
+    update: function() {
+        if (Math.random() < .6) {
+            //Even more wild steering?
+            dylan.incrementAngle(60 * Math.random() - 6);
+        }
+        //Slight speed reduction to match nervousness
+        dylan.body.speed = 480;
+    }
+}
+
 
 dylan.calm = {
     name: "Calm",
@@ -49,7 +90,7 @@ dylan.calm = {
     transition: function() {
         if (Math.random() < .8) {
             return dylan.angry;
-        } 
+        }
         //TODO: Add somethign here too
         return dylan.calm;
     },
@@ -79,6 +120,23 @@ dylan.angry = {
     }
 
 }
+//Will add nervous emotion, issue with line 127 and missing bracket? None that I can see
+/*
+dylan.nervous = {
+    name: "Nervous,"
+    transitionProbability: .15, 
+    transition: function() {
+        if (Math.random() < .7) {
+            return dylan.calm;
+        } else {
+            return dylan.nervous;
+        }
+    },
+    getMotionMode: function() {
+        return dylan.reckless;
+    }
+}
+*/
 
 dylan.emotion = dylan.calm;
 dylan.motionMode = dylan.cruising;
@@ -87,14 +145,14 @@ dylan.motionMode = dylan.cruising;
 
 
 dylan.getStatus = function() {
-    var statusString = dylan.emotion.name;
-    statusString += "/n-------";
-    statusString += "/nMotion mode: " + dylan.motionMode.description;
+    var statusString = "Emotion: " + dylan.emotion.name;
+    statusString += "\nMotion: " + dylan.motionMode.description;
+    statusString += "\n" + dylan.fuel.toString();
     return statusString;
 }
 
 dylan.update = function() {
-
+    dylan.fuel.update();
     if (dylan.atBoundary() === true) {
         dylan.incrementAngle(45);
     }
@@ -112,4 +170,7 @@ dylan.update5Sec = function() {
 
     }
     dylan.motionMode = dylan.emotion.getMotionMode();
+}
+dylan.update4min = function() {
+    dylan.fuel.fill(101);
 }

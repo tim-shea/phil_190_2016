@@ -45,6 +45,8 @@ function preload() {
     game.load.image('oakTree', 'assets/oakTree.png');
     game.load.image('web', 'assets/web.png');
     game.load.image('cocoon', 'assets/cocoon.png');
+    game.load.image('rock', 'assets/rock_formation.png');
+    game.load.image('statue', 'assets/statue_man.png'); 
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
@@ -82,7 +84,8 @@ function create() {
     var oakTree1 = new Entity(400, 400, 'oakTree', game);
     var oakTree2 = new Entity(1000, 2000, 'oakTree', game);
     var cocoon = new Entity (2900, 130, 'cocoon', game);
-
+    var rock = new Entity (730 , 320, 'rock', game);
+    var statue = new Entity(600, 2000, 'statue', game);
     
 
     // Make camera follow the agent
