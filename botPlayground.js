@@ -100,14 +100,14 @@ function create() {
     var statue = new Entity(600, 2000, 'statue', game);
     var dog = new Entity (1000, 1000, 'stray dog', game);
     var Blossom = new Entity (1200, 1200, 'Cherry Blossom Tree', game);
-<<<<<<< HEAD
+
     //by Troi
     var EasternCastle = new Entity(25, 2700, 'Eastern Castle', game);
     var treasure_1 = new Entity(10, 2930, 'Treasure', game);
     //
-=======
 
->>>>>>> origin/master
+
+
     
 
     // Make camera follow the agent
