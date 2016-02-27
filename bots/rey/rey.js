@@ -1,17 +1,74 @@
-var rey = new Bot(240, 220, 'rey', 'bots/rey/whitedeer.png');
+var rey = new Bot(1200, 1200, 'rey', 'bots/rey/whitedeer.png');
 
 // (Override) Initialize Bot
 rey.init = function() {
-    this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
-    this.body.rotation = 100; // Initial Angle
-    this.body.speed = 100; // Initial Speed
+        this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
+        this.body.rotation = 100; // Initial Angle
+        this.body.speed = 100; // Initial Speed
 
-    // Initialize Timed Updates
-    game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
-    //game.time.events.loop(Phaser.Timer.SECOND * .01, rey.updateTenthSec, this);
+        // Initialize Timed Updates
+        game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
+        game.time.events.loop(Phaser.Timer.SECOND * 60, rey.update1min, this);
+    }
+    //
+    // Id Hunger
+    //
+rey.hunger = {
+        amount: 0,
+        eat: function(food_amount) {
+            this.amount -= food_amount;
+            this.amount = Math.max(0, this.amount);
+        },
+        update: function() {
+            if (this.amount >= 40) {
+                // Do nothing.  Hunger is capped. 
+            } else {
+                this.amount++;
+            }
+        },
+        toString: function() {
+            var hungerLevel = "";
+            if (this.amount < 15) {
+                hungerLevel = "Not hungry!";
+            } else if (this.amount < 25) {
+                hungerLevel = "I'm getting pretty hungry..";
+            } else if (this.amount < 38) {
+                hungerLevel = "Okay, now I'm hungry..";
+            } else {
+                hungerLevel = "FEED ME NOW!";
+            }
+            return hungerLevel + " (Hunger = " + this.amount + ")";
+        }
+    }
+    //
+    //Id Curiousity to explore 
+    //
+rey.Curiousity = {
+    amount: 40,
+    motivation: function(motivation_amount) {
+        this.amount -= motivation_amount;
+        this.amount = Math.max(0, this.amount);
+    },
+    update: function() {
+        if (this.amount <= 0) {} else {
+            this.amount--;
+        }
+    },
+    toString: function() {
+        var motivationLevel = "";
+        if (this.amount > 25) {
+            hungerLevel = "I want to explore the world!";
+        } else if (this.amount > 15) {
+            hungerLevel = "On second thought, the world is too big...";
+        } else if (this.amount > 2) {
+            hungerLevel = "I'm also getting tired..";
+        } else {
+            hungerLevel = "Okay I'm done exploring for a while until I can get food again.";
+        }
+        return hungerLevel + " (Curiousity = " + this.amount + ")";
+    }
 }
 
-//
 // Motion modes
 //
 rey.walking = {
@@ -99,6 +156,8 @@ rey.getStatus = function() {
     statusString += " because I am ";
     statusString += rey.emotion.name;
     statusString += ".";
+    statusString += "\n" + rey.hunger.toString();
+    statusString += "\n" + rey.Curiousity.toString();
     return statusString;
 }
 
@@ -106,7 +165,7 @@ rey.update = function() {
     if (rey.atBoundary() === true) {
         rey.incrementAngle(45);
     }
-    rey.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.
+    rey.motionMode.update();
     this.basicUpdate();
 };
 
@@ -116,3 +175,27 @@ rey.update1Sec = function() {
     }
     rey.motionMode = rey.emotion.getMotionMode();
 }
+rey.update1Sec = function() {
+    rey.hunger.update();
+    if (Math.random() < rey.emotion.transitionProbability) {
+        rey.emotion = rey.emotion.transition();
+    }
+    rey.motionMode = rey.emotion.getMotionMode();
+    rey.Curiousity.update();
+    if (Math.random() < rey.emotion.transitionProbability) {
+        rey.emotion = rey.emotion.transition();
+    }
+    rey.motionMode = rey.emotion.getMotionMode();
+}
+
+// Called every one minutes
+rey.update1min = function() {
+        rey.hunger.eat(41);
+    }
+    // rey.update1Sec = function() {
+
+
+// Called every one minutes
+// rey.update1min = function() {
+// rey.Curiousity.motivation(41);
+// }
