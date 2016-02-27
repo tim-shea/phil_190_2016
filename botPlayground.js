@@ -48,7 +48,7 @@ function preload() {
     game.load.image('cocoon', 'assets/cocoon.png');
     game.load.image('singlerock', 'assets/rock.png');
     game.load.image('rock', 'assets/rock_formation.png');
-    game.load.image('statue', 'assets/statue_man.png'); 
+    game.load.image('statue', 'assets/statue_man.png');
     game.load.image('stray dog', 'assets/dog.png');
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
     game.load.image('Eastern Castle', 'assets/eastCastle.png');
@@ -76,7 +76,7 @@ function create() {
     botGroup = game.add.group();
 
     // Background static entities load before everything else
-    var web = new Entity (2755, 0, 'web', game);
+    var web = new Entity(2755, 0, 'web', game);
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
@@ -93,23 +93,18 @@ function create() {
     // Set up static entities.  Give it an x and y coordinate.  
     //      The thir argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
-    var oakTree1 = new Entity(400, 400, 'oakTree', game);
-    var oakTree2 = new Entity(1000, 2000, 'oakTree', game);
-    var cocoon = new Entity (2900, 130, 'cocoon', game);
-    var rock = new Entity(600, 2198, 'singlerock', game);
-    var rock2 = new Entity(1500, 1500,'singlerock', game);
-    var rock = new Entity (730 , 320, 'rock', game);
-    var statue = new Entity(600, 2000, 'statue', game);
-    var dog = new Entity (1000, 1000, 'stray dog', game);
-    var Blossom = new Entity (1200, 1200, 'Cherry Blossom Tree', game);
-    //by Troi
-    var EasternCastle = new Entity(25, 2700, 'Eastern Castle', game);
-    var treasure_1 = new Entity(10, 2930, 'Treasure', game);
-    //
+    var oakTree1 = new Entity(400, 400, 'oakTree');
+    var oakTree2 = new Entity(1000, 2000, 'oakTree');
+    var cocoon = new Entity(2900, 130, 'cocoon');
+    var rock = new Entity(600, 2198, 'singlerock');
+    var rock2 = new Entity(1500, 1500, 'singlerock');
+    var rock = new Entity(730, 320, 'rock');
+    var statue = new Entity(600, 2000, 'statue');
+    var dog = new Entity(1000, 1000, 'stray dog');
+    var Blossom = new Entity(1200, 1200, 'Cherry Blossom Tree');
+    var EasternCastle = new Entity(25, 2700, 'Eastern Castle');
+    var treasure_1 = new Entity(10, 2930, 'Treasure');
 
-
-
-    
 
     // Make camera follow the agent
     game.camera.follow(sprites[currentBotIndex]);
@@ -154,7 +149,7 @@ function update() {
         if (cursorDown && i == currentBotIndex) {
             bots[i].basicUpdate();
             cursorDown = false;
-        } else {               
+        } else {
             bots[i].update();
         }
     }
@@ -181,4 +176,3 @@ function botSelect() {
 function render() {
     // game.debug.text('Bots: ' + bots.length, 32, 32);
 }
-
