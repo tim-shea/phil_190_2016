@@ -1,4 +1,4 @@
-var troi = new Bot(540, 520, 'troi', 'bots/troi/umbreon_2.0.png');
+var troi = new Bot(0, 3000, 'troi', 'bots/troi/umbreon_2.0.png');
 
 /**
  *@author Troi Chua
@@ -11,7 +11,7 @@ troi.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
     this.body.speed = 100; // Initial Speed
-    troi.stamina = 10000; // initial stamina
+    troi.stamina = 250000; // initial stamina
 
     troi.STAMINA_MAX = 20000,
         troi.STAMINA_MIN = 0;
@@ -377,10 +377,11 @@ troi.angry = {
 
 
 // Hunger 
+
 troi.hunger = {
     amount: 0,
     eat: function(food_amount) {
-        this.amount -= food_amount; //this refers to specific class
+        this.amount -= food_amount; //this. refers to specific class
         this.amount = Math.max(0, this.amount); // Don't allow hunger to go below 0
     },
     update: function() {
@@ -414,6 +415,43 @@ troi.hunger = {
     }
 }
 
+//Id state - entertainment/amusment
+
+troi.amuse = {
+    time: 500,
+    play: function(play_time) {
+        this.time += play_time; //increases playtime
+        this.time = Math.min(0, this.time);
+    },
+    update: function() {
+        if (this.time <= 0) {
+            troi.emotion = troi.agitated; //0 playtime = upset troi
+        } else {
+            this.time -= 5; //time spent playing
+        }
+    },
+    toString: function() {
+        var amuse_level = ""; //initializer
+
+        if (this.time >= 250) {
+            amuse_level = "WOOOOOOOOOOOOOT!";
+            //troi.emotion = troi.euphoric; //ecstatic emotion    		//#// code currently stands as responsible for crashing
+            troi.stamina -= 5; //playtime takes energy
+        } else if (this.time >= 100) {
+            amuse_level = "YAAAY!!!";
+           	troi.emotion = troi.happy;
+            troi.stamina -= 3;
+        } else if (this.time >= 50) {
+            amuse_level = "...awe...";
+            troi.emotion = troi.neutral;
+            troi.stamina--;
+        } else {
+            amuse.level = "Sooooooooooooooooooooooooo Boooooooooooooooooooooooooooooooooored.";
+            troi.emotion = troi.agitated; //Boredom is painful
+        }
+        return amuse_level + " (Amusement Level = " + this.time + ")";
+    }
+}
 
 
 // Current States
@@ -426,7 +464,7 @@ troi.getStatus = function() {
     var statusString = troi.emotion.name;
     statusString += "\n-------";
     statusString += "\nMotion mode: " + troi.motionMode.description + "\nEmotion mode: " + troi.emotion.name;
-    statusString += "\nStamina : " + troi.stamina + "\n" + troi.hunger.toString();
+    statusString += "\nStamina : " + troi.stamina + "\n" + troi.hunger.toString() + "\n" + troi.amuse.toString();
     return statusString;
 }
 
@@ -472,7 +510,9 @@ troi.update1Sec = function() {
     console.log(troi.emotion.name);
 
     troi.hunger.update();
+    troi.amuse.update();
 }
 troi.update_1_30_sec = function() {
-    troi.hunger.eat(501);
+    troi.hunger.eat(501); //food for troi
+    troi.amuse.play(500); //playtime increment
 }
