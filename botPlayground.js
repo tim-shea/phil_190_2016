@@ -54,6 +54,9 @@ function preload() {
     game.load.image('Philoberry', 'bots/yang/Philoberry.png');
     game.load.image('Treehouse', 'bots/yang/Deer_Treehouse.png');
     game.load.image('DeerCrossingSign', 'bots/yang/deercrossing.png');
+    game.load.image('grassyrock', 'bots/assets/grassyrock.png');
+    game.load.image('cave', 'bots/assets/cave.png');
+
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
@@ -105,6 +108,8 @@ function create() {
     var philoberry = new Entity(2500, 2500, 'Philoberry');
     var treehouse = new Entity(2700, 2700, 'Treehouse');
     var deercrossingsign = new Entity(2700, 2800, 'DeerCrossingSign');
+    var grassyrock = new Entity(50, 300, 'grassyrock');
+    var cave = new Entity(0, 0, 'cave', game);
 
 
     // Make camera follow the agent

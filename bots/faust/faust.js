@@ -1,4 +1,4 @@
-var faust = new Bot(240, 220, 'faust', 'bots/faust/faust.png');
+var faust = new Bot(70, 50, 'faust', 'bots/faust/faust.png');
 
 faust.init = function() {
     this.body = this.sprite.body;
@@ -157,8 +157,6 @@ faust.update = function() {
     }
     faust.basicUpdate();
 };*/
-
-
 
 
 
