@@ -1,0 +1,17 @@
+<script>
+var yang = {};
+yang.hello_world = function () {
+	console.log("hello world!")
+};
+
+yang["NANANA"] = {name : "TR8R"};
+var x = "222";
+yang["222"] = function () {
+	yang.hello_world();
+} 
+console.log(yang["NANANA"].name);
+yang.hello_world();
+yang[x]();
+
+
+</script>
