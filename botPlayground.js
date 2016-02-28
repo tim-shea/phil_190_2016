@@ -1,5 +1,4 @@
-//
-// Simple Canvas program adapted from this demo:
+// // Simple Canvas program adapted from this demo:
 // http://phaser.io/examples/v2/games/tanks
 //
 
@@ -9,7 +8,6 @@
 var land;
 var cursors;
 var cursorDown;
-var textArea;
 var botGroup;
 
 //
@@ -66,9 +64,6 @@ function preload() {
 //
 function create() {
 
-    // Enable Arcade Physics
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-
     // Set world size
     game.world.setBounds(0, 0, 3000, 3000);
 
@@ -118,12 +113,8 @@ function create() {
     // Set up keyboard input
     cursors = game.input.keyboard.createCursorKeys();
 
-    // Text area to log agent states
-    textArea = document.getElementById("textArea");
-
     // Update selection box
     document.getElementById("botSelect").selectedIndex = defaultBotIndex;
-
 
 }
 
