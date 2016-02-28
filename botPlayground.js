@@ -52,7 +52,10 @@ function preload() {
     game.load.image('stray dog', 'assets/dog.png');
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
     game.load.image('Eastern Castle', 'assets/eastCastle.png');
-    game.load.image('Treasure', 'assets/treasurechest.gif')
+    game.load.image('Treasure', 'assets/treasurechest.gif');
+    game.load.image('Philoberry', 'bots/yang/Philoberry.png');
+    game.load.image('Treehouse', 'bots/yang/Deer_Treehouse.png');
+    game.load.image('DeerCrossingSign', 'bots/yang/deercrossing.png');
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
@@ -104,6 +107,9 @@ function create() {
     var Blossom = new Entity(1200, 1200, 'Cherry Blossom Tree');
     var EasternCastle = new Entity(25, 2700, 'Eastern Castle');
     var treasure_1 = new Entity(10, 2930, 'Treasure');
+    var philoberry = new Entity(2500, 2500, 'Philoberry');
+    var treehouse = new Entity(2700, 2700, 'Treehouse');
+    var deercrossingsign = new Entity(2700, 2800, 'DeerCrossingSign');
 
 
     // Make camera follow the agent

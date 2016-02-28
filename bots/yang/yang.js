@@ -1,3 +1,4 @@
+//though global, only use once
 var yang_home = [2700, 2700];
 
 var yang = new Bot(yang_home[0], yang_home[1], 'yang','bots/yang/yang.png');
@@ -5,6 +6,11 @@ var yang = new Bot(yang_home[0], yang_home[1], 'yang','bots/yang/yang.png');
 yang.init = function() {//all variables are here
     //setup body
     this.body = this.sprite.body;
+    //setup relevent entity
+    //yang
+    //yang.home = new Entity(yang_home[0], yang_home[1], 'Deer Bush', game);
+
+
     //recurrent event
     game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
     game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_timedEvend, yang);
@@ -14,7 +20,7 @@ yang.init = function() {//all variables are here
     //new properties
     //motion related
     yang.control = false;
-    
+    yang.update_yet = false;
     //Text Feedbacks
     yang.stateText = "Test Mode";
     yang.rotationText = "No Message";
@@ -62,27 +68,39 @@ yang.getStatus = function() {
 
 // Update the velocity and angle of the bot to update it's velocity.
 yang.basicUpdate = function() {
+    //yang will always update using the always fun
+    //this feature overrides the cursor down in the main universal update, instead handle the controlled condition inside complexupdate()
+    if (!yang.update_yet) {
+        yang.complexupdate();
+    } else { //else yang is NOT under controll and able to update  
+        //temperory solution before rotation nodes are made
+        if (yang.atBoundary()) {
+            yang.incrementAngle(100);
+        }
+        //temporary random
+        yang.chance = Math.random();
+        if (yang.chance <= .10) {
+            yang.incrementAngle(4);
+        } else if (yang.chance >= .90) {
+            yang.incrementAngle(-4);
+        }
 
-    //temperory solution before rotation nodes are made
-    if (yang.atBoundary() === true) {
-        yang.incrementAngle(100);
     }
-    //temporary random
-    yang.chance = Math.random();
-    if (yang.chance <= .10) {
-        yang.incrementAngle(4);
-    } else if (yang.chance >= .90) {
-        yang.incrementAngle(-4);
-    }
-
+    yang.update_yet = false; // for next cycle
     game.physics.arcade.velocityFromRotation(
         this.sprite.rotation,
         this.sprite.body.speed,
         this.sprite.body.velocity);
 };
 
-yang.update = function() {// a reoccouring event...
+yang.update = function() {
+    yang.complexupdate();
+    yang.basicUpdate(); // do nothing other than that
+}; 
+
+yang.complexupdate = function() {// a reoccouring event...
     //Pre update
+    yang.update_yet = true; // update is called
     yang.rotationText = "Rotation: " + Math.round(yang.body.rotation) + 
         " Vs Angle(degree): " + Math.round(yang.body.angle / Math.PI * 180);
     yang.motionText = "Speed: " + yang.body.speed;
@@ -93,15 +111,13 @@ yang.update = function() {// a reoccouring event...
     //yang.state.test = true; //comment this line to disable test mode
     if (yang.state.test) {
         yang.test_fun();
+        yang.current_mentaltask_node.always_fun();
         yang.current_mentaltask_node.current_fun();
-    } else {
-        yang.current_mentaltask_node.current_fun();//Main Cycle of mentaltask statemachine
-    }
+    } 
     if (!yang.state.test && !yang.control){
         yang.main_AImovements();//Main Cycle of movement statemachine
     }
     //end update
-    yang.basicUpdate();
     // according to basicUpdate, 
     // bots update their "velocity" and "angle" 
     // speed and rotation
@@ -136,10 +152,12 @@ yang.tag_game_obj = function () {
 yang.berry_game_obj = function () {
     this.berry_coord = [yang.x, yang.x];//[x,y] initialized as starting location
     this.berry_distance = 0;
+
+    /*disable for now
     this.create_new_berry = function () {
         this.berry_coord[0] = Math.random() * 10000 % 860 + 70; // 70 - 930
         this.berry_coord[1] = Math.random() * 10000 % 860 + 70; // 70 - 930
-    };
+    };*/
 }
 
 yang.main_AImovements = function () { //this is the current state
@@ -175,7 +193,10 @@ yang.def_node = {
     description : "Default",
     initial : function () { //only call once   
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         //console.log(yang.def_node.description);
         if (false) {
             yang.def_node.switch_to_this_node();
@@ -196,7 +217,10 @@ yang.stop_node = { //stop -extremly low prime meta resources
         yang.body.speed = 0;
         yang.lay.switch_to_this_node(); 
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         //add acceleration here
         if (yang.state.metaresources_prime < 10) {
             yang.stop_node.switch_to_this_node(); //restart this node.
@@ -217,7 +241,10 @@ yang.slow_node = {
         yang.body.speed = 100;
         yang.wander.switch_to_this_node(); 
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         //add acceleration here
         if (yang.state.metaresources_prime < 10) {
             yang.stop_node.switch_to_this_node();
@@ -237,7 +264,10 @@ yang.fast_node = {
         yang.body.speed = 200; 
         yang.gallop.switch_to_this_node();
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         if (yang.state.inspiration >= 70 && !yang.leap.leap_loop) {
             yang.leap.switch_to_this_node();
         }
@@ -257,7 +287,7 @@ yang.lay = {
     description : "Deer lays down.",
     initial : function () { //only call once   
     },
-    current_fun : function () { //always called
+    current_fun : function () { //control sensitive
     },
     switch_to_this_node : function () { 
         yang.current_acceleration_node = yang.lay;
@@ -269,7 +299,10 @@ yang.wander = {
     description : "Deer wanders.",
     initial : function () { //only call once   
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         yang.chance = Math.random();
         if (yang.chance <= .50) {
             yang.body.speed += 5;
@@ -288,7 +321,10 @@ yang.gallop = {
     description : "Deer is in motion.",
     initial : function () { //only call once   
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         if (yang.body.speed < 300) {
             yang.chance = Math.random();
             if (yang.chance <= .50) {
@@ -315,7 +351,10 @@ yang.leap = {
         yang.leap.loop_counts = 50;
         yang.leap.leap_random = Math.random();
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         //continue leap till end
         if (yang.leap.loop_counts > 41) {
             yang.speed += 75;
@@ -352,9 +391,9 @@ yang.leap = {
 yang.primeres_focus = {
     description : "", //write later
     initial : function () { //only call once
-        yang.berry.create_new_berry();
+        //yang.berry.create_new_berry();
     },
-    current_fun : function () { //always called
+    always_fun : function () {
         yang.berry.berry_distance = 
             game.physics.arcade.distanceToXY 
             (yang.sprite, yang.berry.berry_coord[0], yang.berry.berry_coord[1]);
@@ -362,9 +401,11 @@ yang.primeres_focus = {
             "Deer senses a philoberry grows at " + 
             yang.berry.berry_distance +
             " pixels away.";
+    },
+    current_fun : function () { //control sensitive
         if (yang.berry.berry_distance < 50) { // eat berry and grow a new one
             yang.state.metaresources_prime += 200;
-            yang.berry.create_new_berry();
+            //yang.berry.create_new_berry();
         }
         //switch check
         if (yang.state.metaresources_prime >= 50) {//belly filled
@@ -389,7 +430,10 @@ yang.brood_focus = { //uses primary resources to transform emptyness into inspir
         yang.state.inspiration += yang.state.randomness;
         yang.state.randomness = 0;  
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         if (yang.state.metaresources_prime < 10) {
             yang.primeres_focus.switch_to_this_node();
         } else if (yang.state.metaresources_secondary >= 90) {
@@ -409,7 +453,10 @@ yang.drain_focus = {//uses secondary resources for inspiration at high cost
         yang.state.inspiration += yang.state.randomness;
         yang.state.randomness = 0;  
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         if (yang.state.metaresources_prime < 10) {
             yang.primeres_focus.switch_to_this_node();
         } else if (yang.state.emptyness >= 90 ) {
@@ -428,7 +475,10 @@ yang.secondary_focus = {//gain secondary resources from social
     description : "No one catches Deer~",
     initial : function () { //only call once   
     },
-    current_fun : function () { //always called
+    always_fun : function () {
+         /* body... */ 
+    },
+    current_fun : function () { //control sensitive
         //tag game mechanism
         if (false) { 
             yang.state.metaresources_secondary += yang.state.randomness;

@@ -1,0 +1,4 @@
+1. redesign main the update functions in a way that each nodes can be called depend on player control
+2. redesign nodes accordingly to the main update
+3. add another object
+4. the philoberry spawn design
