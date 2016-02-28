@@ -77,15 +77,20 @@ yang.init_state = function() {
     //--------------------------------------------------------
     //state machines that uses nodes
     //mental nodes
-    //yang["mental_task_node"] = yang.node_.id_prime_focus;
-    yang["mental_task_node"] = yang.def_node;
-    //AImovement Nodes
-    //yang["speed_node"] = yang.node_.stop_node;
-    yang["speed_node"] = yang.def_node;
-    yang["acceleration_node"] = yang.def_node;
+    if (yang.test_.test_ongoing) {
+        yang["mental_task_node"] = yang.def_node;
+        yang["speed_node"] = yang.def_node;
+        yang["acceleration_node"] = yang.def_node;
+        yang["rotation_node"] = yang.def_node;
+    } else {
+        yang["mental_task_node"] = yang.node_.id_prime_focus;
+        yang["speed_node"] = yang.node_.stop_node;
+        yang["acceleration_node"] = yang.def_node;
+        yang["rotation_node"] = yang.def_node;
+    }
+      
     //unfinished
-    yang["rotation_node"] = yang.def_node;
-    //
+    //TODO: move away 
     yang.tag = new yang.tag_game_obj(); // see helper
 };
 
