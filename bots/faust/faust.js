@@ -1,4 +1,4 @@
-var faust = new Bot(70, 50, 'faust', 'bots/faust/faust.png');
+var faust = new Bot(300, 300, 'faust', 'bots/faust/faust.png');
 
 faust.init = function() {
     this.body = this.sprite.body;
@@ -17,15 +17,45 @@ faust.turn = function() {
 	}
 }
 
+// Hunger 
+faust.hunger = {
+    amount: 0,
+    eat: function(food_amount) {
+        this.amount -= food_amount;
+        this.amount = Math.max(0,this.amount); // Don't allow hunger to go below 0
+    },
+    update: function() {
+        if(this.amount >= 100) {
+            // Do nothing.  Hunger is capped. 
+        } else {
+            this.amount++;
+        }
+    },
+    toString: function() {
+        var hungerLevel = "";
+        if (this.amount < 20) {
+            hungerLevel = "Not hungry";
+        } else if (this.amount < 60) {            
+            hungerLevel = "Hungry";
+        } else if (this.amount < 80) {            
+            hungerLevel = "Starving!!";
+        } else {            
+            hungerLevel = "FEED ME!";
+        }
+        return hungerLevel + " (Hunger = " + this.amount + ")";
+    }
+}
+
+
 //
 //Stats
 //
 
-faust.energy = {
+/*faust.energy = {
 	amount: 100,
 	max: 150,
 	min: 0,
-	/*--rest: function(need_energy) {
+	rest: function(need_energy) {
 		this.amount = need_energy;
 		this.amount = Math.min(0, this.amount); //max energy is 100 and can't go below 0
 	},
@@ -35,7 +65,7 @@ faust.energy = {
 		} else {
 			this.amount--;
 		}
-	},*/
+	},
 	toString: function() {
 		var energyLevel = "";
 		if (this.amount >= 70) {
@@ -51,7 +81,7 @@ faust.energy = {
 		}
 		return enrgyLevel + " (Energy = " + this.amount + ")";
 	},
-}
+}*/
 
 //
 // Motion states
@@ -63,9 +93,9 @@ faust.walk = {
         faust.body.speed = 100;
         faust.turn();
     },
-    adjustNeeds: function() {
-    	faust.energy.amount++;
-    }
+    //adjustNeeds: function() {
+    //	faust.energy.amount++;
+    //}
 }
 
 faust.run = {
@@ -74,9 +104,9 @@ faust.run = {
 		faust.body.speed = 200;
 		faust.turn();
 	},
-	adjustNeeds: function() {
-		faust.energy.amount -=5;
-	}
+	//adjustNeeds: function() {
+	//	faust.energy.amount -=5;
+	//}
 }
 
 faust.sonicSpeed = {
@@ -85,9 +115,9 @@ faust.sonicSpeed = {
 		faust.body.speed = 500;
 		faust.turn();
 	},
-	adjustNeeds: function() {
-		faust.energy.amount -=10
-	}
+	//adjustNeeds: function() {
+	//	faust.energy.amount -=10
+	//}
 }
 
 faust.still = {
@@ -95,9 +125,9 @@ faust.still = {
     update: function() {
         faust.body.speed = 0;
     },
-    adjustNeeds: function() {
-    	faust.energy.amount += 10;
-    }
+    //adjustNeeds: function() {
+    //	faust.energy.amount += 10;
+    //}
 }
 
 //
