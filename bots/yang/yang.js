@@ -48,8 +48,8 @@ yang.init_plus = function() { //object related initialization
     yang.text_.motionText = "No Message";
     //test related
     yang.test_.ini = 0;
-    //yang.test_.test_ongoing = false;
-    yang.test_.test_ongoing = true;
+    yang.test_.test_ongoing = false;
+    //yang.test_.test_ongoing = true;
     yang.test_.current_testnode = yang.def_node;
     //berry
     yang.berry = new yang.node_.id_prime_focus.berry_game_obj(); //see node
@@ -101,6 +101,9 @@ yang.getStatus = function() {
     if (yang.test_.test_ongoing) {
         yang.text_.stateText =
             "Test Mode" + "\n" +
+            "Test node description: " + "\n" +
+            yang[yang.test_.current_testnode.type].description + "\n" +
+            yang.test_.current_testnode.type + " node description:" + "\n" +
             yang.test_.current_testnode.description + "\n" +
             yang.text_.rotationText + "\n" +
             yang.text_.motionText + "\n" +
@@ -207,6 +210,9 @@ yang.tag_game_obj = function() {
 
 
 yang.test_.node_test = function() { // test with a permanate state
+    
+    //single run node test 
+
     if (yang.test_.ini === 0) {
         //
         yang.chaosmachine_.randomness = 0;
@@ -215,13 +221,16 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
-        //yang.test_.current_testnode = yang.node_.stop_node;
+        yang.test_.current_testnode = yang.node_.id_secondary_focus;
         yang.test_.current_testnode.init_fun();
         yang.test_.current_testnode.always_fun();
         yang.test_.current_testnode.current_fun();
-
+        yang.test_.current_testnode.switch_to_this_node();
         yang.test_.ini++;
     }
+
+    //fixed node test
+    //
 };
 
 yang.test_.timed_test = function() {};
@@ -325,10 +334,10 @@ yang.node_.fast_node.init_fun = function() { //only call once
     yang.node_.gallop.switch_to_this_node();
 };
 yang.node_.fast_node.current_fun = function() { //control sensitive
-    if (yang.state.inspiration >= 70 && !yang.node_.leap.leap_loop) {
+    if (yang.mindmachine_.inspiration >= 70 && !yang.node_.leap.leap_loop) {
         yang.node_.leap.switch_to_this_node();
     }
-    if (yang.state.metaresources_secondary < 10) {
+    if (yang.biomachine_.metaresources_secondary < 10) {
         yang.node_.gallop.switch_to_this_node();
     }
 };
@@ -449,10 +458,10 @@ yang.node_.id_prime_focus.init_fun = function() { //only call once
     //game.add etcetc
 };
 yang.node_.id_prime_focus.always_fun = function() { //ignore control
-    yang.berry.berry_distance =
+    yang.berry.berry_distance = Math.round(
         game.physics.arcade.distanceToXY(yang.sprite,
             yang.berry.berry_coord[0],
-            yang.berry.berry_coord[1]);
+            yang.berry.berry_coord[1]));
     yang.node_.id_prime_focus.description =
         "Deer senses a philoberry grows at " +
         yang.berry.berry_distance +
