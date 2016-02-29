@@ -109,7 +109,7 @@ function create() {
     var treehouse = new Entity(2700, 2700, 'Treehouse');
     var deercrossingsign = new Entity(2700, 2800, 'DeerCrossingSign');
     var grassyrock = new Entity(50, 300, 'grassyrock');
-    var cave = new Entity(0, 0, 'cave', game);
+    var cave = new Entity(-100, -100, 'cave', game);
 
 
     // Make camera follow the agent
