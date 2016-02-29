@@ -54,8 +54,8 @@ function preload() {
     game.load.image('Philoberry', 'bots/yang/Philoberry.png');
     game.load.image('Treehouse', 'bots/yang/Deer_Treehouse.png');
     game.load.image('DeerCrossingSign', 'bots/yang/deercrossing.png');
-    game.load.image('grassyrock', 'bots/assets/grassyrock.png');
-    game.load.image('cave', 'bots/assets/cave.png');
+    game.load.image('grassyrock', 'assets/grassyrock.png');
+    game.load.image('cave', 'assets/cave.png');
 
 
     // Load sounds
