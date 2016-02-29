@@ -127,6 +127,7 @@ yang.basicUpdate = function() {
     //update non motion related parts of state machine
     if (!yang.test_.test_ongoing) {
         yang["mental_task_node"].always_fun();
+        yang.fun_.AImovements_always_fun();
     }
     game.physics.arcade.velocityFromRotation(
         this.sprite.rotation,
@@ -141,7 +142,7 @@ yang.update = function() {
         yang.test_.node_test();
     } else {
         yang["mental_task_node"].current_fun();
-        yang.main_AImovements(); //Main Cycle of movement statemachines
+        yang.fun_.AImovements_current_fun(); //Main Cycle of movement statemachines
     }
     //temperory solution before rotation nodes are made
     if (yang.atBoundary()) {
@@ -178,6 +179,7 @@ yang.timedEvend = function() {
 
     if (yang.biomachine_.metaresources_prime > -200) {
         yang.biomachine_.metaresources_prime -= 5 * Math.round(yang.body.speed / 150); // change depend on speed
+        yang.biomachine_.metaresources_prime = Math.round(yang.biomachine_.metaresources_prime);
     }
 
     if (yang.biomachine_.metaresources_secondary > -200) {
@@ -194,11 +196,18 @@ yang.timedEvend = function() {
 };
 
 //-------Additional Helper functions-----------
-yang.main_AImovements = function() { //this is the current state
+yang.fun_.AImovements_current_fun = function() { //this is the current state
     //main should only controlls physical movements so that it can avoid control***********
     yang["speed_node"].current_fun();
     yang["acceleration_node"].current_fun();
     //yang["rotation_node"].current_fun();
+};
+
+yang.fun_.AImovements_always_fun = function() { //this is the current state
+    //main should only controlls physical movements so that it can avoid control***********
+    //yang["speed_node"].always_fun();
+    yang["acceleration_node"].always_fun();
+    //yang["rotation_node"].always_fun();
 };
 
 //need to remove into a node
@@ -349,12 +358,13 @@ yang.node_.fast_node.current_fun = function() { //control sensitive
 yang.node_.lay = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.lay.description = "";
 yang.node_.lay.always_fun = function() { //only call once 
-    if (!yang.control) {
-        yang.node_.lay.description = "Deer lays down.";
+    if (yang.control) {
+        yang.node_.lay.description = "Deer pushes forward.";
     }
 };
 yang.node_.lay.current_fun = function() { //control sensitive
-    yang.node_.lay.description = "Deer pushes forward.";
+    yang.node_.lay.description = "Deer lays down and eat grass. Tastes terrible!";
+    yang.biomachine_.metaresources_prime += 0.1;
 };
 
 
