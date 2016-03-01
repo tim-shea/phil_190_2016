@@ -5,8 +5,9 @@
 var sharAI = new Bot(2950, 75, 'sharAI', 'bots/sharAI/sharAI.png');
 sharAI.THRESHOLD_MULT = 1.5;
 sharAI.DRIVE_CAP = 600;
-sharAI.botRandom = 0;
+sharAI.angleFromTarget = 0;
 sharAI.inputEnabled = true;
+sharAI.botRandom = -1;
 
 
 
@@ -24,6 +25,16 @@ sharAI.turn = function() {
     if (Math.random() < .2) {
         sharAI.incrementAngle(sharAI.getRandom(-5, 5));
     }
+}
+
+sharAI.pursue = function(target, speed) {
+    sharAI.angleFromTarget = game.physics.arcade.angleBetween(sharAI.sprite, target.sprite);
+    sharAI.sprite.rotation = sharAI.angleFromTarget;
+
+    game.physics.arcade.velocityFromRotation(
+    sharAI.angleFromTarget,
+    speed,
+    sharAI.sprite.body.velocity);
 }
 
 //
@@ -190,6 +201,46 @@ sharAI.nap = {
     }
 }
 
+sharAI.hunt = {
+    name: "Hunt",
+    stateText: "sharAI is hunting ",
+    update: function() {
+        // Get a bot to target
+        if (sharAI.hunt.target < 0 || sharAI.hunt.target >= bots.length) {
+
+            do {
+                sharAI.botRandom = Math.random * bots.length; // Get random bot
+            } while (sharAI.hunt.target == 1) // The while statement prevents sharAI from hunting themself
+
+            sharAI.hunt.stateText = "sharAI is hunting" + bots[sharAI.botRandom].name;
+        }
+
+        // Then pursue the target
+        sharAI.pursue(bots[sharAI.botRandom], 200);
+
+        // Feeds sharAI if they're touching the target
+        if (game.physics.arcade.overlap(sharAI.sprite, bots[sharAI.botRandom].sprite)) {
+            sharAI.hunger.eat(DRIVE_CAP);
+            sharAI.botRandom = -1;
+        }
+    },
+    adjustNeeds: function() {
+        if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
+            sharAI.lethargy.value++;
+        }
+        if (sharAI.exhaustion.value < sharAI.DRIVE_CAP) {
+            sharAI.exhaustion.value += 2;
+            sharAI.exhaustion.value = Math.min(sharAI.exhaustion.value, sharAI.DRIVE_CAP);
+        }
+        if (sharAI.hunger.value < sharAI.DRIVE_CAP) {
+            sharAI.hunger.value++;
+        }
+        if (sharAI.boredom.value > 0) {
+            sharAI.boredom.value--;
+        }
+    }
+}
+
 sharAI.movement = sharAI.walk;
 
 //
@@ -249,6 +300,16 @@ sharAI.tired = {
     }
 }
 
+sharAI.hungry = {
+    name: "Hungry",
+    getNeedMode: function() {
+        return sharAI.hungry;
+    },
+    getMovementMode: function() {
+        return sharAI.hunt;
+    }
+}
+
 sharAI.need = sharAI.content;
 
 //
@@ -258,6 +319,15 @@ sharAI.need = sharAI.content;
 sharAI.getStatus = function() {
     sharAI.textBox = sharAI.movement.stateText + "\n" + sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString();
     return sharAI.textBox;
+}
+
+sharAI.basicUpdate = function() {
+    if (sharAI.movement != sharAI.hunt) {
+        game.physics.arcade.velocityFromRotation(
+        sharAI.sprite.rotation,
+        sharAI.sprite.body.speed,
+        sharAI.sprite.body.velocity);
+    }
 }
 
 sharAI.update = function() {
