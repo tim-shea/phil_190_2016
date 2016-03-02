@@ -57,8 +57,8 @@ function preload() {
     game.load.image('cave', 'assets/cave.png');
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
-    game.load.image('tree', 'assets/tree.png');
-    game.load.image('home', 'assets/home.png');
+    game.load.image('greenTree', 'assets/greenTree.png');
+    game.load.image('pinkTree', 'assets/pinkTree.png');
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
@@ -113,8 +113,8 @@ function create() {
     var cave = new Entity(-100, -100, 'cave', game);
     var princessCastle = new Entity(1000, 1350, 'princessCastle');
     var carousel = new Entity(600, 1200, 'carousel');
-    var tree = new Entity(500, 1000, 'tree');
-    var home = new Entity(300, 300, 'home');
+    var greenTree = new Entity(1000, 2700, 'greenTree');
+    var pinkTree = new Entity(50, 1800, 'pinkTree');
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);
