@@ -19,6 +19,7 @@ sharAI.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 1, sharAI.updatePerSec, this);
 
     sharAI.giggle = game.add.audio('doozer');
+    sharAI.chomp = game.add.audio('chomp');
 }
 
 sharAI.turn = function() {
@@ -32,9 +33,9 @@ sharAI.pursue = function(target, speed) {
     sharAI.sprite.rotation = sharAI.angleFromTarget;
 
     game.physics.arcade.velocityFromRotation(
-    sharAI.angleFromTarget,
-    speed,
-    sharAI.sprite.body.velocity);
+        sharAI.angleFromTarget,
+        speed,
+        sharAI.sprite.body.velocity);
 }
 
 //
@@ -86,10 +87,6 @@ sharAI.hunger = {
     threshold: 300,
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
-    eat: function(nutrition) {
-        this.value -= nutrition;
-        this.value = Math.max(0, this.value); // Don't allow hunger to go below 0
-    },
     toString: function() {
         let hungerBar = "Hunger:     ";
         let hungerAmount = Math.floor(sharAI.hunger.value / 60);
@@ -204,15 +201,16 @@ sharAI.nap = {
 sharAI.hunt = {
     name: "Hunt",
     stateText: "sharAI is hunting ",
+    gotTarget: false,
     update: function() {
         // Get a bot to target
-        if (sharAI.hunt.target < 0 || sharAI.hunt.target >= bots.length) {
-
+        if (sharAI.hunt.gotTarget == false) {
             do {
-                sharAI.botRandom = Math.random * bots.length; // Get random bot
-            } while (sharAI.hunt.target == 1) // The while statement prevents sharAI from hunting themself
+                sharAI.botRandom = Math.floor(sharAI.getRandom(0, bots.length - 1)); // Get random bot
+            } while (sharAI.botRandom == 1) // The while statement prevents sharAI from hunting themself
 
-            sharAI.hunt.stateText = "sharAI is hunting" + bots[sharAI.botRandom].name;
+            sharAI.hunt.stateText = "sharAI is hunting " + bots[sharAI.botRandom].name;
+            sharAI.hunt.gotTarget = true;
         }
 
         // Then pursue the target
@@ -220,8 +218,12 @@ sharAI.hunt = {
 
         // Feeds sharAI if they're touching the target
         if (game.physics.arcade.overlap(sharAI.sprite, bots[sharAI.botRandom].sprite)) {
-            sharAI.hunger.eat(DRIVE_CAP);
-            sharAI.botRandom = -1;
+            sharAI.hunger.value -= 300;
+            sharAI.hunger.value = Math.max(0, this.value)
+            sharAI.chomp.play();
+            sharAI.hunt.gotTarget = false;
+            // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
+            sharAI.need = sharAI.content;
         }
     },
     adjustNeeds: function() {
@@ -252,8 +254,8 @@ sharAI.content = {
     getNeedMode: function() {
         if (sharAI.lethargy.value > sharAI.lethargy.threshold) { // First checks to see if sharAI is sleepy
             return sharAI.sleepy;
-        //} else if (sharAI.hunger.value > sharAI.hunger.threshold) {
-            //return sharAI.hungry
+        } else if (sharAI.hunger.value > sharAI.hunger.threshold) {
+            return sharAI.hungry
         } else if (sharAI.exhaustion.value > sharAI.exhaustion.threshold) { // Then checks to see if sharAI is tired
             return sharAI.tired;
         } else { // If sharAI is none of the above, then they are fine
@@ -261,7 +263,7 @@ sharAI.content = {
         }
     },
     getMovementMode: function() {
-        return sharAI.walk
+        return sharAI.walk;
     },
 }
 
@@ -287,8 +289,6 @@ sharAI.tired = {
     getNeedMode: function() {
         if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) { // If sharAI is going to pass out from drowsiness, let them sleep
             return sharAI.sleepy;
-        //} else if (sharAI.hunger.value >= sharAI.hunger.criticalPoint) {
-            //return sharAI.hungry;
         } else if (sharAI.exhaustion.value < sharAI.exhaustion.satedPoint) { // If sharAI is not feeling tired anymore, then they feel fine
             return sharAI.content;
         } else { // Otherwise, sharAI still feels tired.
@@ -303,7 +303,15 @@ sharAI.tired = {
 sharAI.hungry = {
     name: "Hungry",
     getNeedMode: function() {
-        return sharAI.hungry;
+        if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) {
+            return sharAI.sleepy
+        } else if (sharAI.exhaustion.value >= sharAI.exhaustion.criticalPoint) {
+            return sharAI.tired;
+        } else if (sharAI.hunger.value < sharAI.hunger.satedPoint) {
+            return sharAI.content;
+        } else {
+            return sharAI.hungry;
+        }
     },
     getMovementMode: function() {
         return sharAI.hunt;
@@ -324,9 +332,9 @@ sharAI.getStatus = function() {
 sharAI.basicUpdate = function() {
     if (sharAI.movement != sharAI.hunt) {
         game.physics.arcade.velocityFromRotation(
-        sharAI.sprite.rotation,
-        sharAI.sprite.body.speed,
-        sharAI.sprite.body.velocity);
+            sharAI.sprite.rotation,
+            sharAI.sprite.body.speed,
+            sharAI.sprite.body.velocity);
     }
 }
 
@@ -339,9 +347,6 @@ sharAI.update = function() {
     sharAI.movement.update();
     sharAI.basicUpdate();
 
-    if (sharAI.hunger.value >= 1000) {
-        sharAI.hunger.value = 0;
-    }
     if (sharAI.boredom.value >= 1000) {
         sharAI.boredom.value = 0;
     }
@@ -349,6 +354,7 @@ sharAI.update = function() {
 }
 
 sharAI.updatePerSec = function() {
-    sharAI.need = sharAI.need.getNeedMode();
+
     sharAI.movement.adjustNeeds();
+    sharAI.need = sharAI.need.getNeedMode();
 }

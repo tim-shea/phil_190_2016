@@ -60,6 +60,7 @@ function preload() {
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
+    game.load.audio('chomp', 'assets/chwl.wav');
 }
 
 //
