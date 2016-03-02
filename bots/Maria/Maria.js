@@ -1,4 +1,4 @@
-var maria = new Bot(240, 220, 'maria', 'bots/Maria/Maria.png');
+var maria = new Bot(311, 1280, 'maria', 'bots/Maria/Maria.png');
 
 maria.stateText = "The princess is here!";
 
@@ -44,7 +44,7 @@ maria.hunger = {
 //Id stubbornness to explore
 
 maria.Stubborn = {
-    amount: 40,
+    amount: 20,
     motivation: function(motivation_amount) {
         this.amount -= motivation_amount;
         this.amount = Math.max(0, this.amount);
@@ -161,6 +161,7 @@ maria.getStatus = function() {
     var statusString = "Emotion: " + maria.emotion.name;
     statusString += "\nMotion: " + maria.motionMode.description;
     statusString += "\n" + maria.hunger.toString();
+    statusString += "\n" + maria.Stubborn.toString();
     return statusString;
 }
 
@@ -183,13 +184,18 @@ maria.update1Sec = function() {
 	maria.hunger.update();
         if (Math.random() < maria.emotion.transitionProbability) {
             maria.emotion = maria.emotion.transition();
-
         }
-        maria.motionMode = maria.emotion.getMotionMode();            
+        maria.motionMode = maria.emotion.getMotionMode(); 
+        maria.Stubborn.update();
+        if (Math.random() < maria.emotion.transitionProbability) {
+            maria.emotion = maria.emotion.transition();
+        } 
+        maria.motionMode = maria.emotion.getMotionMode();          
     }
 
 
 //Called every 30 seconds
  	maria.update30Sec = function() {
  		maria.hunger.eat(51);
+        maria.Stubborn.motivation(40);
  	}

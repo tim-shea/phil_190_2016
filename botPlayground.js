@@ -113,8 +113,8 @@ function create() {
     var deercrossingsign = new Entity(2700, 2800, 'DeerCrossingSign');
     var grassyrock = new Entity(50, 300, 'grassyrock');
     var cave = new Entity(-100, -100, 'cave', game);
-    var princessCastle = new Entity(30, 2500, 'princessCastle');
-    var carousel = new Entity(500, 500, 'carousel');
+    var princessCastle = new Entity(1000, 1350, 'princessCastle');
+    var carousel = new Entity(600, 1200, 'carousel');
 
 
     // Make camera follow the agent
