@@ -187,7 +187,6 @@ duyen.update = function() {
 
 // Called every tenth of a second
 duyen.updateTenthSec = function() {
-console.log("moving");
     //  No implementation
 }
 
