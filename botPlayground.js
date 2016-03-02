@@ -5,7 +5,6 @@
 //
 // Global Variables
 // 
-var land;
 var cursors;
 var cursorDown;
 var botGroup;
@@ -59,7 +58,6 @@ function preload() {
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
 
-
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
@@ -74,13 +72,10 @@ function create() {
     game.world.setBounds(0, 0, 3000, 3000);
 
     // Set up the land
-    land = game.add.tileSprite(0, 0, 3000, 3000, 'background');
+    game.add.tileSprite(0, 0, 3000, 3000, 'background');
 
     // Add group for bots
     botGroup = game.add.group();
-
-    // Background static entities load before everything else
-    var web = new Entity(2755, 0, 'web', game);
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
@@ -97,6 +92,7 @@ function create() {
     // Set up static entities.  Give it an x and y coordinate.  
     //      The thir argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
+    var web = new Entity(2755, 0, 'web', game);
     var oakTree1 = new Entity(400, 400, 'oakTree');
     var oakTree2 = new Entity(1000, 2000, 'oakTree');
     var cocoon = new Entity(2900, 130, 'cocoon');
@@ -116,6 +112,8 @@ function create() {
     var princessCastle = new Entity(1000, 1350, 'princessCastle');
     var carousel = new Entity(600, 1200, 'carousel');
 
+    // Code below places bots on top of entities
+    // game.world.bringToTop(botGroup);
 
     // Make camera follow the agent
     game.camera.follow(sprites[currentBotIndex]);
@@ -163,7 +161,6 @@ function update() {
 
     // Update the text area
     document.textArea.logText.value = bots[currentBotIndex].getStatus();
-    // Todo. text history
 
 }
 
