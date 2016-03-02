@@ -56,6 +56,8 @@ function preload() {
     game.load.image('DeerCrossingSign', 'bots/yang/deercrossing.png');
     game.load.image('grassyrock', 'assets/grassyrock.png');
     game.load.image('cave', 'assets/cave.png');
+    game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
+    game.load.image('carousel', 'assets/carousel.png');
 
 
     // Load sounds
@@ -111,6 +113,8 @@ function create() {
     var deercrossingsign = new Entity(2700, 2800, 'DeerCrossingSign');
     var grassyrock = new Entity(50, 300, 'grassyrock');
     var cave = new Entity(-100, -100, 'cave', game);
+    var princessCastle = new Entity(30, 2500, 'princessCastle');
+    var carousel = new Entity(500, 500, 'carousel');
 
 
     // Make camera follow the agent

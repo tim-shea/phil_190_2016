@@ -3,14 +3,72 @@ var maria = new Bot(240, 220, 'maria', 'bots/Maria/Maria.png');
 maria.stateText = "The princess is here!";
 
 maria.init = function() {
-    maria.body = maria.sprite.body;
+    maria.body = this.sprite.body;
     maria.body.rotation = 100;
     maria.body.speed = 100;
 
     //Initialized time updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, maria.update1Sec, this);
     game.time.events.loop(Phaser.Timer.SECOND * .01, maria.updateTenthSec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 30, maria.update30Sec, this);
 }
+// Hunger 
+maria.hunger = {
+    amount: 0,
+    eat: function(food_amount) {
+        this.amount -= food_amount;
+        this.amount = Math.max(0,this.amount); 
+    },
+    update: function() {
+        if(this.amount >= 50) {
+            
+        } else {
+            this.amount++;
+        }
+    },
+    toString: function() {
+        var hungerLevel = "";
+        if (this.amount < 25) {
+            hungerLevel = "Not hungry";
+        } else if (this.amount < 35) {            
+            hungerLevel = "Starting to get hungry";
+        } else if (this.amount < 47) {            
+            hungerLevel = "I'm hungry!!";
+        } else {            
+            hungerLevel = "I NEED FOOD!";
+        }
+        return hungerLevel + " (Hunger = " + this.amount + ")";
+    }
+}
+
+//Id stubbornness to explore
+
+maria.Stubborn = {
+    amount: 40,
+    motivation: function(motivation_amount) {
+        this.amount -= motivation_amount;
+        this.amount = Math.max(0, this.amount);
+    },
+    update: function() {
+        if (this.amount <= 0) {} else {
+            this.amount--;
+        }
+    },
+    toString: function() {
+        var motivationLevel = "";
+        if (this.amount > 25) {
+            hungerLevel = "Let's see who we can visit today!";
+        } else if (this.amount > 15) {
+            hungerLevel = "People are being pretty annoying today";
+        } else if (this.amount > 2) {
+            hungerLevel = "This is exactly why I don't leave my house.";
+        } else {
+            hungerLevel = "I hate everyone!";
+        }
+        return hungerLevel + " (Stubbornness = " + this.amount+ ")";
+    }
+}
+
 
 //Motion modes
 maria.dancing = {
@@ -100,9 +158,9 @@ maria.motionMode = maria.dancing;
 
 //(Override) Populate status field
 maria.getStatus = function() {
-    var statusString = maria.emotion.name;
-    statusString += "\n-------";
-    statusString += "\nMotion mode: " + maria.motionMode.description;
+    var statusString = "Emotion: " + maria.emotion.name;
+    statusString += "\nMotion: " + maria.motionMode.description;
+    statusString += "\n" + maria.hunger.toString();
     return statusString;
 }
 
@@ -122,7 +180,7 @@ maria.updateTenthSec = function() {
 
 // Called every second
 maria.update1Sec = function() {
-    if (maria.emotion) {
+	maria.hunger.update();
         if (Math.random() < maria.emotion.transitionProbability) {
             maria.emotion = maria.emotion.transition();
 
@@ -130,4 +188,8 @@ maria.update1Sec = function() {
         maria.motionMode = maria.emotion.getMotionMode();            
     }
 
-}
+
+//Called every 30 seconds
+ 	maria.update30Sec = function() {
+ 		maria.hunger.eat(51);
+ 	}
