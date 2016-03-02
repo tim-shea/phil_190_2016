@@ -1,4 +1,4 @@
-var duyen = new Bot(150, 150, 'duyen', 'bots/duyen/duyen.png');
+var duyen = new Bot(75, 1800, 'duyen', 'bots/duyen/duyen.png');
 duyen.angle = 90;
 duyen.speed = 100;
 
