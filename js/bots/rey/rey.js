@@ -1,4 +1,4 @@
-var rey = new Bot(1200, 1200, 'rey', 'bots/rey/whitedeer.png');
+var rey = new Bot(1200, 1200, 'rey', 'js/bots/rey/whitedeer.png');
 
 // (Override) Initialize Bot
 rey.init = function() {

@@ -1,4 +1,4 @@
-var dylan = new Bot(1021, 1000, 'dylan', 'bots/dylan/player_car.png');
+var dylan = new Bot(1021, 1000, 'dylan', 'js/bots/dylan/player_car.png');
 
 
 //getStats & init for later??

@@ -1,4 +1,4 @@
-var yang = new Bot(2700, 2700, 'yang', 'bots/yang/yang.png');
+var yang = new Bot(2700, 2700, 'yang', 'js/bots/yang/yang.png');
 //One leve of variable only contains :
 //basic variables and references
 //basic functions that manipulate basic variables and references 

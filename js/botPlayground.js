@@ -41,27 +41,27 @@ function preload() {
 
     // Load all entity sprites.  The first argument (e.g. 'oakTree')
     //   will be used as the name of this image below.
-    game.load.image('oakTree', '../assets/oakTree.png');
-    game.load.image('web', '../assets/web.png');
-    game.load.image('cocoon', '../assets/cocoon.png');
-    game.load.image('singlerock', '../assets/rock.png');
-    game.load.image('rock', '../assets/rock_formation.png');
-    game.load.image('statue', '../assets/statue_man.png');
-    game.load.image('stray dog', '../assets/dog.png');
-    game.load.image('Cherry Blossom Tree', '../assets/Blossom.png');
-    game.load.image('Eastern Castle', '../assets/eastCastle.png');
-    game.load.image('Treasure', '../assets/treasurechest.gif');
-    game.load.image('Philoberry', 'bots/yang/Philoberry.png');
-    game.load.image('Treehouse', 'bots/yang/Deer_Treehouse.png');
-    game.load.image('DeerCrossingSign', 'bots/yang/deercrossing.png');
-    game.load.image('grassyrock', '../assets/grassyrock.png');
-    game.load.image('cave', '../assets/cave.png');
-    game.load.image('princessCastle', '../assets/large_princess-castle-2.png');
-    game.load.image('carousel', '../assets/carousel.png');
+    game.load.image('oakTree', 'assets/oakTree.png');
+    game.load.image('web', 'assets/web.png');
+    game.load.image('cocoon', 'assets/cocoon.png');
+    game.load.image('singlerock', 'assets/rock.png');
+    game.load.image('rock', 'assets/rock_formation.png');
+    game.load.image('statue', 'assets/statue_man.png');
+    game.load.image('stray dog', 'assets/dog.png');
+    game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
+    game.load.image('Eastern Castle', 'assets/eastCastle.png');
+    game.load.image('Treasure', 'assets/treasurechest.gif');
+    game.load.image('Philoberry', 'js/bots/yang/Philoberry.png');
+    game.load.image('Treehouse', 'js/bots/yang/Deer_Treehouse.png');
+    game.load.image('DeerCrossingSign', 'js/bots/yang/deercrossing.png');
+    game.load.image('grassyrock', 'assets/grassyrock.png');
+    game.load.image('cave', 'assets/cave.png');
+    game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
+    game.load.image('carousel', 'assets/carousel.png');
 
     // Load sounds
-    game.load.audio('doozer', '../assets/doos.wav');
-    game.load.audio('chomp', '../assets/chwl.wav');
+    game.load.audio('doozer', 'assets/doos.wav');
+    game.load.audio('chomp', 'assets/chwl.wav');
 }
 
 //

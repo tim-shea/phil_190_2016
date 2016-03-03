@@ -1,4 +1,4 @@
-var jeff = new Bot(540, 520, 'jeff', 'bots/jeff/person.png');
+var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
 
 // Following variables
 jeff.pursuitMode = false;

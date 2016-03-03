@@ -2,7 +2,7 @@
 // INIT
 //
 
-var sharAI = new Bot(2950, 75, 'sharAI', 'bots/sharAI/sharAI.png');
+var sharAI = new Bot(2950, 75, 'sharAI', 'js/bots/sharAI/sharAI.png');
 sharAI.THRESHOLD_MULT = 1.5;
 sharAI.DRIVE_CAP = 600;
 sharAI.angleFromTarget = 0;

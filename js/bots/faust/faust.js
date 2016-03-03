@@ -1,4 +1,4 @@
-var faust = new Bot(300, 300, 'faust', 'bots/faust/faust.png');
+var faust = new Bot(300, 300, 'faust', 'js/bots/faust/faust.png');
 
 faust.init = function() {
     this.body = this.sprite.body;

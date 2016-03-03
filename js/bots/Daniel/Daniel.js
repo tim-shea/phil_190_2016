@@ -1,4 +1,4 @@
-var Daniel = new Bot(240, 220, 'Daniel', 'bots/Daniel/espeon.png');
+var Daniel = new Bot(240, 220, 'Daniel', 'js/bots/Daniel/espeon.png');
 
 Daniel.init = function() {
     this.body = this.sprite.body;

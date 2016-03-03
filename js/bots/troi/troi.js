@@ -1,4 +1,4 @@
-var troi = new Bot(0, 3000, 'troi', 'bots/troi/umbreon_2.0.png');
+var troi = new Bot(0, 3000, 'troi', 'js/bots/troi/umbreon_2.0.png');
 
 /**
  *@author Troi Chua

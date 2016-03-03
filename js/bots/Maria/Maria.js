@@ -1,4 +1,4 @@
-var maria = new Bot(311, 1280, 'maria', 'bots/Maria/Maria.png');
+var maria = new Bot(311, 1280, 'maria', 'js/bots/Maria/Maria.png');
 
 maria.stateText = "The princess is here!";
 
