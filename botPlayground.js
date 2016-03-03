@@ -14,6 +14,7 @@ var botGroup;
 //
 var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey];
 var sprites = [];
+var entities = [];
 var currentBotIndex = defaultBotIndex;
 
 //
@@ -57,8 +58,6 @@ function preload() {
     game.load.image('cave', 'assets/cave.png');
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
-    game.load.image('greenTree', 'assets/greenTree.png');
-    game.load.image('pinkTree', 'assets/pinkTree.png');
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
@@ -94,27 +93,25 @@ function create() {
     // Set up static entities.  Give it an x and y coordinate.  
     //      The thir argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
-    var web = new Entity(2755, 0, 'web', game);
-    var oakTree1 = new Entity(400, 400, 'oakTree');
-    var oakTree2 = new Entity(1000, 2000, 'oakTree');
-    var cocoon = new Entity(2900, 130, 'cocoon');
-    var rock = new Entity(600, 2198, 'singlerock');
-    var rock2 = new Entity(1500, 1500, 'singlerock');
-    var rock = new Entity(730, 320, 'rock');
-    var statue = new Entity(600, 2000, 'statue');
-    var dog = new Entity(1000, 1000, 'stray dog');
-    var Blossom = new Entity(1200, 1200, 'Cherry Blossom Tree');
-    var EasternCastle = new Entity(25, 2700, 'Eastern Castle');
-    var treasure_1 = new Entity(10, 2930, 'Treasure');
-    var philoberry = new Entity(2500, 2500, 'Philoberry');
-    var treehouse = new Entity(2700, 2700, 'Treehouse');
-    var deercrossingsign = new Entity(2700, 2800, 'DeerCrossingSign');
-    var grassyrock = new Entity(50, 300, 'grassyrock');
-    var cave = new Entity(-100, -100, 'cave', game);
-    var princessCastle = new Entity(1000, 1350, 'princessCastle');
-    var carousel = new Entity(600, 1200, 'carousel');
-    var greenTree = new Entity(1000, 2700, 'greenTree');
-    var pinkTree = new Entity(50, 1800, 'pinkTree');
+    entities.push(new Entity(2755, 0, 'web', game));
+    entities.push(new Entity(400, 400, 'oakTree'));
+    entities.push(new Entity(1000, 2000, 'oakTree'));
+    entities.push(new Entity(2900, 130, 'cocoon'));
+    entities.push(new Entity(600, 2198, 'singlerock'));
+    entities.push(new Entity(1500, 1500, 'singlerock'));
+    entities.push(new Entity(730, 320, 'rock'));
+    entities.push(new Entity(600, 2000, 'statue'));
+    entities.push(new Entity(1000, 1000, 'stray dog'));
+    entities.push(new Entity(1200, 1200, 'Cherry Blossom Tree'));
+    entities.push(new Entity(25, 2700, 'Eastern Castle'));
+    entities.push(new Entity(10, 2930, 'Treasure'));
+    entities.push(new Entity(2500, 2500, 'Philoberry'));
+    entities.push(new Entity(2700, 2700, 'Treehouse'));
+    entities.push(new Entity(2700, 2800, 'DeerCrossingSign'));
+    entities.push(new Entity(50, 300, 'grassyrock'));
+    entities.push(new Entity(-100, -100, 'cave', game));
+    entities.push(new Entity(1000, 1350, 'princessCastle'));
+    entities.push(new Entity(600, 1200, 'carousel'));
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);

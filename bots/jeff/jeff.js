@@ -1,5 +1,9 @@
 var jeff = new Bot(540, 520, 'jeff', 'bots/jeff/person.png');
 
+// Following variables
+jeff.pursuitMode = false;
+jeff.currentlyPursuing = "Nothing";
+
 // (Override) Initialize Bot
 jeff.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
@@ -8,8 +12,8 @@ jeff.init = function() {
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, jeff.update1Sec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * .01, jeff.updateTenthSec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * 60*2, jeff.update2min, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 10, jeff.updateTenSecs, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, jeff.update2min, this);
 }
 
 // Hunger 
@@ -17,7 +21,7 @@ jeff.hunger = {
     amount: 0,
     eat: function(food_amount) {
         this.amount -= food_amount;
-        this.amount = Math.max(0,this.amount); // Don't allow hunger to go below 0
+        this.amount = Math.max(0, this.amount); // Don't allow hunger to go below 0
     },
     update: function() {
         if(this.amount >= 100) {
@@ -30,11 +34,11 @@ jeff.hunger = {
         var hungerLevel = "";
         if (this.amount < 20) {
             hungerLevel = "Not hungry";
-        } else if (this.amount < 60) {            
+        } else if (this.amount < 60) {
             hungerLevel = "Hungry";
-        } else if (this.amount < 80) {            
+        } else if (this.amount < 80) {
             hungerLevel = "Starving!!";
-        } else {            
+        } else {
             hungerLevel = "FEED ME!";
         }
         return hungerLevel + " (Hunger = " + this.amount + ")";
@@ -167,6 +171,12 @@ jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotion.name;
     statusString += "\nMotion: " + jeff.motionMode.description;
     statusString += "\n" + jeff.hunger.toString();
+    statusString += "\nEntity collisions: " + 
+        jeff.getOverlappingEntities().map(function(item) {return item.name;});
+    statusString += "\nBot collisions: " + 
+        jeff.getOverlappingBots().map(function(item) {return item.name;});
+    statusString += "\nMoving to: " + 
+        jeff.currentlyPursuing;
     return statusString;
 }
 
@@ -176,13 +186,10 @@ jeff.update = function() {
         jeff.incrementAngle(45);
     }
     jeff.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.
-    this.basicUpdate();
+    if (!this.pursuitMode) {
+        this.basicUpdate();
+    }
 };
-
-// Called every tenth of a second
-jeff.updateTenthSec = function() {
-    //  No implementation
-}
 
 // Called every second
 jeff.update1Sec = function() {
@@ -191,6 +198,17 @@ jeff.update1Sec = function() {
         jeff.emotion = jeff.emotion.transition();
     }
     jeff.motionMode = jeff.emotion.getMotionMode();
+}
+
+// Called every ten seconds
+jeff.updateTenSecs = function() {
+    if(Phaser.Math.chanceRoll()) {
+        jeff.pursuitMode = true;
+        jeff.currentlyPursuing = this.pursueRandom(200).name;
+    } else {
+        jeff.pursuitMode = false;
+        jeff.currentlyPursuing = "Nothing";
+    }
 }
 
 // Called every two minutes
