@@ -2,8 +2,8 @@ var faust = new Bot(300, 300, 'faust', 'bots/faust/faust.png');
 
 faust.init = function() {
     this.body = this.sprite.body;
-    faust.body.rotation = 100; // Initial Angle
-    faust.body.speed = 100; // Initial Speed
+    this.body.rotation = 100; // Initial Angle
+    this.body.speed = 100; // Initial Speed
     //faust.energy = 100 // Initial energy level
     game.time.events.loop(Phaser.Timer.SECOND * 1, faust.update1Sec, this);
 }
@@ -88,10 +88,12 @@ faust.hunger = {
 //
 
 faust.walk = {
-    description: "walk",
+    description: "walking",
     update: function() {
+    	if (Math.random() < .5) {
+            faust.incrementAngle(10 * Math.random() - 5);
+        }
         faust.body.speed = 100;
-        faust.turn();
     },
     //adjustNeeds: function() {
     //	faust.energy.amount++;
@@ -101,8 +103,10 @@ faust.walk = {
 faust.run = {
 	description: "running!",
 	update: function() {
+		if (Math.random() < .5) {
+			faust.incrementAngle(10 * Math.random() - 5);
+		}
 		faust.body.speed = 200;
-		faust.turn();
 	},
 	//adjustNeeds: function() {
 	//	faust.energy.amount -=5;
@@ -112,8 +116,10 @@ faust.run = {
 faust.sonicSpeed = {
 	description: "SONIC SPEED!",
 	update: function() {
+		if (Math.random() < .5) {
+			faust.incrementAngle(10 * Math.random() - 5);
+		}
 		faust.body.speed = 500;
-		faust.turn();
 	},
 	//adjustNeeds: function() {
 	//	faust.energy.amount -=10
@@ -130,13 +136,87 @@ faust.still = {
     //}
 }
 
+faust.moping = {
+    description: "moping",
+    update: function() {
+        if (Math.random() < .05) {
+            faust.incrementAngle(10 * Math.random() - 5);
+        }
+        faust.body.speed = 50;
+    }
+}
+
 //
 // Emotion States
 //
 
 faust.calm = {
-	name: "Calm",
-	transitionProbability: .05,
+    name: "Calm",
+    transitionProbability: .05,
+    transition: function() {
+        if (Math.random() < .8) {
+            return faust.happy;
+        } else {
+            return faust.angry;
+        }
+    },
+    getMotionState: function() {
+        if (Math.random() < .4) {
+            return faust.still;
+        } else {
+            return faust.moping;
+        }
+    }
+}
+faust.angry = {
+    name: "Angry",
+    transitionProbability: .2,
+    transition: function() {
+        // Leave this state 80% of the time
+        if (Math.random() < .8) {
+            // If exiting, go to back to calm
+            return faust.calm;
+        } else {
+            return faust.angry;
+        }
+    },
+    getMotionState: function() {
+        return faust.sonicSpeed;
+    }
+
+}
+faust.happy = {
+    name: "Happy",
+    transitionProbability: .01,
+    transition: function() {
+        if (Math.random() < .8) {
+            return faust.calm;
+        } else {
+            return faust.angry;
+        }
+    },
+    getMotionState: function() {
+        // When happy, either walk or spaz
+        if (Math.random() < .8) {
+            return faust.run;
+        } else {
+            return faust.sonicSpeed;
+        }
+    }
+}
+faust.sad = {
+    name: "Sad",
+    transitionProbability: .3,
+    transition: function() {
+        if (Math.random() < .8) {
+            return faust.calm;
+        } else {
+            return faust.angry;
+        }
+    },
+    getMotionState: function() {
+        return faust.moping;
+    }
 }
 
 //
@@ -144,14 +224,14 @@ faust.calm = {
 //
 
 // Current States
-faust.movement = faust.walk;
-faust.emotion = faust.calm; 
+faust.motionState = faust.walk;
+faust.emotionState = faust.calm; 
 
 // (Override) Populate status field
 faust.getStatus = function() {
-    var statusString = faust.movement.description;
-    statusString += "\n-------";
-    statusString += "\nMotion mode: " + faust.movement.description;
+    var statusString = "Emotion: " + faust.emotionState.name;
+    statusString += "\nMotion: " + faust.motionState.description;
+    statusString += "\n" + faust.hunger.toString();
     return statusString;
 }
 
@@ -159,34 +239,18 @@ faust.update = function() {
     if (faust.atBoundary() === true) {
         faust.incrementAngle(45);
     }
-    faust.movement.update(); 
+    faust.motionState.update(); 
     this.basicUpdate();
 }
 
 faust.update1Sec = function() {
-	// faust.emotion.update(); // TODO: Emotions not fully implemented yet
-	faust.movement.update();
-}
-
-/*faust.getStatus = function() {
-    return faust.stateText;
-}
-
-faust.update = function() {
-    if (Math.random() < .05) {
-        faust.incrementAngle(10);
+	faust.hunger.update();
+    if (Math.random() < faust.emotionState.transitionProbability) {
+        faust.emotionState = faust.emotionState.transition();
     }
-    if (Math.random() < .01) {
-        if (Math.random() < .5) {
-            faust.body.speed = 500;
-            faust.stateText = "Normal";
-        } else {
-            faust.body.speed = 0;
-            faust.stateText = "Backwards";
-        }
-    }
-    faust.basicUpdate();
-};*/
+    faust.motionState = faust.emotionState.getMotionState();
+    faust.hunger.eat(101);
+}
 
 
 
