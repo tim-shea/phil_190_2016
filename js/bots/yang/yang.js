@@ -156,6 +156,7 @@ yang.update = function() {
     }
     yang.chaosmachine_.chance = 0;
     yang.basicUpdate();
+    yang.collisionCheck();
 };
 
 yang.pre_update = function() { // a reoccouring event...
@@ -547,7 +548,14 @@ yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
     }
 };
 
-
+/**
+ * High five bots upon collision.
+ *
+ * @Override
+ */
+yang.collision = function(object) {
+    yang.highFive(object);
+}
 
 // ------Back Yard---------------------------------------------------
 //useful notes

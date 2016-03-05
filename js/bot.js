@@ -78,6 +78,8 @@ Bot.prototype.incrementAngle = function(amount) {
 //
 // Update the velocity and angle of the bot to update it's velocity.
 // 
+// TODO: Possibly change name to something more descriptive.
+// 
 // A basic default update style.
 //
 Bot.prototype.basicUpdate = function() {
@@ -103,6 +105,8 @@ Bot.objectsOverlap = function(item1, item2) {
 
 /**
  * Pursue the indicated object.
+ *
+ * NOTE: Be sure to send in sprites!
  * 
  * @param  {sprite} sprite to pursue
  * @param  {Number} speed in pixels/sec
@@ -113,6 +117,19 @@ Bot.prototype.pursue = function(object, speed) {
 }
 
 /**
+ * Turn away from the specified object and move with specified speed.
+ *
+ * TODO: Not a very effective flight algorithm yet.  Improve.
+ * 
+ * @param  {Bot} object object to run front
+ * @param  {Number} speed speed to run with
+ */
+Bot.prototype.flee = function(object, speed) {
+    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object);
+    this.sprite.speed = speed;
+}
+
+/**
  * Pursue a random bot.
  *
  * Todo: prevent movement to self
@@ -120,7 +137,7 @@ Bot.prototype.pursue = function(object, speed) {
  * @param  {Number} speed in pixels/sec
  */
 Bot.prototype.pursueRandomBot = function(speed) {
-    let chosenBot = bots[game.rnd.integerInRange(0,bots.length-1)]
+    let chosenBot = bots[game.rnd.integerInRange(0, bots.length - 1)]
     this.pursue(chosenBot.sprite, speed);
     return chosenBot;
 }
@@ -131,7 +148,7 @@ Bot.prototype.pursueRandomBot = function(speed) {
  * @param  {Number} speed in pixels/sec
  */
 Bot.prototype.pursueRandomEntity = function(speed) {
-    let chosenEntity = entities[game.rnd.integerInRange(0,bots.length-1)]
+    let chosenEntity = entities[game.rnd.integerInRange(0, bots.length - 1)]
     this.pursue(chosenEntity.sprite, speed);
     return chosenEntity;
 }
@@ -141,11 +158,11 @@ Bot.prototype.pursueRandomEntity = function(speed) {
  * 
  * Todo: prevent movement to self
  * 
- * @param  {Number} speed in pixels/sec
+ * @param {Number} speed in pixels/sec
  */
 Bot.prototype.pursueRandom = function(speed) {
     let allObjects = entities.concat(bots);
-    let chosenEntity = allObjects[game.rnd.integerInRange(0,allObjects.length-1)]
+    let chosenEntity = allObjects[game.rnd.integerInRange(0, allObjects.length - 1)]
     this.pursue(chosenEntity.sprite, speed);
     return chosenEntity;
 }
@@ -187,4 +204,75 @@ Bot.prototype.getOverlappingEntities = function() {
         }
     });
     return overlappingObjects;
+}
+
+/**
+ * Check if overlapping an entity.
+ *
+ * @return {boolean} true if overlapping something, false otherwise
+ */
+Bot.prototype.collisionCheck = function() {
+    let overlappingObjects = this.getOverlappingEntities().concat(this.getOverlappingBots());
+    if (overlappingObjects.length > 0) {
+        this.collision(overlappingObjects[0]);
+    }
+}
+
+/**
+ * When another entity collides with this bot, this function is called.
+ *
+ * Override this function to reaction to collisions.
+ *
+ * @param {object} the object collided with
+ */
+Bot.prototype.collision = function(object) {
+    console.log("collided with " + object);
+}
+
+/**
+ * Say something to the specified bot.
+ *
+ * TODO: Biting, trading, and other interactions can follow this pattern.
+ *
+ * @param {Bot} botToTalkTo the bot to talk to
+ * @param {String} whatToSay what was said
+ */
+Bot.prototype.speak = function(botToTalkTo, whatToSay) {
+    if (botToTalkTo instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
+            botToTalkTo.hear(this, whatToSay);
+        }
+    }
+}
+
+/**
+ * Override to react when hearing something
+ *
+ * @param  {Bot} botWhoSpokeToMe who talked to me
+ * @return {String} whatTheySaid what they said!
+ */
+Bot.prototype.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    console.log(botWhoSpokeToMe.name + " said " + whatTheySaid);
+}
+
+/**
+ * High five a specified bot
+ *
+ * @param {Bot} botToHighFive the bot to high five
+ */
+Bot.prototype.highFive = function(botToHighFive) {
+    if (botToHighFive instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToHighFive.sprite) < 100) {
+            botToHighFive.highFived(this);
+        }
+    }
+}
+
+/**
+ * Override to react when high fived
+ *
+ * @param  {Bot} botWhoSpokeToMe who talked to me
+ */
+Bot.prototype.highFived = function(botWhoHighFivedMe) {
+    console.log(botWhoHighFivedMe.name + " high fived " + this.name);
 }
