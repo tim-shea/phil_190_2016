@@ -1,12 +1,21 @@
+/**
+ * Jeff's bot
+ */
 var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
 
-// State variables
+/**
+ * State variables
+ */
 jeff.pursuitMode = false;
 jeff.currentlyPursuing = "Nothing";
-jeff.talkText = "";
+jeff.speechText = "";
 jeff.currentMotion = Motions.still;
 
-// (Override) Initialize Bot
+/**
+ * Initialize bot
+ *
+ * @override
+ */
 jeff.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
@@ -18,10 +27,10 @@ jeff.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, jeff.update2min, this);
 }
 
-//
-// Markov chain controlling emotions
-//
-jeff.emotions = new MarkovChain("Calm");
+/**
+ * Markov process controlling emotions
+ */
+jeff.emotions = new MarkovProcess("Calm");
 jeff.emotions.add("Calm", [
     ["Calm", "Happy", "Angry", "Sad"],
     [.8, .1, .05, .05]
@@ -39,43 +48,51 @@ jeff.emotions.add("Happy", [
     [.7, .3]
 ]);
 
-// Hunger Variable
+/**
+ * Hunger Variable
+ */
 jeff.hunger = new DecayVariable(0, 1, 0, 100);
 jeff.hunger.toString = function() {
     var hungerLevel = "";
-    if (jeff.hunger.value < 20) {
+    if (this.value < 20) {
         hungerLevel = "Not hungry";
-    } else if (jeff.hunger.value < 60) {
+    } else if (this.value < 60) {
         hungerLevel = "Hungry";
-    } else if (jeff.hunger.value < 80) {
+    } else if (this.value < 80) {
         hungerLevel = "Starving!!";
     } else {
         hungerLevel = "FEED ME!";
     }
-    return hungerLevel + " (Hunger = " + jeff.hunger.value + ")";
+    return hungerLevel + " (Hunger = " + this.value + ")";
 }
 
-// (Override) Populate status field
+/**
+ * Populate the status field
+ *
+ * @override
+ */
 jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
     statusString += "\nMotion: " + jeff.currentMotion.description;
     statusString += "\n" + jeff.hunger.toString();
-    statusString += "\nEntity collisions: " +
-        jeff.getOverlappingEntities().map(function(item) {
-            return item.name;
-        });
-    statusString += "\nBot collisions: " +
-        jeff.getOverlappingBots().map(function(item) {
-            return item.name;
-        });
-    statusString += "\nMoving to: " +
-        jeff.currentlyPursuing;
-    statusString += "\nSpeech: " +
-        jeff.talkText;
+    // statusString += "\nEntity collisions: " +
+    //     jeff.getOverlappingEntities().map(function(item) {
+    //         return item.name;
+    //     });
+    // statusString += "\nBot collisions: " +
+    //     jeff.getOverlappingBots().map(function(item) {
+    //         return item.name;
+    //     });
+    statusString += "\nMoving to: " + jeff.currentlyPursuing;
+    statusString += "\nSpeech: " + jeff.speechText;
     return statusString;
 }
 
-// (Override) Main update.  On my machine this is called about 43 times per second
+/**
+ * Main update called by the phaer game object (about 40 times / sec. on my machine.
+ *
+ * @override
+ */
 jeff.update = function() {
     if (this.atBoundary() === true) {
         this.incrementAngle(45);
@@ -83,16 +100,17 @@ jeff.update = function() {
     if (!this.pursuitMode) {
         this.currentMotion.apply(jeff);
     }
-    this.collisionCheck(); // Must call this for collision to work.
+    this.collisionCheck();
 };
 
 /**
  * React to a collision.
+ *
  * @override
  */
 jeff.collision = function(object) {
-    if (!jeff.talkText.contains("Hello")) {
-        jeff.talkText += " Hello " + object.name + ".";
+    if (!jeff.speechText.contains(object.name)) {
+        jeff.speechText += " Hello " + object.name + ".";
     }
     jeff.speak(object, "Hello " + object.name);
     // jeff.flee(object);
@@ -105,8 +123,8 @@ jeff.collision = function(object) {
  * @override
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    if (!jeff.talkText.contains("Oh you")) {
-        jeff.talkText += " Oh you just said " + whatTheySaid + ".";
+    if (!jeff.speechText.contains("Oh you")) {
+        jeff.speechText += " Oh you just said " + whatTheySaid + ".";
     }
 }
 
@@ -116,20 +134,14 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
  * @override
  */
 jeff.highFived = function(botWhoHighFivedMe) {
-    if (!jeff.talkText.contains("high five")) {
-        jeff.talkText += " Thanks for the high five " + botWhoHighFivedMe.name + ".";
+    if (!jeff.speechText.contains("high five")) {
+        jeff.speechText += " Thanks for the high five " + botWhoHighFivedMe.name + ".";
     }
 }
 
-// Called every second
-jeff.update1Sec = function() {
-    jeff.hunger.increment();
-    jeff.talkText = "";
-    jeff.emotions.update();
-    jeff.setMotion();
-}
-
-// Set the current motion state
+/**
+ * Set the current motion state
+ */
 jeff.setMotion = function() {
     if (jeff.emotions.current === "Sad") {
         jeff.currentMotion = Motions.moping;
@@ -147,7 +159,19 @@ jeff.setMotion = function() {
     }
 }
 
-// Called every ten seconds
+/**
+ * Called every second
+ */
+jeff.update1Sec = function() {
+    jeff.hunger.increment();
+    jeff.speechText = "";
+    jeff.emotions.update();
+    jeff.setMotion();
+}
+
+/**
+ * Called every ten seconds
+ */
 jeff.updateTenSecs = function() {
     // Enter pursuit mode 80% of the time
     if (Phaser.Math.chanceRoll(80)) {
@@ -159,7 +183,9 @@ jeff.updateTenSecs = function() {
     }
 }
 
-// Called every two minutes
+/**
+ *  Called every two minutes
+ */
 jeff.update2min = function() {
     jeff.hunger.setValue(0);
 }

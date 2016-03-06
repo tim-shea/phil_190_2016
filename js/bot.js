@@ -1,6 +1,11 @@
-//
-// Parent object for all bots.
-//
+/**
+ * Parent object for all bots.
+ *
+ * @param {[Number]} x initial x coordinate
+ * @param {[Number]} y initial y coordinate
+ * @param {[String]} name name of the bot
+ * @param {[String]} path path to the bot (e.g....)
+ */
 function Bot(x, y, name, path) {
     this.x = x;
     this.y = y;
@@ -18,27 +23,32 @@ function Bot(x, y, name, path) {
 
 };
 
-//
-// Returns a status string that describes the bot's internal state
-//
+/**
+ * Returns a status string that describes the bot's internal state
+ *
+ * @return text for the status field on the web page
+ */
 Bot.prototype.getStatus = function() {
     return "Status function not yet defined for bot: " + this.name;
 };
 
-//
-// Override to initialize the bot
-//
+/**
+ * Override to initialize the bot
+ */
 Bot.prototype.init = function() {};
 
-//
-// Called every time the game is updated.  
-//
+/**
+ * Called every time the game is updated.  
+ * @return {[type]} [description]
+ */
 Bot.prototype.update = function() {};
 
-//
-// Returns true if the bot is at the boundary of the world, false otherwise
-//
-Bot.prototype.atBoundary = function(amount) {
+/**
+ * Returns true if the bot is at the boundary of the world, false otherwise
+ *
+ * @return {Boolean} true if at the boundary, false otherwise
+ */
+Bot.prototype.atBoundary = function() {
     // Not sure why onWall fails on top and bottom,
     //  so adding in cases manually
     if (this.body.onWall()) {
@@ -53,35 +63,44 @@ Bot.prototype.atBoundary = function(amount) {
     return false;
 }
 
-//
-// Returns a random number between floor and ceiling 
-// (Author: Daniel)
-//
-// Also note that it looks like Phaser supplies an integer version of this.
-//   e.g. game.rnd.integerInRange(0, 7));
-// 
+
+/**
+ * Returns a random number between floor and ceiling 
+ *  Calculates midpoint and difference between the given amounts to 
+ *  calculate a random number between the amounts
+ *  Example of how to use:  "Daniel.incrementAngle(Daniel.getRandom(-5, 5));"
+ * note that it looks like Phaser supplies an integer version of this.
+ * e.g. game.rnd.integerInRange(0, 7));
+ * 
+ * @param  {Number} floor bottom value
+ * @param  {Number} ceiling top value
+ * @return {Number} the random number
+ *
+ * @author Daniel
+ */
 Bot.prototype.getRandom = function(floor, ceiling) {
         var midpoint = (ceiling + floor) / 2;
         var difference = ceiling - floor;
         var randomBetween = difference * Math.random() - (difference / 2) + midpoint;
         return randomBetween;
     }
-    //
-    // Calculates midpoint and difference between the given amounts to calculate a random number between the amounts
-    // Example of how to use:  "Daniel.incrementAngle(Daniel.getRandom(-5, 5));"
-    //
+
+/**
+ * Increment the angle of the agent. 
+ * @param  {Number} amount amount to increment the angle
+ */
 Bot.prototype.incrementAngle = function(amount) {
     this.sprite.body.rotation += amount;
     this.sprite.body.rotation = this.sprite.body.rotation % 180;
 }
 
-//
-// Update the velocity and angle of the bot to update it's velocity.
-// 
-// TODO: Possibly change name to something more descriptive.
-// 
-// A basic default update style.
-//
+
+/**
+ * Update the velocity and angle of the bot to update it's velocity.
+ *
+ * TODO: Possibly change name to something more descriptive.
+ * A basic default update style.
+ */
 Bot.prototype.basicUpdate = function() {
     game.physics.arcade.velocityFromRotation(
         this.sprite.rotation,
@@ -145,7 +164,7 @@ Bot.prototype.pursueRandomBot = function(speed) {
 /**
  * Pursue a random entity.
  * 
- * @param  {Number} speed in pixels/sec
+ * @param {Number} speed in pixels/sec
  */
 Bot.prototype.pursueRandomEntity = function(speed) {
     let chosenEntity = entities[game.rnd.integerInRange(0, bots.length - 1)]

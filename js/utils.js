@@ -1,11 +1,11 @@
 /**
- * Implements a discrete time Markov chain. 
+ * Implements a discrete time Markov process or Markov chain. 
  *
  * http://setosa.io/blog/2014/07/26/markov-chains/
  * 
  * @param {String} initialStateName name of initial state
  */
-function MarkovChain(initialStateName) {
+function MarkovProcess(initialStateName) {
     // A collection of states, where each state has a name and a "fan-out array",
     // an array of target states and the probabilities of transitioning to them.
     // A state could be [["happy","sad"],[.4,.6]].
@@ -19,7 +19,7 @@ function MarkovChain(initialStateName) {
  * @param {String} stateName the name of the state being added 
  * @param {Object} theState  the fan-out array, e.g. [["happy","sad"],[.4,.6]].
  */
-MarkovChain.prototype.add = function(stateName, theState) {
+MarkovProcess.prototype.add = function(stateName, theState) {
     this.states[stateName] = theState;
 };
 
@@ -27,7 +27,7 @@ MarkovChain.prototype.add = function(stateName, theState) {
  * Update the markov chain.  From the current state, choose a random
  * number between 0 and 1, and then set the new state based on that.
  */
-MarkovChain.prototype.update = function() {
+MarkovProcess.prototype.update = function() {
     let rnd = Math.random(); // Roll a die
     let fanOut = this.states[this.current]; // Get the fan-out array
     let threshold = fanOut[1][0];
@@ -43,6 +43,8 @@ MarkovChain.prototype.update = function() {
 
 /**
  * A variable that can be incremented or decremented.
+ *
+ * TODO: Rename?  Decay should be more of a diffeq.  This is a clipped or rectified counter.
  *
  * @param {Number} initialVal initial value for variable
  * @param {Number} incrementAmount how much to increment or decrement
