@@ -88,7 +88,7 @@ yang.init_state = function() {
         yang["acceleration_node"] = yang.def_node;
         yang["rotation_node"] = yang.def_node;
     }
-      
+
     //unfinished
     //TODO: move away 
     yang.tag = new yang.tag_game_obj(); // see helper
@@ -127,7 +127,7 @@ yang.basicUpdate = function() {
     //update non motion related parts of state machine
     if (!yang.test_.test_ongoing) {
         yang["mental_task_node"].always_fun();
-        yang.fun_.AImovements_always_fun();
+        yang.fun_.AImotion_always_fun();
     }
     game.physics.arcade.velocityFromRotation(
         this.sprite.rotation,
@@ -142,7 +142,7 @@ yang.update = function() {
         yang.test_.node_test();
     } else {
         yang["mental_task_node"].current_fun();
-        yang.fun_.AImovements_current_fun(); //Main Cycle of movement statemachines
+        yang.fun_.AImotion_current_fun(); //Main Cycle of movement statemachines
     }
     //temperory solution before rotation nodes are made
     if (yang.atBoundary()) {
@@ -173,43 +173,42 @@ yang.timedEvend = function() {
     //use the following in init function
     //game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
     //console.log(game.time.totalElapsedSeconds());//save the line just in case
-
-    if (yang.chaosmachine_.randomness < 200) {
-        yang.chaosmachine_.randomness += Math.round((Math.random() * 10));
-    }
-
-    if (yang.biomachine_.metaresources_prime > -200) {
-        yang.biomachine_.metaresources_prime -= 5 * Math.round(yang.body.speed / 150); // change depend on speed
-        yang.biomachine_.metaresources_prime = Math.round(yang.biomachine_.metaresources_prime);
-    }
-
-    if (yang.biomachine_.metaresources_secondary > -200) {
-        yang.biomachine_.metaresources_secondary -= 1;
-    }
-
-    if (yang.mindmachine_.emptyness < 200) {
-        yang.mindmachine_.emptyness += 5;
-    }
-
-    if (yang.mindmachine_.inspiration < 200) {
-        yang.mindmachine_.inspiration -= 1;
-    }
+    //randomness
+    yang.chaosmachine_.randomness += Math.round((Math.random() * 10));
+    yang.chaosmachine_.randomness = Math.min(200, yang.chaosmachine_.randomness);
+    //prime
+    yang.biomachine_.metaresources_prime -= 2 * Math.round(yang.body.speed / 150); //change depend on speed
+    yang.biomachine_.metaresources_prime = Math.round(yang.biomachine_.metaresources_prime);
+    yang.biomachine_.metaresources_prime = Math.min(200, yang.biomachine_.metaresources_prime);
+    yang.biomachine_.metaresources_prime = Math.max(0, yang.biomachine_.metaresources_prime);
+    //secondary
+    yang.biomachine_.metaresources_secondary -= 1;
+    yang.biomachine_.metaresources_secondary = Math.min(200, yang.biomachine_.metaresources_secondary);
+    yang.biomachine_.metaresources_secondary = Math.max(0, yang.biomachine_.metaresources_secondary);
+    //empty
+    yang.mindmachine_.emptyness += 5;
+    yang.mindmachine_.emptyness = Math.min(200, yang.mindmachine_.emptyness);
+    yang.mindmachine_.emptyness = Math.max(0, yang.mindmachine_.emptyness);
+    //inspiration
+    yang.mindmachine_.inspiration -= 1;
+    yang.mindmachine_.inspiration = Math.min(200, yang.mindmachine_.inspiration);
+    yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
 };
 
 //-------Additional Helper functions-----------
-yang.fun_.AImovements_current_fun = function() { //this is the current state
-    //main should only controlls physical movements so that it can avoid control***********
+yang.fun_.AImotion_current_fun = function() { //this is the current state
     yang["speed_node"].current_fun();
     yang["acceleration_node"].current_fun();
     //yang["rotation_node"].current_fun();
 };
 
-yang.fun_.AImovements_always_fun = function() { //this is the current state
-    //main should only controlls physical movements so that it can avoid control***********
-    //yang["speed_node"].always_fun();
+yang.fun_.AImotion_always_fun = function() { //this is the current state
+    //wherever in here shouldn't affect control
+    yang["speed_node"].always_fun();
     yang["acceleration_node"].always_fun();
     //yang["rotation_node"].always_fun();
 };
+
 
 //need to remove into a node
 yang.tag_game_obj = function() {
@@ -218,9 +217,9 @@ yang.tag_game_obj = function() {
 };
 
 
-
+//---------------------Test Zone ------------
 yang.test_.node_test = function() { // test with a permanate state
-    
+
     //single run node test 
 
     if (yang.test_.ini === 0) {
@@ -246,12 +245,23 @@ yang.test_.node_test = function() { // test with a permanate state
 yang.test_.timed_test = function() {};
 
 
+/*High five bots upon collision @Override*/
+yang.collision = function(object) {
+    yang.highFive(object);
+    for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
+        yang.node_.brake.brake();//slow down to high five
+    }
+    yang.biomachine_.metaresources_secondary += 0.2;
+    yang.biomachine_.metaresources_prime -= 0.1;
+}
+
+//---------------Nodes-----------------
 //default node constructor
 yang.fun_.def_node_construct = function(node_type) { //arguement is string
     if (!new.target) throw "def_node_construct() must be called with new";
     //the methods are attempted to listed in an order of calling by game functions
     this.type = node_type; //used for switch
-    this.description = "Default"; // used to write state text
+    this.description = "Default"; //used to write state text
     this.init_fun = function() { //only call once
     };
     this.current_fun = function() { //player control sensitive
@@ -273,47 +283,19 @@ yang.fun_.def_node_construct = function(node_type) { //arguement is string
     };
 };
 
-//default node 
-//default node has type "void"
+//-----------default node 
+//default node has type "void", and does nothing
 yang.def_node = new yang.fun_.def_node_construct("void");
-/*obsolete defaut node model
-//but still shows what a node would have
-yang.def_node = {
-    this.type : "some machine, //used for switch
-    description : "Default", //used for statetext
-    init_fun : function () { //only call once   
-    },
-    always_fun : function () {
-        if (false) {
-            yang.def_node.switch_to_this_node();
-        }
-    },
-    current_fun : function () { //control sensitive
-        //console.log(yang.def_node.description);
-        if (false) {
-            yang.def_node.switch_to_this_node();
-        } 
-    },
-    //everyone node has a switch to itself, so other nodes can just call this one
-    switch_to_this_node : function () { 
-        yang.test_.current_testnode = yang.def_node;
-        yang.def_node.init_fun();
-    }
-};*/
 
 //--------Base Speed Nodes----------------------
-// Base speed is completely depends on meta resources
+// Base speed completely depends on meta resources
 yang.node_.stop_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.stop_node.description = "Deer's body doesn't feel energitic.",
-    yang.node_.stop_node.init_fun = function() { //only call once
-        yang.body.speed = 0;
-        yang.node_.lay.switch_to_this_node();
-    };
-yang.node_.stop_node.current_fun = function() { //control sensitive
-    if (yang.biomachine_.metaresources_prime < 10) {
-        yang.node_.stop_node.switch_to_this_node(); //restart this node.
-    }
-    if (yang.biomachine_.metaresources_prime >= 10) {
+yang.node_.stop_node.init_fun = function() {
+    yang.node_.brake.switch_to_this_node();
+};
+yang.node_.stop_node.current_fun = function() { //unrelated to control
+    if (yang.biomachine_.metaresources_prime >= 50) {
         yang.node_.slow_node.switch_to_this_node();
     }
 };
@@ -322,15 +304,16 @@ yang.node_.stop_node.current_fun = function() { //control sensitive
 
 yang.node_.slow_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.slow_node.description = "Deer's body still has fuel.";
-yang.node_.slow_node.init_fun = function() { //only call once   
-    yang.body.speed = 100;
+yang.node_.slow_node.init_fun = function() { //only call once
     yang.node_.wander.switch_to_this_node();
 };
-yang.node_.slow_node.current_fun = function() { //control sensitive
-    //add acceleration here
+yang.node_.slow_node.current_fun = function() { //control sensitive   
+    yang.body.speed = Math.max(100, yang.body.speed);
+};
+yang.node_.slow_node.always_fun = function() {   
     if (yang.biomachine_.metaresources_prime < 10) {
         yang.node_.stop_node.switch_to_this_node();
-    } else if (yang.biomachine_.metaresources_secondary >= 10) {
+    } else if (yang.biomachine_.metaresources_secondary >= 50) {
         yang.node_.fast_node.switch_to_this_node();
     }
 };
@@ -339,16 +322,15 @@ yang.node_.slow_node.current_fun = function() { //control sensitive
 
 yang.node_.fast_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.fast_node.description = "Deer's body feels lighter than usual.";
-yang.node_.fast_node.init_fun = function() { //only call once   
-    yang.body.speed = 200;
+yang.node_.fast_node.init_fun = function() { //only call once
     yang.node_.gallop.switch_to_this_node();
 };
-yang.node_.fast_node.current_fun = function() { //control sensitive
-    if (yang.mindmachine_.inspiration >= 70 && !yang.node_.leap.leap_loop) {
-        yang.node_.leap.switch_to_this_node();
-    }
+yang.node_.fast_node.current_fun = function() { //control sensitive   
+    yang.body.speed = Math.max(200, yang.body.speed);
+};
+yang.node_.fast_node.always_fun = function() {
     if (yang.biomachine_.metaresources_secondary < 10) {
-        yang.node_.gallop.switch_to_this_node();
+        yang.node_.slow_node.switch_to_this_node();
     }
 };
 
@@ -357,15 +339,37 @@ yang.node_.fast_node.current_fun = function() { //control sensitive
 //--------Acceleration Nodes---------------------------
 //switch of acceleration nodes depend on base speed nodes 
 yang.node_.lay = new yang.fun_.def_node_construct("acceleration_node");
-yang.node_.lay.description = "";
-yang.node_.lay.always_fun = function() { //only call once 
-    if (yang.control) {
-        yang.node_.lay.description = "Deer pushes forward.";
-    }
-};
+yang.node_.lay.description = "Deer lays down and eat grass. Tastes terrible!";
 yang.node_.lay.current_fun = function() { //control sensitive
     yang.node_.lay.description = "Deer lays down and eat grass. Tastes terrible!";
     yang.biomachine_.metaresources_prime += 0.1;
+};
+yang.node_.lay.always_fun = function() {
+    if (yang.control) {
+        this.description = "Deer pushes forward.";
+    }
+};
+
+
+
+
+yang.node_.brake = new yang.fun_.def_node_construct("acceleration_node");
+yang.node_.brake.description = "";
+yang.node_.brake.brake = function () {
+    if (yang.body.speed > 0) {
+        yang.body.speed = Math.floor(yang.body.speed * 9 / 10);
+    }
+}
+yang.node_.brake.current_fun = function() { //control sensitive
+    if (yang.body.speed === 0) {
+        yang.node_.lay.switch_to_this_node();
+    } else {
+        yang.node_.lay.description = "Deer slows down.";
+        yang.node_.brake.brake();
+    }
+};
+yang.node_.brake.always_fun = function() {
+    yang.node_.lay.always_fun();//only change description
 };
 
 
@@ -388,6 +392,9 @@ yang.node_.wander.current_fun = function() { //control sensitive
 yang.node_.gallop = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.gallop.description = "Deer is in motion.";
 yang.node_.gallop.current_fun = function() { //control sensitive
+    if (yang.mindmachine_.inspiration >= 70 && !yang.node_.leap.leap_loop) {
+        yang.node_.leap.switch_to_this_node();
+    }
     if (yang.body.speed < 300) {
         yang.chaosmachine_.chance = Math.random();
         if (yang.chaosmachine_.chance <= .50) {
@@ -397,7 +404,6 @@ yang.node_.gallop.current_fun = function() { //control sensitive
         }
         yang.chaosmachine_.chance = 0;
     }
-    //no switch
 };
 
 
@@ -416,12 +422,12 @@ yang.node_.leap.current_fun = function() { //control sensitive
     //continue leap till end
     //Todo: try simplify somehow, maybe use a timed event...watchout control
     if (yang.node_.leap.loop_counts > 41) {
-        yang.speed += 75;
+        yang.body.speed += 75;
         yang.node_.leap.loop_counts -= 2;
     } else if (yang.node_.leap.loop_counts > 9) {
         yang.node_.leap.loop_counts -= 1;
     } else if (yang.node_.leap.loop_counts > 0) {
-        yang.speed -= 75;
+        yang.node_.brake.current_fun();
         yang.node_.leap.loop_counts -= 2;
     } else if (yang.chaosmachine_.chance > 0.5) {
         yang.node_.leap.loop_counts = 50;
@@ -548,14 +554,7 @@ yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
     }
 };
 
-/**
- * High five bots upon collision.
- *
- * @Override
- */
-yang.collision = function(object) {
-    yang.highFive(object);
-}
+
 
 // ------Back Yard---------------------------------------------------
 //useful notes
