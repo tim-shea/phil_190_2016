@@ -47,16 +47,3 @@ Motions.moping = {
         botToMove.basicUpdate();
     }
 }
-
-Motions.moping = {
-    description: "moping",
-    apply: function(botToMove) {
-        // Change angle rarely and just a bit
-        if (Math.random() < .05) {
-            botToMove.incrementAngle(10 * Math.random() - 5);
-        }
-        // Slow
-        botToMove.body.speed = 50;
-        botToMove.basicUpdate();
-    }
-}
