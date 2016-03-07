@@ -51,9 +51,9 @@ function preload() {
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
     game.load.image('Eastern Castle', 'assets/eastCastle.png');
     game.load.image('Treasure', 'assets/treasurechest.gif');
-    game.load.image('Philoberry', 'js/bots/yang/Philoberry.png');
-    game.load.image('Treehouse', 'js/bots/yang/Deer_Treehouse.png');
-    game.load.image('DeerCrossingSign', 'js/bots/yang/deercrossing.png');
+    game.load.image('Philoberry', 'assets/Philoberry.png');
+    game.load.image('Treehouse', 'assets/Deer_Treehouse.png');
+    game.load.image('DeerCrossingSign', 'assets/deercrossing.png');
     game.load.image('grassyrock', 'assets/grassyrock.png');
     game.load.image('cave', 'assets/cave.png');
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
