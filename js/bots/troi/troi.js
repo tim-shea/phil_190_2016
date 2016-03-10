@@ -68,6 +68,7 @@ troi.walking = {
         troi.body.speed = 200;
         troi.stamina -= 10; //energy spent walking        
     }
+
 }
 troi.resting = {
     description: "Resting",
@@ -97,6 +98,7 @@ troi.sprinting = {
                 return troi.sprinting;
             }
         }
+
     },
     update: function() {
         // Wilder steering changes
@@ -488,6 +490,8 @@ troi.update = function() {
         troi.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.        
     }
     this.basicUpdate();
+
+    troi.genericUpdate();
 };
 
 // Called every tenth of a second
