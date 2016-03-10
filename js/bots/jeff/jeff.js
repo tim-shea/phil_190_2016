@@ -89,18 +89,21 @@ jeff.getStatus = function() {
 }
 
 /**
- * Main update called by the phaer game object (about 40 times / sec. on my machine.
+ * Main update called by the phaer game object (about 40 times / sec. on my machine).
  *
  * @override
  */
 jeff.update = function() {
+    // Handle boundary collissions
     if (this.atBoundary() === true) {
-        this.incrementAngle(45);
+        this.incrementAngle(45); // Todo: create a bot-level bounce function, or world wrap.
     }
-    if (!this.pursuitMode) {
+    // Apply current motion
+    if(!this.pursuitMode) {
         this.currentMotion.apply(jeff);
     }
-    this.collisionCheck();
+    // "Superclass" update method
+    jeff.genericUpdate();
 };
 
 /**
@@ -109,6 +112,7 @@ jeff.update = function() {
  * @override
  */
 jeff.collision = function(object) {
+    // console.log("Object is edible: " + object.isEdible);
     if (!jeff.speechText.contains(object.name)) {
         jeff.speechText += " Hello " + object.name + ".";
     }
@@ -140,9 +144,17 @@ jeff.highFived = function(botWhoHighFivedMe) {
 }
 
 /**
- * Set the current motion state
+ * Set the current motion state.  Currently updated every second.
  */
 jeff.setMotion = function() {
+
+    // If in pursuit mode, don't do default behavior
+    if(jeff.pursuitMode) {
+        return;
+    }
+
+    // Default markov chain movement patterns
+    // TODO: Add conditions that involve hunger, etc.
     if (jeff.emotions.current === "Sad") {
         jeff.currentMotion = Motions.moping;
     } else if (jeff.emotions.current === "Happy") {
@@ -173,10 +185,10 @@ jeff.update1Sec = function() {
  * Called every ten seconds
  */
 jeff.updateTenSecs = function() {
-    // Enter pursuit mode 80% of the time
-    if (Phaser.Math.chanceRoll(80)) {
-        jeff.pursuitMode = true;
-        jeff.currentlyPursuing = this.pursueRandom(500).name;
+    // Enter pursuit mode X% of the time
+    if (Phaser.Math.chanceRoll(40)) {
+        jeff.pursuitMode = true
+        jeff.currentlyPursuing = this.pursueRandomObject(700).name;
     } else {
         jeff.pursuitMode = false;
         jeff.currentlyPursuing = "Nothing";

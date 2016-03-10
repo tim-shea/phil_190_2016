@@ -1,5 +1,5 @@
 /**
- * Implements a discrete time Markov process or Markov chain. 
+ * Implements a discrete time Markov process, or whatis also knowwn as a "Markov chain."" 
  *
  * http://setosa.io/blog/2014/07/26/markov-chains/
  * 

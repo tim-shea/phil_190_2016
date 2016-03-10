@@ -1,10 +1,10 @@
 /**
  * Parent object for all bots.
  *
- * @param {[Number]} x initial x coordinate
- * @param {[Number]} y initial y coordinate
- * @param {[String]} name name of the bot
- * @param {[String]} path path to the bot (e.g....)
+ * @param {Number} x initial x coordinate
+ * @param {Number} y initial y coordinate
+ * @param {String} name name of the bot
+ * @param {String} path path to the bot (e.g....)
  */
 function Bot(x, y, name, path) {
     this.x = x;
@@ -20,6 +20,9 @@ function Bot(x, y, name, path) {
     // Reference to the body of the sprite.  Play with this!
     // See http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html 
     this.body;
+
+    // Can this bot be eaten?  Default is yes!
+    this.isEdible = true;
 
 };
 
@@ -39,9 +42,16 @@ Bot.prototype.init = function() {};
 
 /**
  * Called every time the game is updated.  
- * @return {[type]} [description]
  */
-Bot.prototype.update = function() {};
+Bot.prototype.update = function() {
+};
+
+/**
+ * Generic update method
+ */
+Bot.prototype.genericUpdate = function() {
+    this.collisionCheck();
+};
 
 /**
  * Returns true if the bot is at the boundary of the world, false otherwise
@@ -79,11 +89,11 @@ Bot.prototype.atBoundary = function() {
  * @author Daniel
  */
 Bot.prototype.getRandom = function(floor, ceiling) {
-        var midpoint = (ceiling + floor) / 2;
-        var difference = ceiling - floor;
-        var randomBetween = difference * Math.random() - (difference / 2) + midpoint;
-        return randomBetween;
-    }
+    var midpoint = (ceiling + floor) / 2;
+    var difference = ceiling - floor;
+    var randomBetween = difference * Math.random() - (difference / 2) + midpoint;
+    return randomBetween;
+}
 
 /**
  * Increment the angle of the agent. 
@@ -126,6 +136,7 @@ Bot.objectsOverlap = function(item1, item2) {
  * Pursue the indicated object.
  *
  * NOTE: Be sure to send in sprites!
+ * TODO: Improve motion.   Need notification when done.  Perhaps use tweens instead.
  * 
  * @param  {sprite} sprite to pursue
  * @param  {Number} speed in pixels/sec
@@ -149,26 +160,13 @@ Bot.prototype.flee = function(object, speed) {
 }
 
 /**
- * Pursue a random bot.
+ * Returns a random object (bot or static entity)
  *
- * Todo: prevent movement to self
- * 
- * @param  {Number} speed in pixels/sec
+ * @return {Bot} the random entity
  */
-Bot.prototype.pursueRandomBot = function(speed) {
-    let chosenBot = bots[game.rnd.integerInRange(0, bots.length - 1)]
-    this.pursue(chosenBot.sprite, speed);
-    return chosenBot;
-}
-
-/**
- * Pursue a random entity.
- * 
- * @param {Number} speed in pixels/sec
- */
-Bot.prototype.pursueRandomEntity = function(speed) {
-    let chosenEntity = entities[game.rnd.integerInRange(0, bots.length - 1)]
-    this.pursue(chosenEntity.sprite, speed);
+Bot.prototype.getRandomObject = function() {
+    let allObjects = entities.concat(bots);
+    let chosenEntity = allObjects[game.rnd.integerInRange(0, allObjects.length - 1)]
     return chosenEntity;
 }
 
@@ -179,10 +177,9 @@ Bot.prototype.pursueRandomEntity = function(speed) {
  * 
  * @param {Number} speed in pixels/sec
  */
-Bot.prototype.pursueRandom = function(speed) {
-    let allObjects = entities.concat(bots);
-    let chosenEntity = allObjects[game.rnd.integerInRange(0, allObjects.length - 1)]
-    this.pursue(chosenEntity.sprite, speed);
+Bot.prototype.pursueRandomObject = function(speed) {
+    let chosenEntity =  this.getRandomObject();
+    this.pursue(chosenEntity, speed);
     return chosenEntity;
 }
 
