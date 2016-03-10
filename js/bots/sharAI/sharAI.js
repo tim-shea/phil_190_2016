@@ -48,7 +48,7 @@ sharAI.lethargy = {
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
     toString: function() {
-        let lethargyBar = "Lethargy:   ";
+        let lethargyBar = "Lethargy:\t\t";
         let lethargyAmount = Math.floor(sharAI.lethargy.value / 60);
         let iCount = 0;
         for (i = 0; i < lethargyAmount; i++) {
@@ -68,7 +68,7 @@ sharAI.exhaustion = {
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
     toString: function() {
-        let exhaustionBar = "Exhaustion: ";
+        let exhaustionBar = "Exhaustion:\t";
         let exhaustionAmount = Math.floor(sharAI.exhaustion.value / 60);
         let iCount = 0;
         for (i = 0; i < exhaustionAmount; i++) {
@@ -88,7 +88,7 @@ sharAI.hunger = {
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
     toString: function() {
-        let hungerBar = "Hunger:     ";
+        let hungerBar = "Hunger:\t\t";
         let hungerAmount = Math.floor(sharAI.hunger.value / 60);
         let iCount = 0;
         for (i = 0; i < hungerAmount; i++) {
@@ -112,7 +112,7 @@ sharAI.boredom = {
         sharAI.giggle.play();
     },
     toString: function() {
-        let boredomBar = "Boredom:    ";
+        let boredomBar = "Boredom:\t\t";
         let boredomAmount = Math.floor(sharAI.boredom.value / 60);
         let iCount = 0;
         for (i = 0; i < boredomAmount; i++) {
@@ -215,16 +215,6 @@ sharAI.hunt = {
 
         // Then pursue the target
         sharAI.pursue(bots[sharAI.botRandom], 200);
-
-        // Feeds sharAI if they're touching the target
-        if (game.physics.arcade.overlap(sharAI.sprite, bots[sharAI.botRandom].sprite)) {
-            sharAI.hunger.value -= 300;
-            sharAI.hunger.value = Math.max(0, this.value)
-            sharAI.chomp.play();
-            sharAI.hunt.gotTarget = false;
-            // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
-            sharAI.need = sharAI.content;
-        }
     },
     adjustNeeds: function() {
         if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
@@ -240,6 +230,14 @@ sharAI.hunt = {
         if (sharAI.boredom.value > 0) {
             sharAI.boredom.value--;
         }
+    },
+    eat: function() {
+        sharAI.hunger.value -= 300;
+        sharAI.hunger.value = Math.max(0, this.value)
+        sharAI.chomp.play();
+        sharAI.hunt.gotTarget = false;
+        // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
+        sharAI.need = sharAI.content;
     }
 }
 
@@ -346,6 +344,7 @@ sharAI.update = function() {
     sharAI.movement = sharAI.need.getMovementMode();
     sharAI.movement.update();
     sharAI.basicUpdate();
+    sharAI.genericUpdate();
 
     if (sharAI.boredom.value >= 1000) {
         sharAI.boredom.value = 0;
@@ -357,4 +356,10 @@ sharAI.updatePerSec = function() {
 
     sharAI.movement.adjustNeeds();
     sharAI.need = sharAI.need.getNeedMode();
+}
+
+sharAI.collision = function(object) {
+    if (object instanceof Bot && object != sharAI) {
+        sharAI.hunt.eat();
+    }
 }

@@ -43,8 +43,7 @@ Bot.prototype.init = function() {};
 /**
  * Called every time the game is updated.  
  */
-Bot.prototype.update = function() {
-};
+Bot.prototype.update = function() {};
 
 /**
  * Generic update method
@@ -142,8 +141,8 @@ Bot.objectsOverlap = function(item1, item2) {
  * @param  {Number} speed in pixels/sec
  */
 Bot.prototype.pursue = function(object, speed) {
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object);
-    game.physics.arcade.moveToObject(this.sprite, object, speed);
+    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object.sprite);
+    game.physics.arcade.moveToObject(this.sprite, object.sprite, speed);
 }
 
 /**
@@ -155,7 +154,7 @@ Bot.prototype.pursue = function(object, speed) {
  * @param  {Number} speed speed to run with
  */
 Bot.prototype.flee = function(object, speed) {
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object);
+    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object.sprite) * -1;
     this.sprite.speed = speed;
 }
 
@@ -178,7 +177,7 @@ Bot.prototype.getRandomObject = function() {
  * @param {Number} speed in pixels/sec
  */
 Bot.prototype.pursueRandomObject = function(speed) {
-    let chosenEntity =  this.getRandomObject();
+    let chosenEntity = this.getRandomObject();
     this.pursue(chosenEntity, speed);
     return chosenEntity;
 }
@@ -292,3 +291,34 @@ Bot.prototype.highFive = function(botToHighFive) {
 Bot.prototype.highFived = function(botWhoHighFivedMe) {
     console.log(botWhoHighFivedMe.name + " high fived " + this.name);
 }
+
+/**
+ * Attack a specified bot
+ *
+ * @param {Bot} botToAttack The bot to attack
+ * @param {Number} damage Strength of the attack
+ * @param {Number} range (Optional) How close you gotta be to attack the bot (in pixels)
+ */
+Bot.prototype.attack = function(botToAttack, damage) {
+    if (botToAttack instanceof Bot) {
+        botToAttack.gotAttacked(this, damage);
+    }
+};
+
+Bot.prototype.attack = function(botToAttack, damage, range) {
+    if (botToAttack instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < range) {
+            botToAttack.gotAttacked(this, damage);
+        }
+    }
+};
+
+/**
+ * Override to react when attacked
+ *
+ * @param {Bot} botWhoAttackedMe The bot that attacked me
+ * @param {Number} damage The amount of damage done
+ */
+Bot.prototype.gotAttacked = function(botWhoAttackedMe, damage) {
+    console.log(botWhoAttackedMe.name + "attacked me!");
+};
