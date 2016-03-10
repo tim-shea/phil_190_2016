@@ -1,12 +1,14 @@
 var faust = new Bot(300, 300, 'faust', 'js/bots/faust/faust.png');
 
+faust.speechText = "";
+
 faust.init = function() {
     this.body = this.sprite.body;
     this.body.rotation = 100; // Initial Angle
     this.body.speed = 100; // Initial Speed
     //faust.energy = 100 // Initial energy level
     game.time.events.loop(Phaser.Timer.SECOND * 1, faust.update1Sec, this);
-}
+};
 
 faust.turn = function() {
 	faust.turnRandom = Math.random();
@@ -15,7 +17,7 @@ faust.turn = function() {
 	} else if (faust.turnRandom >= .1 && faust.turnRandom < .2) { // small right turn
 		faust.incrementAngle(-5)
 	}
-}
+};
 
 // Hunger 
 faust.hunger = {
@@ -44,7 +46,7 @@ faust.hunger = {
         }
         return hungerLevel + " (Hunger = " + this.amount + ")";
     }
-}
+};
 
 
 //
@@ -98,7 +100,7 @@ faust.walk = {
     //adjustNeeds: function() {
     //	faust.energy.amount++;
     //}
-}
+};
 
 faust.run = {
 	description: "running!",
@@ -111,7 +113,7 @@ faust.run = {
 	//adjustNeeds: function() {
 	//	faust.energy.amount -=5;
 	//}
-}
+};
 
 faust.sonicSpeed = {
 	description: "SONIC SPEED!",
@@ -124,7 +126,7 @@ faust.sonicSpeed = {
 	//adjustNeeds: function() {
 	//	faust.energy.amount -=10
 	//}
-}
+};
 
 faust.still = {
     description: "still",
@@ -134,7 +136,7 @@ faust.still = {
     //adjustNeeds: function() {
     //	faust.energy.amount += 10;
     //}
-}
+};
 
 faust.moping = {
     description: "moping",
@@ -144,7 +146,7 @@ faust.moping = {
         }
         faust.body.speed = 50;
     }
-}
+};
 
 //
 // Emotion States
@@ -167,7 +169,8 @@ faust.calm = {
             return faust.moping;
         }
     }
-}
+};
+
 faust.angry = {
     name: "Angry",
     transitionProbability: .2,
@@ -184,7 +187,8 @@ faust.angry = {
         return faust.sonicSpeed;
     }
 
-}
+};
+
 faust.happy = {
     name: "Happy",
     transitionProbability: .01,
@@ -203,7 +207,8 @@ faust.happy = {
             return faust.sonicSpeed;
         }
     }
-}
+};
+
 faust.sad = {
     name: "Sad",
     transitionProbability: .3,
@@ -217,7 +222,7 @@ faust.sad = {
     getMotionState: function() {
         return faust.moping;
     }
-}
+};
 
 //
 // Other Stuff
@@ -232,25 +237,45 @@ faust.getStatus = function() {
     var statusString = "Emotion: " + faust.emotionState.name;
     statusString += "\nMotion: " + faust.motionState.description;
     statusString += "\n" + faust.hunger.toString();
+    statusString += "\nSpeech: " + faust.speechText;
     return statusString;
-}
+};
 
 faust.update = function() {
     if (faust.atBoundary() === true) {
         faust.incrementAngle(45);
-    }
+    };
     faust.motionState.update(); 
     this.basicUpdate();
-}
+    faust.genericUpdate(); //"Superclass" update method, can override the collision status
+};
+
+faust.collision = function(object) {
+    // console.log("Object is edible: " + object.isEdible);
+    if (!faust.speechText.contains(object.name)) {
+        faust.speechText += " Hello " + object.name + ".";
+    }
+    faust.speak(object, "Hello " + object.name);
+    // faust.flee(object);
+    // faust.pursue(object);
+};
+
+//speak vs hear -----> speak is bot and hear is the override of speak in my specific bot
+faust.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    if (!faust.speechText.contains("Oh you")) {
+        faust.speechText += " Oh you just said " + whatTheySaid + ".";
+    }
+};
 
 faust.update1Sec = function() {
 	faust.hunger.update();
     if (Math.random() < faust.emotionState.transitionProbability) {
         faust.emotionState = faust.emotionState.transition();
-    }
+    };
     faust.motionState = faust.emotionState.getMotionState();
     faust.hunger.eat(101);
-}
+    faust.speechText = "";
+};
 
 
 

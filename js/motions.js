@@ -35,6 +35,18 @@ Motions.walking = {
         botToMove.basicUpdate();
     }
 }
+Motions.sonicSpeed = {
+    description: "SONIC SPEED!",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(10 * Math.random() - 5);
+        }
+        //very fast
+        botToMove.body.speed = 500;
+        botToMove.basicUpdate();
+
+    }
+}
 Motions.moping = {
     description: "moping",
     apply: function(botToMove) {
