@@ -9,6 +9,7 @@ sharAI.angleFromTarget = 0;
 sharAI.inputEnabled = true;
 sharAI.botRandom = -1;
 sharAI.ear = "";
+sharAI.voicebox = "";
 
 
 
@@ -331,7 +332,8 @@ sharAI.need = sharAI.content;
 //
 
 sharAI.getStatus = function() {
-    sharAI.textBox = sharAI.movement.stateText + "\n" + sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n" + sharAI.ear;
+    sharAI.textBox = sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n"
+    + sharAI.movement.stateText + "\n" + sharAI.voicebox + "\n" + sharAI.ear;
     return sharAI.textBox;
 }
 
@@ -369,7 +371,7 @@ sharAI.collision = function(object) {
 }
 
 sharAI.highFived = function(botWhoHighFivedMe) {
-    sharAI.speak(botWhoHighFivedMe, "Those are some nice phalanges you got there. It would be a shame if something happened to them :)");
+    sharAI.speak(botWhoHighFivedMe, "Those are some nice phalanges you got there," + botWhoHighFivedMe.name + ". It would be a shame if something happened to them :)");
     sharAI.boredom.value -= 5;
 }
 
@@ -378,6 +380,15 @@ sharAI.gotBit = function(botWhoAttackedMe, damage) {
     sharAI.bite(botWhoAttackedMe, 25, 25);
 }
 
+sharAI.speak = function(botToTalkTo, whatToSay) {
+    if (botToTalkTo instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
+            botToTalkTo.hear(this, whatToSay);
+        }
+    }
+    sharAI.voicebox = "sharAI says: " + whatToSay;
+}
+
 sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    sharAI.ear = botWhoSpokeToMe.name + ": " + whatTheySaid;
+    sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
 }
