@@ -10,6 +10,17 @@ Motions.still = {
         botToMove.basicUpdate();
     }
 }
+Motions.stop = {
+    description: "stopped",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(10 * Math.random() - 5);
+
+        }
+        botToMove.botToMove.speed = 0;
+        botToMove.basicUpdate();
+    }
+}
 Motions.spazzing = {
     description: "spazzing",
     apply: function(botToMove) {

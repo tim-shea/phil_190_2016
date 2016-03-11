@@ -300,21 +300,14 @@ Bot.prototype.highFived = function(botWhoHighFivedMe) {
 }
 
 /**
- * Attack a specified bot
+ * Bite a specified bot
  *
- * @param {Bot} botToAttack The bot to attack
- * @param {Number} damage Strength of the attack
- * @param {Number} range (Optional) How close you gotta be to attack the bot (in pixels)
+ * @param {Bot} botToAttack The bot to bite
+ * @param {Number} damage Strength of the bite
  */
-Bot.prototype.attack = function(botToAttack, damage) {
+Bot.prototype.bite = function(botToAttack, damage) {
     if (botToAttack instanceof Bot) {
-        botToAttack.gotAttacked(this, damage);
-    }
-};
-
-Bot.prototype.attack = function(botToAttack, damage, range) {
-    if (botToAttack instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < range) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
             botToAttack.gotAttacked(this, damage);
         }
     }
@@ -323,10 +316,10 @@ Bot.prototype.attack = function(botToAttack, damage, range) {
 /**
  * Override to react when attacked
  *
- * @param {Bot} botWhoAttackedMe The bot that attacked me
+ * @param {Bot} botWhoAttackedMe The bot that bit me
  * @param {Number} damage The amount of damage done
  */
-Bot.prototype.gotAttacked = function(botWhoAttackedMe, damage) {
+Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
     console.log(botWhoAttackedMe.name + "attacked me!");
 };
 

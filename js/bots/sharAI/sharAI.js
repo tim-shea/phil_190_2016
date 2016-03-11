@@ -8,6 +8,7 @@ sharAI.DRIVE_CAP = 600;
 sharAI.angleFromTarget = 0;
 sharAI.inputEnabled = true;
 sharAI.botRandom = -1;
+sharAI.ear = "";
 
 
 
@@ -134,8 +135,7 @@ sharAI.walk = {
     name: "Walk",
     stateText: "sharAI is moving around",
     update: function() {
-        sharAI.body.speed = 100;
-        sharAI.turn();
+        Motions.walking.apply(sharAI);
     },
     adjustNeeds: function() {
         if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
@@ -157,8 +157,7 @@ sharAI.stop = {
     name: "Stop",
     stateText: "sharAI is looking around.",
     update: function() {
-        sharAI.body.speed = 0;
-        sharAI.turn();
+        Motions.stop.apply(sharAI);
     },
     adjustNeeds: function() {
         if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
@@ -180,7 +179,7 @@ sharAI.nap = {
     name: "Nap",
     stateText: "sharAI is napping",
     update: function() {
-        sharAI.body.speed = 0;
+        Motions.still.apply(sharAI);
     },
     adjustNeeds: function() {
         if (sharAI.lethargy.value > 0) {
@@ -235,6 +234,9 @@ sharAI.hunt = {
         sharAI.hunger.value -= 300;
         sharAI.hunger.value = Math.max(0, this.value)
         sharAI.chomp.play();
+        sharAI.bite(bots[sharAI.botRandom], 25);
+        sharAI.speak(bots[sharAI.botRandom], "Thanks for the meal!");
+        sharAI.highFive(bots[sharAI.botRandom]);
         sharAI.hunt.gotTarget = false;
         // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
         sharAI.need = sharAI.content;
@@ -319,11 +321,17 @@ sharAI.hungry = {
 sharAI.need = sharAI.content;
 
 //
+// EMOTIONS
+//
+
+
+
+//
 // THE OTHER STUFF
 //
 
 sharAI.getStatus = function() {
-    sharAI.textBox = sharAI.movement.stateText + "\n" + sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString();
+    sharAI.textBox = sharAI.movement.stateText + "\n" + sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n" + sharAI.ear;
     return sharAI.textBox;
 }
 
@@ -337,10 +345,6 @@ sharAI.basicUpdate = function() {
 }
 
 sharAI.update = function() {
-    if (sharAI.atBoundary() === true) {
-        sharAI.incrementAngle(45);
-    }
-
     sharAI.movement = sharAI.need.getMovementMode();
     sharAI.movement.update();
     sharAI.basicUpdate();
@@ -359,7 +363,21 @@ sharAI.updatePerSec = function() {
 }
 
 sharAI.collision = function(object) {
-    if (object instanceof Bot && object != sharAI) {
+    if (object instanceof Bot && object != sharAI && sharAI.hunger.value > sharAI.hunger.satedPoint) {
         sharAI.hunt.eat();
     }
+}
+
+sharAI.highFived = function(botWhoHighFivedMe) {
+    sharAI.speak(botWhoHighFivedMe, "Those are some nice phalanges you got there. It would be a shame if something happened to them :)");
+    sharAI.boredom.value -= 5;
+}
+
+sharAI.gotBit = function(botWhoAttackedMe, damage) {
+    sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that!");
+    sharAI.bite(botWhoAttackedMe, 25, 25);
+}
+
+sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    sharAI.ear = botWhoSpokeToMe.name + ": " + whatTheySaid;
 }
