@@ -89,61 +89,6 @@ jeff.getStatus = function() {
 }
 
 /**
- * Main update called by the phaer game object (about 40 times / sec. on my machine).
- *
- * @override
- */
-jeff.update = function() {
-    // Handle boundary collissions
-    if (this.atBoundary() === true) {
-        this.incrementAngle(45); // Todo: create a bot-level bounce function, or world wrap.
-    }
-    // Apply current motion
-    if(!this.pursuitMode) {
-        this.currentMotion.apply(jeff);
-    }
-    // "Superclass" update method
-    jeff.genericUpdate();
-};
-
-/**
- * React to a collision.
- *
- * @override
- */
-jeff.collision = function(object) {
-    // console.log("Object is edible: " + object.isEdible);
-    if (!jeff.speechText.contains(object.name)) {
-        jeff.speechText += " Hello " + object.name + ".";
-    }
-    jeff.speak(object, "Hello " + object.name);
-    // jeff.flee(object);
-    // jeff.pursue(object);
-}
-
-/**
- * React when someone talks to me.
- *
- * @override
- */
-jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    if (!jeff.speechText.contains("Oh you")) {
-        jeff.speechText += " Oh you just said " + whatTheySaid + ".";
-    }
-}
-
-/**
- * React when someone high fives me.
- *
- * @override
- */
-jeff.highFived = function(botWhoHighFivedMe) {
-    if (!jeff.speechText.contains("high five")) {
-        jeff.speechText += " Thanks for the high five " + botWhoHighFivedMe.name + ".";
-    }
-}
-
-/**
  * Set the current motion state.  Currently updated every second.
  */
 jeff.setMotion = function() {
@@ -171,6 +116,26 @@ jeff.setMotion = function() {
     }
 }
 
+//////////////////////
+// Update Functions //
+//////////////////////
+
+/**
+ * Main update called by the phaer game object (about 40 times / sec. on my machine).
+ *
+ * @override
+ */
+jeff.update = function() {
+
+    // Apply current motion
+    if(!this.pursuitMode) {
+        this.currentMotion.apply(jeff);
+    }
+    // "Superclass" update method
+    jeff.genericUpdate();
+};
+
+
 /**
  * Called every second
  */
@@ -186,7 +151,7 @@ jeff.update1Sec = function() {
  */
 jeff.updateTenSecs = function() {
     // Enter pursuit mode X% of the time
-    if (Phaser.Math.chanceRoll(40)) {
+    if (Math.random() > .4) {
         jeff.pursuitMode = true
         jeff.currentlyPursuing = this.pursueRandomObject(700).name;
     } else {
@@ -200,4 +165,48 @@ jeff.updateTenSecs = function() {
  */
 jeff.update2min = function() {
     jeff.hunger.setValue(0);
+}
+
+///////////////////////////
+// Interaction Functions //
+///////////////////////////
+
+
+/**
+ * React to a collision.
+ *
+ * @override
+ */
+jeff.collision = function(object) {
+    // console.log("Object is edible: " + object.isEdible);
+    if (!jeff.speechText.contains(object.name)) {
+        jeff.speechText += " Hello " + object.name + ".";
+    }
+    jeff.speak(object, "Hello " + object.name);
+    // jeff.flee(object);
+    // jeff.pursue(object);
+}
+
+
+/**
+ * Reaction to hearing something.
+ *
+ * @param  {Bot} botWhoSpokeToMe the bot talking to this one
+ * @param  {String} whatTheySaid  what they said!
+ */
+jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    if (!jeff.speechText.contains("Oh you")) {
+        jeff.speechText += " Oh you just said " + whatTheySaid + ".";
+    }
+}
+
+/**
+ * React when someone high fives me.
+ *
+ * @override
+ */
+jeff.highFived = function(botWhoHighFivedMe) {
+    if (!jeff.speechText.contains("high five")) {
+        jeff.speechText += " Thanks for the high five " + botWhoHighFivedMe.name + ".";
+    }
 }
