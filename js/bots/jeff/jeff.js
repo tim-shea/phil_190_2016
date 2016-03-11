@@ -6,7 +6,6 @@ var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
 /**
  * State variables
  */
-jeff.pursuitMode = false;
 jeff.currentlyPursuing = "Nothing";
 jeff.speechText = "";
 jeff.currentMotion = Motions.still;
@@ -93,11 +92,6 @@ jeff.getStatus = function() {
  */
 jeff.setMotion = function() {
 
-    // If in pursuit mode, don't do default behavior
-    if(jeff.pursuitMode) {
-        return;
-    }
-
     // Default markov chain movement patterns
     // TODO: Add conditions that involve hunger, etc.
     if (jeff.emotions.current === "Sad") {
@@ -116,6 +110,14 @@ jeff.setMotion = function() {
     }
 }
 
+/**
+ * When a pursuit is completed reset the pursuit string.
+ */
+jeff.pursuitCompleted = function() {
+    jeff.currentlyPursuing = "Nothing";
+    this.currentMotion = Motions.still;
+}
+
 //////////////////////
 // Update Functions //
 //////////////////////
@@ -128,9 +130,7 @@ jeff.setMotion = function() {
 jeff.update = function() {
 
     // Apply current motion
-    if(!this.pursuitMode) {
-        this.currentMotion.apply(jeff);
-    }
+    this.currentMotion.apply(jeff);
     // "Superclass" update method
     jeff.genericUpdate();
 };
@@ -150,13 +150,9 @@ jeff.update1Sec = function() {
  * Called every ten seconds
  */
 jeff.updateTenSecs = function() {
-    // Enter pursuit mode X% of the time
-    if (Math.random() > .4) {
-        jeff.pursuitMode = true
-        jeff.currentlyPursuing = this.pursueRandomObject(700).name;
-    } else {
-        jeff.pursuitMode = false;
-        jeff.currentlyPursuing = "Nothing";
+    // Pursue a random entity
+    if (Math.random() < .9) {
+        jeff.currentlyPursuing = this.pursueRandomObject(2000).name;
     }
 }
 

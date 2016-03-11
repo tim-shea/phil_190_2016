@@ -135,15 +135,21 @@ Bot.objectsOverlap = function(item1, item2) {
 /**
  * Pursue the indicated object.
  *
- * NOTE: Be sure to send in sprites!
- * TODO: Improve motion.   Need notification when done.  Perhaps use tweens instead.
- * 
- * @param  {sprite} sprite to pursue
- * @param  {Number} speed in pixels/sec
+ * @param  {Object} the object to pursue
+ * @param  {Number} duration of pursuit in milliseconds
  */
-Bot.prototype.pursue = function(object, speed) {
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object.sprite);
-    game.physics.arcade.moveToObject(this.sprite, object.sprite, speed);
+Bot.prototype.pursue = function(objectToPursue, duration) {
+    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
+    var pursuitTween = game.add.tween(this.sprite);
+    pursuitTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, Phaser.Easing.Exponential.InOut);
+    pursuitTween.onComplete.add(this.pursuitCompleted);
+    pursuitTween.start();
+}
+
+/**
+ * Called after a pursuit completes.  Override if any functionality is needed.
+ */
+Bot.prototype.pursuitCompleted = function() {
 }
 
 /**
@@ -323,3 +329,4 @@ Bot.prototype.attack = function(botToAttack, damage, range) {
 Bot.prototype.gotAttacked = function(botWhoAttackedMe, damage) {
     console.log(botWhoAttackedMe.name + "attacked me!");
 };
+

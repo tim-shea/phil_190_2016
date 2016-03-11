@@ -6,8 +6,7 @@
 function Entity(x, y, name) {
     this.x = x;
     this.y = y;
-	this.sprite = game.add.sprite(x, y, name);
-	this.name = name; // Todo: replace with description separate from name
-	this.isEdible = false;
+    this.sprite = game.add.sprite(x, y, name);
+    this.name = name; // Todo: replace with description separate from name
+    this.isEdible = false;
 };
-

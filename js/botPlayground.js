@@ -20,7 +20,7 @@ var currentBotIndex = defaultBotIndex;
 //
 // Main game object. Size of visible region.
 //
-var game = new Phaser.Game(500, 500, Phaser.AUTO, 'canvasContainer', {
+var game = new Phaser.Game(700, 700, Phaser.AUTO, 'canvasContainer', {
     preload: preload,
     create: create,
     update: update,
@@ -93,7 +93,7 @@ function create() {
     // Set up static entities.  Give it an x and y coordinate.  
     //      The thir argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
-    entities.push(new Entity(2755, 0, 'web', game));
+    entities.push(new Entity(2755, 0, 'web'));
     entities.push(new Entity(400, 400, 'oakTree'));
     entities.push(new Entity(1000, 2000, 'oakTree'));
     entities.push(new Entity(2900, 130, 'cocoon'));
