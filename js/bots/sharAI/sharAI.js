@@ -11,8 +11,10 @@ sharAI.botRandom = -1;
 sharAI.ear = "";
 sharAI.voicebox = "";
 
-
-
+/**
+ * Initializes sharAI
+ * @return {void}
+ */
 sharAI.init = function() {
     this.body = this.sprite.body;
     sharAI.body.rotation = 100;
@@ -24,12 +26,12 @@ sharAI.init = function() {
     sharAI.chomp = game.add.audio('chomp');
 }
 
-sharAI.turn = function() {
-    if (Math.random() < .2) {
-        sharAI.incrementAngle(sharAI.getRandom(-5, 5));
-    }
-}
-
+/**
+ * A customized version of Bot.pursue
+ * @param  {Game Object} target The target to pursue
+ * @param  {Number} speed The speed to chase the target at
+ * @return {void}
+ */
 sharAI.pursue = function(target, speed) {
     sharAI.angleFromTarget = game.physics.arcade.angleBetween(sharAI.sprite, target.sprite);
     sharAI.sprite.rotation = sharAI.angleFromTarget;
@@ -49,6 +51,10 @@ sharAI.lethargy = {
     threshold: 420,
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
+    /**
+     * Prints lethargy value to string
+     * @return {void}
+     */
     toString: function() {
         let lethargyBar = "Lethargy:\t\t";
         let lethargyAmount = Math.floor(sharAI.lethargy.value / 60);
@@ -69,6 +75,10 @@ sharAI.exhaustion = {
     threshold: 480,
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
+    /**
+     * Prints exhaustion value to string
+     * @return {void}
+     */
     toString: function() {
         let exhaustionBar = "Exhaustion:\t";
         let exhaustionAmount = Math.floor(sharAI.exhaustion.value / 60);
@@ -89,6 +99,10 @@ sharAI.hunger = {
     threshold: 300,
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
+    /**
+     * Prints hunger value to string
+     * @return {void}
+     */
     toString: function() {
         let hungerBar = "Hunger:\t\t";
         let hungerAmount = Math.floor(sharAI.hunger.value / 60);
@@ -109,10 +123,18 @@ sharAI.boredom = {
     threshold: 180,
     criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
     satedPoint: this.threshold * sharAI.THRESHOLD_MULT,
+    /**
+     * Runs when sharAI is clicked on (in the future, that is)
+     * @return {void}
+     */
     tickle: function() {
         sharAI.boredom.value -= 100;
         sharAI.giggle.play();
     },
+    /**
+     * Prints boredom value to string
+     * @return {void}
+     */
     toString: function() {
         let boredomBar = "Boredom:\t\t";
         let boredomAmount = Math.floor(sharAI.boredom.value / 60);
@@ -135,9 +157,17 @@ sharAI.boredom = {
 sharAI.walk = {
     name: "Walk",
     stateText: "sharAI is moving around",
+    /**
+     * Runs during update when walk is current movement state
+     * @return {void}
+     */
     update: function() {
         Motions.walking.apply(sharAI);
     },
+    /**
+     * Runs every second when walk is current movement state
+     * @return {void}
+     */
     adjustNeeds: function() {
         if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
             sharAI.lethargy.value++;
@@ -157,9 +187,17 @@ sharAI.walk = {
 sharAI.stop = {
     name: "Stop",
     stateText: "sharAI is looking around.",
+    /**
+     * Runs during update when stop is current movement state
+     * @return {void}
+     */
     update: function() {
         Motions.stop.apply(sharAI);
     },
+    /**
+     * Runs every second when stop is current movement state
+     * @return {void}
+     */
     adjustNeeds: function() {
         if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
             sharAI.lethargy.value++;
@@ -179,9 +217,17 @@ sharAI.stop = {
 sharAI.nap = {
     name: "Nap",
     stateText: "sharAI is napping",
+    /**
+     * Runs during update when nap is current movement state
+     * @return {void}
+     */
     update: function() {
         Motions.still.apply(sharAI);
     },
+    /**
+     * Runs every second when nap is current movement state
+     * @return {void}
+     */
     adjustNeeds: function() {
         if (sharAI.lethargy.value > 0) {
             sharAI.lethargy.value--;
@@ -202,6 +248,10 @@ sharAI.hunt = {
     name: "Hunt",
     stateText: "sharAI is hunting ",
     gotTarget: false,
+    /**
+     * Runs during update when hunt is current movement state
+     * @return {void}
+     */
     update: function() {
         // Get a bot to target
         if (sharAI.hunt.gotTarget == false) {
@@ -216,6 +266,10 @@ sharAI.hunt = {
         // Then pursue the target
         sharAI.pursue(bots[sharAI.botRandom], 200);
     },
+    /**
+     * Runs every second when hunt is current movement state
+     * @return {void}
+     */
     adjustNeeds: function() {
         if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
             sharAI.lethargy.value++;
@@ -231,6 +285,10 @@ sharAI.hunt = {
             sharAI.boredom.value--;
         }
     },
+    /**
+     * Runs when sharAI is hungry and runs into a non-sharAI and non-dylan bot
+     * @return {void}
+     */
     eat: function() {
         sharAI.hunger.value -= 300;
         sharAI.hunger.value = Math.max(0, this.value)
@@ -252,6 +310,10 @@ sharAI.movement = sharAI.walk;
 
 sharAI.content = {
     name: "Content",
+    /**
+     * Controls the current need state
+     * @return {void}
+     */
     getNeedMode: function() {
         if (sharAI.lethargy.value > sharAI.lethargy.threshold) { // First checks to see if sharAI is sleepy
             return sharAI.sleepy;
@@ -263,6 +325,10 @@ sharAI.content = {
             return sharAI.content;
         }
     },
+    /**
+     * Sets the current movement mode to walk while need state is content
+     * @return {void}
+     */
     getMovementMode: function() {
         return sharAI.walk;
     },
@@ -270,6 +336,10 @@ sharAI.content = {
 
 sharAI.sleepy = {
     name: "Sleepy",
+    /**
+     * Controls the current need state
+     * @return {void}
+     */
     getNeedMode: function() {
         if (sharAI.lethargy.value < sharAI.lethargy.satedPoint) { // If sharAI is not sleepy anymore and ...
             if (sharAI.exhaustion.value >= sharAI.exhaustion.threshold) { // ...sharAI is tired, switch to the tired state
@@ -280,6 +350,10 @@ sharAI.sleepy = {
             return sharAI.sleepy;
         }
     },
+    /**
+     * Sets the current movement mode to nap while need state is sleepy
+     * @return {void}
+     */
     getMovementMode: function() {
         return sharAI.nap;
     }
@@ -287,6 +361,10 @@ sharAI.sleepy = {
 
 sharAI.tired = {
     name: "Tired",
+    /**
+     * Controls the current need state
+     * @return {void}
+     */
     getNeedMode: function() {
         if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) { // If sharAI is going to pass out from drowsiness, let them sleep
             return sharAI.sleepy;
@@ -296,6 +374,10 @@ sharAI.tired = {
             return sharAI.tired
         }
     },
+    /**
+     * Sets the current movement mode to stop while need state is tired
+     * @return {void}
+     */
     getMovementMode: function() {
         return sharAI.stop;
     }
@@ -303,6 +385,10 @@ sharAI.tired = {
 
 sharAI.hungry = {
     name: "Hungry",
+    /**
+     * Controls the current need state
+     * @return {void}
+     */
     getNeedMode: function() {
         if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) {
             return sharAI.sleepy
@@ -314,6 +400,10 @@ sharAI.hungry = {
             return sharAI.hungry;
         }
     },
+    /**
+     * Sets the current movement mode to hunt while need state is hungry
+     * @return {void}
+     */
     getMovementMode: function() {
         return sharAI.hunt;
     }
@@ -331,12 +421,20 @@ sharAI.need = sharAI.content;
 // THE OTHER STUFF
 //
 
+/**
+ * Compiles all of the toStrings and other assorted things together
+ * @return {String}
+ */
 sharAI.getStatus = function() {
     sharAI.textBox = sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n"
     + sharAI.movement.stateText + "\n" + sharAI.voicebox + "\n" + sharAI.ear;
     return sharAI.textBox;
 }
 
+/**
+ * Override of basicUpdate
+ * @return {void}
+ */
 sharAI.basicUpdate = function() {
     if (sharAI.movement != sharAI.hunt) {
         game.physics.arcade.velocityFromRotation(
@@ -346,6 +444,10 @@ sharAI.basicUpdate = function() {
     }
 }
 
+/**
+ * main() equivalent
+ * @return {void}
+ */
 sharAI.update = function() {
     sharAI.movement = sharAI.need.getMovementMode();
     sharAI.movement.update();
@@ -358,28 +460,53 @@ sharAI.update = function() {
 
 }
 
+/**
+ * Runs these methods every second
+ * @return {void}
+ */
 sharAI.updatePerSec = function() {
-
     sharAI.movement.adjustNeeds();
     sharAI.need = sharAI.need.getNeedMode();
 }
 
+/**
+ * Override of Bot.collision. sharAI will bite any objects they run into that are bots
+ * @param  {Game Object} object An object in the world
+ * @return {void}
+ */
 sharAI.collision = function(object) {
-    if (object instanceof Bot && object != sharAI && sharAI.hunger.value > sharAI.hunger.satedPoint) {
+    if (object instanceof Bot && object != sharAI && object != dylan && sharAI.hunger.value > sharAI.hunger.satedPoint) {
         sharAI.hunt.eat();
     }
 }
 
+/**
+ * Override of Bot.highFived
+ * @param  {Bot} botWhoHighFivedMe The bot that high-fived sharAI
+ * @return {void}
+ */
 sharAI.highFived = function(botWhoHighFivedMe) {
     sharAI.speak(botWhoHighFivedMe, "Those are some nice phalanges you got there," + botWhoHighFivedMe.name + ". It would be a shame if something happened to them :)");
     sharAI.boredom.value -= 5;
 }
 
+/**
+ * Override of Bot.gotBit
+ * @param  {Bot} botWhoAttackedMe The bot that attacked sharAI
+ * @param  {Number} damage The amount of damage dealt to sharAI
+ * @return {void}
+ */
 sharAI.gotBit = function(botWhoAttackedMe, damage) {
     sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that!");
     sharAI.bite(botWhoAttackedMe, 25, 25);
 }
 
+/**
+ * Override of Bot.speak
+ * @param  {Bot} botToTalkTo The bot sharAI's talking to
+ * @param  {String} whatToSay What sharAI will say to the bot they're speaking to
+ * @return {void}
+ */
 sharAI.speak = function(botToTalkTo, whatToSay) {
     if (botToTalkTo instanceof Bot) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
@@ -389,6 +516,12 @@ sharAI.speak = function(botToTalkTo, whatToSay) {
     sharAI.voicebox = "sharAI says: " + whatToSay;
 }
 
+/**
+ * Override of Bot.hear
+ * @param  {Bot} botWhoSpokeToMe The bot who spoke to sharAI
+ * @param  {String} whatTheySaid What the bot said to sharAI
+ * @return {void}
+ */
 sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
     sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
 }
