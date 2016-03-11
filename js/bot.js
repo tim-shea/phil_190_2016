@@ -50,6 +50,7 @@ Bot.prototype.update = function() {};
  */
 Bot.prototype.genericUpdate = function() {
     this.collisionCheck();
+    game.world.wrap(this.sprite);
 };
 
 /**
@@ -241,7 +242,7 @@ Bot.prototype.collisionCheck = function() {
  * @param {object} the object collided with
  */
 Bot.prototype.collision = function(object) {
-    console.log("collided with " + object.name);
+    console.log(this.name + " collided with " + object.name);
 }
 
 /**

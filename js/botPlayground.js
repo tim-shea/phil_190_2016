@@ -86,7 +86,7 @@ function create() {
         bots[i].body = newSprite.body;
         game.physics.enable(newSprite, Phaser.Physics.ARCADE);
         sprites.push(newSprite);
-        newSprite.body.collideWorldBounds = true;
+        // newSprite.body.collideWorldBounds = true;
         bots[i].init();
     }
 
