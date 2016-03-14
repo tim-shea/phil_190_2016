@@ -67,6 +67,21 @@ sharAI.lethargy = {
             lethargyBar += "░"
         }
         return lethargyBar;
+    },
+    /**
+     * Returns current need status to sharAI.emotions.adjustTransitions()
+     * @return {string}
+     */
+    getMood: function() {
+    	if (this.value < this.satedPoint) {
+    		return "Calm"
+    	}
+    	else if (this.value > this.criticalPoint) {
+    		return "Anxious"
+    	}
+    	else {
+    		return "Content"
+    	}
     }
 }
 
@@ -91,6 +106,21 @@ sharAI.exhaustion = {
             exhaustionBar += "░"
         }
         return exhaustionBar;
+    },
+    /**
+     * Returns current need status to sharAI.emotions.adjustTransitions()
+     * @return {string}
+     */
+    getMood: function() {
+    	if (this.value < this.satedPoint) {
+    		return "Calm"
+    	}
+    	else if (this.value > this.criticalPoint) {
+    		return "Anxious"
+    	}
+    	else {
+    		return "Content"
+    	}
     }
 }
 
@@ -115,6 +145,21 @@ sharAI.hunger = {
             hungerBar += "░"
         }
         return hungerBar;
+    },
+    /**
+     * Returns current need status to sharAI.emotions.adjusTransitions()
+     * @return {string}
+     */
+    getMood: function() {
+    	if (this.value < this.satedPoint) {
+    		return "Calm"
+    	}
+    	else if (this.value > this.criticalPoint) {
+    		return "Anxious"
+    	}
+    	else {
+    		return "Content"
+    	}
     }
 }
 
@@ -147,8 +192,25 @@ sharAI.boredom = {
             boredomBar += "░"
         }
         return boredomBar;
+    },
+    /**
+     * Returns current need status to sharAI.emotions.adjustTransitions()
+     * @return {string}
+     */
+    getMood: function() {
+    	if (this.value < this.satedPoint) {
+    		return "Calm"
+    	}
+    	else if (this.value > this.criticalPoint) {
+    		return "Anxious"
+    	}
+    	else {
+    		return "Content"
+    	}
     }
 }
+
+sharAI.needArray = [sharAI.lethargy, sharAI.exhaustion, sharAI.hunger, sharAI.boredom]
 
 //
 // MOVEMENT STATES
@@ -298,7 +360,7 @@ sharAI.hunt = {
         sharAI.highFive(bots[sharAI.botRandom]);
         sharAI.hunt.gotTarget = false;
         // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
-        sharAI.need = sharAI.content;
+        sharAI.need = sharAI.satisfied;
     }
 }
 
@@ -308,8 +370,8 @@ sharAI.movement = sharAI.walk;
 // NEED STATES
 //
 
-sharAI.content = {
-    name: "Content",
+sharAI.satisfied = {
+    name: "Satisfied",
     /**
      * Controls the current need state
      * @return {void}
@@ -322,11 +384,11 @@ sharAI.content = {
         } else if (sharAI.exhaustion.value > sharAI.exhaustion.threshold) { // Then checks to see if sharAI is tired
             return sharAI.tired;
         } else { // If sharAI is none of the above, then they are fine
-            return sharAI.content;
+            return sharAI.satisfied;
         }
     },
     /**
-     * Sets the current movement mode to walk while need state is content
+     * Sets the current movement mode to walk while need state is satisfied
      * @return {void}
      */
     getMovementMode: function() {
@@ -345,7 +407,7 @@ sharAI.sleepy = {
             if (sharAI.exhaustion.value >= sharAI.exhaustion.threshold) { // ...sharAI is tired, switch to the tired state
                 return sharAI.tired;
             }
-            return sharAI.content; //...sharAI is not tired, then sharAI is content
+            return sharAI.satisfied; //...sharAI is not tired, then sharAI is satisfied
         } else { // Else, sharAI is still sleepy
             return sharAI.sleepy;
         }
@@ -369,7 +431,7 @@ sharAI.tired = {
         if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) { // If sharAI is going to pass out from drowsiness, let them sleep
             return sharAI.sleepy;
         } else if (sharAI.exhaustion.value < sharAI.exhaustion.satedPoint) { // If sharAI is not feeling tired anymore, then they feel fine
-            return sharAI.content;
+            return sharAI.satisfied;
         } else { // Otherwise, sharAI still feels tired.
             return sharAI.tired
         }
@@ -395,7 +457,7 @@ sharAI.hungry = {
         } else if (sharAI.exhaustion.value >= sharAI.exhaustion.criticalPoint) {
             return sharAI.tired;
         } else if (sharAI.hunger.value < sharAI.hunger.satedPoint) {
-            return sharAI.content;
+            return sharAI.satisfied;
         } else {
             return sharAI.hungry;
         }
@@ -409,13 +471,51 @@ sharAI.hungry = {
     }
 }
 
-sharAI.need = sharAI.content;
+sharAI.need = sharAI.satisfied;
 
 //
 // EMOTIONS
 //
 
+sharAI.emotions = new MarkovProcess("calm");
+sharAI.emotions.add("calm", ["content", "anxious", "calm"], [.1, .1, .8]);
+sharAI.emotions.add("content", ["content", "anxious", "calm"], [.8, .1, .1]);
+sharAI.emotions.add("anxious", ["content", "anxious", "calm"], [.1, .8, .1]);
+sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
 
+/**
+ * Changes transitions according to what sharAI's current needs are.
+ * @param  {String Array} needArray An array of needs
+ * @return {void}
+ */
+sharAI.emotions.adjustTransitions = function(needArray) {
+	let currentNeedsArray = [];
+
+	for (i = 0; i < needArray.length; i++) {
+		currentNeedsArray[i] = needArray[i].getMood();
+	}
+
+	let fraction = .5 / needArray.length;
+	let calmCount = 0;
+	let contentCount = 0;
+	let anxiousCount = 0;
+
+	for (i = 0; i < currentNeedsArray.length; i++) {
+		if (currentNeedsArray[i] == "Calm") {
+			calmCount+= fraction;
+		}
+		else if (currentNeedsArray[i] == "Content") {
+			contentCount+= fraction;
+		}
+		else {
+			anxiousCount+= fraction;
+		}
+	}
+
+	this.changeTransitions("calm", [contentCount + .1, anxiousCount + .1, calmCount + .3]);
+	this.changeTransitions("content", [contentCount + .3, anxiousCount + .1, calmCount + .1]);
+	this.changeTransitions("anxious", [contentCount + .1, anxiousCount + .3, calmCount + .1]);
+}
 
 //
 // THE OTHER STUFF
@@ -427,7 +527,7 @@ sharAI.need = sharAI.content;
  */
 sharAI.getStatus = function() {
     sharAI.textBox = sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n"
-    + sharAI.movement.stateText + "\n" + sharAI.voicebox + "\n" + sharAI.ear;
+    + sharAI.movement.stateText + sharAI.emotions.stateText + "\n" + sharAI.voicebox + "\n" + sharAI.ear;
     return sharAI.textBox;
 }
 
@@ -467,6 +567,10 @@ sharAI.update = function() {
 sharAI.updatePerSec = function() {
     sharAI.movement.adjustNeeds();
     sharAI.need = sharAI.need.getNeedMode();
+
+    //sharAI.emotions.adjustTransitions(sharAI.needArray);
+    sharAI.emotions.update();
+    sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
 }
 
 /**
