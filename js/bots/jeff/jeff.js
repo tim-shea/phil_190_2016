@@ -7,7 +7,6 @@ var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
  * State variables
  */
 jeff.currentlyPursuing = "Nothing";
-jeff.speechText = "";
 jeff.currentMotion = Motions.still;
 
 /**
@@ -18,7 +17,7 @@ jeff.currentMotion = Motions.still;
 jeff.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
-    this.body.speed = 100; // Initial Speed
+    this.body.speed = 0; // Initial Speed
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, jeff.update1Sec, this);
@@ -83,7 +82,6 @@ jeff.getStatus = function() {
     //         return item.name;
     //     });
     statusString += "\nMoving to: " + jeff.currentlyPursuing;
-    statusString += "\nSpeech: " + jeff.speechText;
     return statusString;
 }
 
@@ -141,7 +139,6 @@ jeff.update = function() {
  */
 jeff.update1Sec = function() {
     jeff.hunger.increment();
-    jeff.speechText = "";
     jeff.emotions.update();
     jeff.setMotion();
 }
@@ -152,7 +149,7 @@ jeff.update1Sec = function() {
 jeff.updateTenSecs = function() {
     // Pursue a random entity
     if (Math.random() < .9) {
-        jeff.currentlyPursuing = this.pursueRandomObject(2000).name;
+        // jeff.currentlyPursuing = this.pursueRandomObject(2000).name;
     }
 }
 
@@ -175,9 +172,6 @@ jeff.update2min = function() {
  */
 jeff.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
-    if (!jeff.speechText.contains(object.name)) {
-        jeff.speechText += " Hello " + object.name + ".";
-    }
     jeff.speak(object, "Hello " + object.name);
     // jeff.flee(object);
     // jeff.pursue(object);
@@ -191,9 +185,7 @@ jeff.collision = function(object) {
  * @param  {String} whatTheySaid  what they said!
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    if (!jeff.speechText.contains("Oh you")) {
-        jeff.speechText += " Oh you just said " + whatTheySaid + ".";
-    }
+    jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
 }
 
 /**
@@ -202,7 +194,5 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
  * @override
  */
 jeff.highFived = function(botWhoHighFivedMe) {
-    if (!jeff.speechText.contains("high five")) {
-        jeff.speechText += " Thanks for the high five " + botWhoHighFivedMe.name + ".";
-    }
+    jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
