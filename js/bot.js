@@ -51,6 +51,8 @@ Bot.prototype.update = function() {};
 Bot.prototype.genericUpdate = function() {
     this.collisionCheck();
     game.world.wrap(this.sprite);
+    this.speechBubble.x = this.sprite.x + 50;
+    this.speechBubble.y = this.sprite.y - 40;
 };
 
 /**
@@ -149,8 +151,7 @@ Bot.prototype.pursue = function(objectToPursue, duration) {
 /**
  * Called after a pursuit completes.  Override if any functionality is needed.
  */
-Bot.prototype.pursuitCompleted = function() {
-}
+Bot.prototype.pursuitCompleted = function() {}
 
 /**
  * Turn away from the specified object and move with specified speed.
@@ -254,12 +255,18 @@ Bot.prototype.collision = function(object) {
 /**
  * Say something to the specified bot.
  *
- * TODO: Biting, trading, and other interactions can follow this pattern.
- *
  * @param {Bot} botToTalkTo the bot to talk to
  * @param {String} whatToSay what was said
  */
 Bot.prototype.speak = function(botToTalkTo, whatToSay) {
+    // Activate the speech Bubble
+    this.speechBubble.bitmapText.text = whatToSay;
+    // TODO speech bubble has extra left padding often.
+    // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
+    this.speechBubble.visible = true;
+    game.time.events.add(Phaser.Timer.SECOND * 1, function() { this.speechBubble.visible = false; }, this);
+
+    // Call the listeners "hear" function
     if (botToTalkTo instanceof Bot) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
             botToTalkTo.hear(this, whatToSay);
@@ -322,4 +329,3 @@ Bot.prototype.bite = function(botToAttack, damage) {
 Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
     console.log(botWhoAttackedMe.name + "attacked me!");
 };
-

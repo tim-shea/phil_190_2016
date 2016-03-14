@@ -62,6 +62,9 @@ function preload() {
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
+
+    // Load speech bubble assets
+    loadSpeechBubbleAssets();
 }
 
 //
@@ -88,6 +91,9 @@ function create() {
         sprites.push(newSprite);
         // newSprite.body.collideWorldBounds = true;
         bots[i].init();
+        bots[i].speechBubble = game.world.add(new SpeechBubble(game, bots[i].x, bots[i].y + 50, 256,
+            "Loading " + bots[i].name));
+        bots[i].speechBubble.visible = false;
     }
 
     // Set up static entities.  Give it an x and y coordinate.  
