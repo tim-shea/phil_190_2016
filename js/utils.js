@@ -86,3 +86,54 @@ DecayVariable.prototype.setValue = function(newVal) {
 String.prototype.contains = function(it) {
     return this.indexOf(it) != -1;
 };
+
+
+/**
+ * Add a food item to the game
+ */
+function setUpFood() {
+
+    // Add 20 pieces of food in various categories
+    for (var i = 0; i < 20; i++) {
+        let rnd = game.rnd.integerInRange(1, 1);
+        switch (rnd) {
+            case 1:
+                addFoodItem("food_fruit_veggies", "fruits and veggies", 40);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+/**
+ * Add one item of food
+ *
+ * @param {String} imagePath path to the food asset
+ * @param {String} description description of the food
+ * @param {String} calories how many calories it has
+ */
+function addFoodItem(imagePath, description, calories) {
+    if (imagePath != "") {
+        food = new Entity(Math.random() * worldSizeX, Math.random() * worldSizeY, imagePath);
+        food.description = description;
+        food.calories = calories;
+        food.isEdible = true;
+        food.eat = function() {
+            console.log("Eating " + this.description + " with " + this.calories + " calories");
+            let tempSprite = this.sprite;
+            tempSprite.reset(-10,-10);
+            tempSprite.visible = false;
+            // Respawn food in 5 seconds.
+            //  TODO: Note that sprite.kill(), .exists, and body.enable all failed...
+            //   So I place the sprite off screen then bring it back
+            if (!tempSprite.visible) {
+                game.time.events.add(Phaser.Timer.SECOND * 1, function() {
+                    tempSprite.reset(Math.random() * worldSizeX, Math.random() * worldSizeY);
+                    tempSprite.visible = true;
+                });
+            }
+        }
+        entities.push(food);
+    }
+}

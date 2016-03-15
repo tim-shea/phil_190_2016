@@ -21,8 +21,8 @@ function Bot(x, y, name, path) {
     // See http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html 
     this.body;
 
-    // Can this bot be eaten?  Default is yes!
-    this.isEdible = true;
+    // Eating each other is not yet supported.
+    this.isEdible = false;
 
 };
 
@@ -129,7 +129,9 @@ Bot.prototype.basicUpdate = function() {
  */
 Bot.objectsOverlap = function(item1, item2) {
     if (item1 != item2) {
-        return Phaser.Rectangle.intersects(item1.getBounds(), item2.getBounds());
+        // if(item1.body.enable && item2.body.enable) {
+            return Phaser.Rectangle.intersects(item1.getBounds(), item2.getBounds());            
+        // }
     }
     return false;
 }

@@ -172,7 +172,12 @@ jeff.update2min = function() {
  */
 jeff.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
-    jeff.speak(object, "Hello " + object.name);
+    if (object.isEdible) {
+        jeff.speak(object, "Yummy " + object.description + "!");
+        object.eat();
+    } else {
+        jeff.speak(object, "Hello " + object.name);
+    }
     // jeff.flee(object);
     // jeff.pursue(object);
 }

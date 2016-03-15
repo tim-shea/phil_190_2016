@@ -8,6 +8,9 @@
 var cursors;
 var cursorDown;
 var botGroup;
+var worldSizeX = 3000;
+var worldSizeY = 3000;
+
 
 //
 // Arrays of bots
@@ -65,6 +68,10 @@ function preload() {
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
+
+    // Load food items
+    game.load.image('food_fruit_veggies', 'assets/food_fruit_veggies.png');
+
 }
 
 //
@@ -73,10 +80,10 @@ function preload() {
 function create() {
 
     // Set world size
-    game.world.setBounds(0, 0, 3000, 3000);
+    game.world.setBounds(0, 0, worldSizeX, worldSizeY);
 
     // Set up the land
-    game.add.tileSprite(0, 0, 3000, 3000, 'background');
+    game.add.tileSprite(0, 0, worldSizeX, worldSizeY, 'background');
 
     // Add group for bots
     botGroup = game.add.group();
@@ -97,7 +104,7 @@ function create() {
     }
 
     // Set up static entities.  Give it an x and y coordinate.  
-    //      The thir argument (e.g. 'oakTree') must match the name used
+    //      The third argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
     entities.push(new Entity(2755, 0, 'web'));
     entities.push(new Entity(400, 400, 'oakTree'));
@@ -118,6 +125,9 @@ function create() {
     entities.push(new Entity(-100, -100, 'cave', game));
     entities.push(new Entity(1000, 1350, 'princessCastle'));
     entities.push(new Entity(600, 1200, 'carousel'));
+
+    // Set up food items
+    setUpFood();
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);
