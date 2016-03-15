@@ -78,9 +78,9 @@ function preload() {
 
 }
 
-//
-// Set up the simulation
-//
+/**
+ * Set up the simulation
+ */
 function create() {
 
     // Set world size
