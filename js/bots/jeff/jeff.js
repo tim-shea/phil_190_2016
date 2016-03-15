@@ -17,7 +17,7 @@ jeff.currentMotion = Motions.still;
 jeff.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
-    this.body.speed = 0; // Initial Speed
+    this.body.speed = 100; // Initial Speed
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, jeff.update1Sec, this);
@@ -159,7 +159,7 @@ jeff.update = function() {
 jeff.update1Sec = function() {
     jeff.hunger.increment();
     jeff.emotions.update();
-    jeff.setMotion();
+    // jeff.setMotion();
     fireProductions(jeff.productions);
 
 }
@@ -198,9 +198,14 @@ jeff.collision = function(object) {
     } else {
         jeff.speak(object, "Hello " + object.name);
     }
+    // I'm a nice guy
+    if (object instanceof Bot) {
+        object.highFive();
+    }
+
     // jeff.flee(object);
     // jeff.pursue(object);
-}
+ }
 
 /**
  * Call this when eating something.  
@@ -216,8 +221,7 @@ jeff.eatObject = function(objectToEat) {
 /**
  * Reaction to hearing something.
  *
- * @param  {Bot} botWhoSpokeToMe the bot talking to this one
- * @param  {String} whatTheySaid  what they said!
+ * @override
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
     jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!

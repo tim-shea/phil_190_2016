@@ -1,6 +1,10 @@
-// // Simple Canvas program adapted from this demo:
-// http://phaser.io/examples/v2/games/tanks
-//
+/**
+ * @overview The Bot Playground: A semester-long class project for Phil 190, 
+ * Spring 2016, at UC Merced. An experimental application that allows us to create 
+ * simple bots with their own distinctive personalities, AI, etc.
+ *
+ * @author  Jeff Yoshimi, ... [list your name here]
+*/
 
 //
 // Global Variables

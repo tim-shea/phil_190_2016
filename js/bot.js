@@ -1,10 +1,15 @@
 /**
- * Parent object for all bots.
- *
+ * @fileOverview Parent object for all bots.
+ */
+
+/*
+ * Construct a bot.
+ * 
+ * @constructor
  * @param {Number} x initial x coordinate
  * @param {Number} y initial y coordinate
- * @param {String} name name of the bot
- * @param {String} path path to the bot (e.g....)
+ * @param {string} name name of the bot
+ * @param {string} path path to the bot (e.g....)
  */
 function Bot(x, y, name, path) {
     this.x = x;

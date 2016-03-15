@@ -112,9 +112,9 @@ function setUpFood() {
 /**
  * Add one item of food
  *
- * @param {String} imagePath path to the food asset
- * @param {String} description description of the food
- * @param {String} calories how many calories it has
+ * @param {string} imagePath path to the food asset
+ * @param {string} description description of the food
+ * @param {string} calories how many calories it has
  */
 function addFoodItem(imagePath, description, calories) {
     if (imagePath != "") {
@@ -144,10 +144,10 @@ function addFoodItem(imagePath, description, calories) {
 /**
  * A production which, if its conditions are met, fires some actions.
  *
- * @param  {String} name name of this production
+ * @param  {string} name name of this production
  * @param  {Number} priority value from 1 (lowest) to 10 (highest) 
  *                           indicating how important this production is
- * @param  {boolean function} condition if true, fire the production
+ * @param  {function} condition if true, fire the production
  * @param  {function} actions function to call when firing this produciton
  */
 function Production(name, priorityLevel, condition, action) {
@@ -163,11 +163,11 @@ Production.priority.Medium = 5;
 Production.priority.Low = 1;
 
 /**
- * Find those productions in alist whose condition is met, sort by priority, and fire the
+ * Find those productions in a list whose condition is met, sort by priority, and fire the
  * highest priority production in the resulting set (in the case of a tie the first
  * production in the list of ties is fired).
  *
- * @param  {array[production]} productions list of productions to check
+ * @param  {Production[]} productions list of productions to check
  */
 function fireProductions(productions) {
     activeProductions = productions.filter(function(production) {return production.condition();});
