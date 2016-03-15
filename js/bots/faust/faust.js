@@ -49,8 +49,12 @@ faust.init = function() {
  */
 faust.emotions = new MarkovProcess("Calm");
 faust.emotions.add("Calm", [
-    ["Calm", "Happy", "Angry", "Sad"],
-    [.8, .1, .05, .05]
+    ["Calm", "Upbeat", "Happy", "Angry", "Sad"],
+    [.6, .2, .1, .05, .05]
+]);
+faust.emotions.add("Upbeat", [
+    ["Upbeat", "Calm", "Happy",],
+    [.2, .3, .5,]
 ]);
 faust.emotions.add("Sad", [
     ["Sad", "Calm"],
@@ -114,7 +118,7 @@ faust.setMotion = function() {
     if (faust.emotions.current === "Sad") {
         faust.currentMotion = Motions.moping;
     } else if (faust.emotions.current === "Happy") {
-        faust.currentMotion = Motions.walking;
+        faust.currentMotion = Motions.sonicSpeed;
     } else if (faust.emotions.current === "Calm") {
         let rnd = Math.random();
         if (rnd < .5) {
