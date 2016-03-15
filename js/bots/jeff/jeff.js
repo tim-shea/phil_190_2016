@@ -159,7 +159,7 @@ jeff.update = function() {
 jeff.update1Sec = function() {
     jeff.hunger.increment();
     jeff.emotions.update();
-    // jeff.setMotion();
+    jeff.setMotion();
     fireProductions(jeff.productions);
 
 }
