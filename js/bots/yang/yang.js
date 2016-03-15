@@ -1,9 +1,15 @@
+/**
+ * Yang's Bot
+ * @type {Bot}
+ */
 var yang = new Bot(2700, 2700, 'yang', 'js/bots/yang/yang.png');
-//One leve of variable only contains :
-//basic variables and references
-//basic functions that manipulate basic variables and references 
-//objects that has its own basic variables, basic functions and objects 
-//"_" marks objects
+/**
+ * One leve of variable only contains :
+ * basic variables and references
+ * basic functions that manipulate basic variables and references 
+ * objects that has its own basic variables, basic functions and objects 
+ * "_" marks objects
+ */
 yang.test_ = {}; //combine all debug related stuff
 yang.text_ = {}; //combine all text related varandfun
 yang.fun_ = {}; //combine all additional non-initializor functions
@@ -12,7 +18,9 @@ yang.biomachine_ = {}; //basic bio states of two resources
 yang.mindmachine_ = {}; //basic mind states of two spirit
 yang.node_ = {}; //store non-default nodes
 
-//major node reference, those index names are magic
+/**
+ * major node reference, those index names are magic
+ */
 yang.void_node = { type: "void" }; //an object of nothing, completely useless
 yang["mental_task_node"] = yang.void_node;
 yang["speed_node"] = yang.void_node;
@@ -22,8 +30,9 @@ yang["rotation_node"] = yang.void_node;
 
 
 
-
-//-------------------initializors-------------
+/**
+ * initializors
+ */
 yang.init = function() {
     //setup body
     this.body = this.sprite.body;
@@ -94,9 +103,9 @@ yang.init_state = function() {
     yang.tag = new yang.tag_game_obj(); // see helper
 };
 
-
-//---------game system accessors-------------
-//can estimate other bot's location
+/**
+ * game system accessors
+ */
 yang.getStatus = function() {
     if (yang.test_.test_ongoing) {
         yang.text_.stateText =
@@ -121,9 +130,10 @@ yang.getStatus = function() {
     return yang.text_.stateText;
 };
 
-//---------game system manipulators-------------
-//Update the velocity and angle of the bot to update it's velocity.
-yang.basicUpdate = function() {
+/**
+ * game system manipulators
+ */
+yang.basicUpdate = function() {//Update the velocity and angle of the bot to update it's velocity.
     //update non motion related parts of state machine
     if (!yang.test_.test_ongoing) {
         yang["mental_task_node"].always_fun();
@@ -156,7 +166,7 @@ yang.update = function() {
     }
     yang.chaosmachine_.chance = 0;
     yang.basicUpdate();
-    yang.collisionCheck();
+    yang.genericUpdate();//yang.collisionCheck() are included
 };
 
 yang.pre_update = function() { // a reoccouring event...
@@ -193,9 +203,13 @@ yang.timedEvend = function() {
     yang.mindmachine_.inspiration -= 1;
     yang.mindmachine_.inspiration = Math.min(200, yang.mindmachine_.inspiration);
     yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
+    //speical markov chain update
+    yang.MRGPRB4.update();
 };
 
-//-------Additional Helper functions-----------
+/**
+ * Additional Helper functions
+ */
 yang.fun_.AImotion_current_fun = function() { //this is the current state
     yang["speed_node"].current_fun();
     yang["acceleration_node"].current_fun();
@@ -209,15 +223,17 @@ yang.fun_.AImotion_always_fun = function() { //this is the current state
     //yang["rotation_node"].always_fun();
 };
 
-
+/**
+ * Test Zone
+ * @return {[type]} [description]
+ */
+//to do
 //need to remove into a node
 yang.tag_game_obj = function() {
     this.it; //index in the bots
     this.tagger_list = ["jeff", "sharAI"]; //the name tags
 };
 
-
-//---------------------Test Zone ------------
 yang.test_.node_test = function() { // test with a permanate state
 
     //single run node test 
@@ -244,8 +260,10 @@ yang.test_.node_test = function() { // test with a permanate state
 
 yang.test_.timed_test = function() {};
 
-
-/*High five bots upon collision @Override*/
+/**
+ * Interaction Zone 
+ * @Override
+ */
 yang.collision = function(object) {
     yang.highFive(object);
     for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
@@ -255,7 +273,41 @@ yang.collision = function(object) {
     yang.biomachine_.metaresources_prime -= 0.1;
 }
 
-//---------------Nodes-----------------
+yang.highFived = function(botWhoHighFivedMe) {
+    yang.speak (botWhoHighFivedMe, "Yoyoyo, let's party bruh.");
+}
+
+/**
+ * Markov chain of MRGPRB4
+ * MRGPRB4 is a type of neuron that has special demanding
+ */
+yang.MRGPRB4 = new MarkovProcess("wary");
+yang.MRGPRB4.add("wary", [
+    ["wary", "alert", "demanding", "caress", "annoyed"],
+    [.5, .45, .02, .03]
+]);
+yang.MRGPRB4.add("caress", [
+    ["caress", "annoyed"],
+    [.9, .1]
+]);
+yang.MRGPRB4.add("demanding", [
+    ["caress", "wary", "demanding"],
+    [.05, .05, 0.9]
+]);
+yang.MRGPRB4.add("alert", [
+    ["alert", "annoyed"],
+    [.5, .5]
+]);
+
+yang.MRGPRB4.add("annoyed", [
+    ["annoyed", "wary"],
+    [.8, .2]
+]);
+
+
+/**
+ * Nodes
+ */
 //default node constructor
 yang.fun_.def_node_construct = function(node_type) { //arguement is string
     if (!new.target) throw "def_node_construct() must be called with new";
@@ -283,12 +335,16 @@ yang.fun_.def_node_construct = function(node_type) { //arguement is string
     };
 };
 
-//-----------default node 
-//default node has type "void", and does nothing
+/**
+ * default node
+ * default node has type "void", and does nothing
+ */
 yang.def_node = new yang.fun_.def_node_construct("void");
 
-//--------Base Speed Nodes----------------------
-// Base speed completely depends on meta resources
+/**
+ * Base Speed Nodes
+ * Base speed completely depends on meta resources
+ */
 yang.node_.stop_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.stop_node.description = "Deer's body doesn't feel energitic.",
 yang.node_.stop_node.init_fun = function() {
@@ -336,8 +392,10 @@ yang.node_.fast_node.always_fun = function() {
 
 
 
-//--------Acceleration Nodes---------------------------
-//switch of acceleration nodes depend on base speed nodes 
+/**
+ * Acceleration Nodes
+ * switch of acceleration nodes depend on base speed nodes 
+ */
 yang.node_.lay = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.lay.description = "Deer lays down and eat grass. Tastes terrible!";
 yang.node_.lay.current_fun = function() { //control sensitive
@@ -447,15 +505,17 @@ yang.node_.leap.current_fun = function() { //control sensitive
 
 
 
-//--------Rotation Nodes----------------
-//Under design
+/**
+ * Rotation Nodes
+ * Under design
+ */
 
 
 
-//--------Mental Task(Ego) Nodes------------------
-//id_focus, super_ego_focus
-//can be very complicated, beware
-//!!!!mental task is independent from motions, use always _fun more often!!!!
+/**
+ * Mental Task(Id-Ego-Super) Nodes
+ * mental task is independent from motions, use always _fun more often
+ */
 //first one basically a hungry mechanic
 yang.node_.id_prime_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.id_prime_focus.berry_game_obj = function() {
@@ -600,18 +660,19 @@ var philoberry_bush
 var predator
 var troll
 
-
-
-
-
-
 botplayground.js
 var bots = [jeff, mouse, yang];
 */
 
+/*Yang's action - reaction
+Bot.prototype.antler_caress = function(botTocaress, message) {
+    console.log(botTocaress.name + message);
+};
 
-
-
+Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
+    console.log(botWhocaresedMe.name + "attacked me!");
+};
+*/
 
 
 

@@ -331,3 +331,14 @@ Bot.prototype.bite = function(botToAttack, damage) {
 Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
     console.log(botWhoAttackedMe.name + "attacked me!");
 };
+
+/**
+ * Yang's action - reaction
+ */
+Bot.prototype.antler_caress = function(botTocaress, message) {
+    console.log(botTocaress.name + message);
+};
+
+Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
+    console.log(botWhocaresedMe.name + "attacked me!");
+};
