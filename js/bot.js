@@ -347,3 +347,25 @@ Bot.prototype.antler_caress = function(botTocaress, message) {
 Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
     console.log(botWhocaresedMe.name + "attacked me!");
 };
+
+/**
+ * Lick a specified bot
+ *
+ * @param {Bot} botToLick the bot to lick
+ */
+Bot.prototype.lick = function(botTolick) {
+    if (botTolick instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botTolick.sprite) < 100) {
+            botTolick.gotLicked(this);
+        }
+    }
+};
+
+/**
+ * Override to react when licked
+ *
+ * @param  {Bot} botWhoLickedToMe who licked me
+ */
+Bot.prototype.gotLicked = function(botWhoLickedMe) {
+    console.log(botWhoLickedMe.name + " licked " + this.name);
+};
