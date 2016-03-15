@@ -177,6 +177,7 @@ function update() {
         // When cursor is down, perform "cursor override" update
         //   for current bot
         if (cursorDown && i == currentBotIndex) {
+            bots[i].genericUpdate();
             bots[i].basicUpdate();
             cursorDown = false;
         } else {
