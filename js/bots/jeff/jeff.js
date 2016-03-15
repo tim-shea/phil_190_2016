@@ -129,6 +129,8 @@ jeff.setMotion = function() {
 
 /**
  * When a pursuit is completed reset the pursuit string.
+ *
+ * @override
  */
 jeff.pursuitCompleted = function() {
     jeff.currentlyPursuing = "Nothing";
@@ -160,8 +162,7 @@ jeff.update1Sec = function() {
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();
-    fireProductions(jeff.productions);
-
+    // fireProductions(jeff.productions);
 }
 
 /**
