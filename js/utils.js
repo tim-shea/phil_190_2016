@@ -140,3 +140,43 @@ function addFoodItem(imagePath, description, calories) {
         entities.push(food);
     }
 }
+
+/**
+ * A production which, if its conditions are met, fires some actions.
+ *
+ * @param  {String} name name of this production
+ * @param  {Number} priority value from 1 (lowest) to 10 (highest) 
+ *                           indicating how important this production is
+ * @param  {boolean function} condition if true, fire the production
+ * @param  {function} actions function to call when firing this produciton
+ */
+function Production(name, priorityLevel, condition, action) {
+    this.name = name;
+    this.priorityLevel = priorityLevel;
+    this.condition = condition;
+    this.action = action;
+
+};
+Production.priority = {};
+Production.priority.High = 10;
+Production.priority.Medium = 5;
+Production.priority.Low = 1;
+
+/**
+ * Find those productions in alist whose condition is met, sort by priority, and fire the
+ * highest priority production in the resulting set (in the case of a tie the first
+ * production in the list of ties is fired).
+ *
+ * @param  {array[production]} productions list of productions to check
+ */
+function fireProductions(productions) {
+    activeProductions = productions.filter(function(production) {return production.condition();});
+    activeProductions = activeProductions.sort(
+        function(a,b) {return (a.priorityLevel < b.priorityLevel);});
+    // for (var i = 0; i < activeProductions.length; i++) {
+    //     console.log(activeProductions[i]);
+    // }
+    if(activeProductions.length > 0) {
+        activeProductions[0].action();
+    }
+}
