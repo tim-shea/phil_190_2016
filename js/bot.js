@@ -29,6 +29,9 @@ function Bot(x, y, name, path) {
     // Eating each other is not yet supported.
     this.isEdible = false;
 
+    // Flag turned on during bot interactions to prevent infinite loops between bots.
+    this.isInteracting = false;
+
 };
 
 /**
@@ -271,11 +274,14 @@ Bot.prototype.speak = function(botToTalkTo, whatToSay) {
     // TODO speech bubble has extra left padding often.
     // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
     this.speechBubble.visible = true;
-    game.time.events.add(Phaser.Timer.SECOND * 1, function() { this.speechBubble.visible = false; }, this);
+    game.time.events.add(Phaser.Timer.SECOND * 1, function() { 
+        this.speechBubble.visible = false; 
+        this.isInteracting = false;}, this);
 
     // Call the listeners "hear" function
-    if (botToTalkTo instanceof Bot) {
+    if (botToTalkTo instanceof Bot && this.isInteracting === false) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
+            this.isInteracting = true;
             botToTalkTo.hear(this, whatToSay);
         }
     }
