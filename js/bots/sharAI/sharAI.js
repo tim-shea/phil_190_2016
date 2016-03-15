@@ -33,7 +33,6 @@ sharAI.init = function() {
 sharAI.pursue = function(target, speed) {
     sharAI.angleFromTarget = game.physics.arcade.angleBetween(sharAI.sprite, target.sprite);
     sharAI.sprite.rotation = sharAI.angleFromTarget;
-
     game.physics.arcade.velocityFromRotation(
         sharAI.angleFromTarget,
         speed,
@@ -336,23 +335,6 @@ sharAI.hunt = {
         if (sharAI.boredom.value > 0) {
             sharAI.boredom.value--;
         }
-    },
-    /**
-     * Runs when sharAI is hungry and runs into a non-sharAI and non-dylan bot
-     * @return {void}
-     */
-    eatBot: function(bot) {
-        if (bot instanceof Bot) {
-            sharAI.hunger.value -= 300;
-            sharAI.hunger.value = Math.max(0, this.value)
-            sounds.chomp.play();
-            sharAI.bite(bot, 25);
-            sharAI.speak("Thanks for the meal, " + bot.name + "!");
-            sharAI.highFive(bot);
-            sharAI.hunt.gotTarget = false;
-            // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
-            sharAI.need = sharAI.satisfied;
-        }
     }
 }
 
@@ -551,11 +533,6 @@ sharAI.update = function() {
     sharAI.movement.update();
     sharAI.basicUpdate();
     sharAI.genericUpdate();
-
-    if (sharAI.boredom.value >= 1000) {
-        sharAI.boredom.value = 0;
-    }
-
 }
 
 /**
@@ -577,8 +554,14 @@ sharAI.updatePerSec = function() {
  * @return {void}
  */
 sharAI.collision = function(object) {
-    if (object instanceof Bot && object != sharAI && sharAI.hunger.value > sharAI.hunger.satedPoint) {
-        sharAI.hunt.eatBot(object);
+    if (object instanceof Bot && object != sharAI) {
+    	sharAI.speak(object, "Hello lunch");
+    	if (sharAI.hunger.value > sharAI.hunger.satedPoint) {
+    		sharAI.hunt.bite(object, 25);
+    	}
+    	if (sharAI.boredom.value > sharAI.boredom.satedPoint) {
+    		sharAI.highFive(object);
+    	}
     }
 }
 
@@ -588,7 +571,6 @@ sharAI.collision = function(object) {
  * @return {void}
  */
 sharAI.highFived = function(botWhoHighFivedMe) {
-    //sharAI.speak("A hand, for me? How kind of you, " + botWhoHighFivedMe.name + "!");
     sharAI.boredom.value -= 5;
 }
 
@@ -599,7 +581,7 @@ sharAI.highFived = function(botWhoHighFivedMe) {
  * @return {void}
  */
 sharAI.gotBit = function(botWhoAttackedMe, damage) {
-    sharAI.speak("Ow! You'll pay for that, " + botWhoAttackedMe.name + "!");
+    sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that, " + botWhoAttackedMe.name + "!");
     sharAI.bite(botWhoAttackedMe, 25, 25);
 }
 
@@ -612,3 +594,23 @@ sharAI.gotBit = function(botWhoAttackedMe, damage) {
 sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
     sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
 }
+
+/**
+ * Override of Bot.bite
+ * @param  {Bot} botToAttack The bot to bite
+ * @param  {Number} damage      Strength of bite
+ * @return {void}
+ */
+sharAI.bite = function(botToAttack, damage) {
+    if (botToAttack instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
+        	sharAI.hunger.value -= 300;
+        	sharAI.hunger.value = Math.max(0, sharAI.hunger.value)
+        	sounds.chomp.play();
+        	botToAttack.gotBit(this, damage);
+        	sharAI.speak(bot, "Thanks for the meal, " + bot.name + "!");
+            sharAI.highFive(bot);
+            sharAI.hunt.gotTarget = false;
+        }
+    }
+};
