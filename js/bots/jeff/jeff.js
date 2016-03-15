@@ -157,7 +157,7 @@ jeff.updateTenSecs = function() {
  *  Called every two minutes
  */
 jeff.update2min = function() {
-    jeff.hunger.setValue(0);
+    // jeff.hunger.setValue(0);
 }
 
 ///////////////////////////
@@ -173,13 +173,23 @@ jeff.update2min = function() {
 jeff.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
     if (object.isEdible) {
-        jeff.speak(object, "Yummy " + object.description + "!");
-        object.eat();
+        jeff.eatObject(object);
     } else {
         jeff.speak(object, "Hello " + object.name);
     }
     // jeff.flee(object);
     // jeff.pursue(object);
+}
+
+/**
+ * Call this when eating something.  
+ *
+ * @param {Entity} objectToEat what to eat
+ */
+jeff.eatObject = function(objectToEat) {
+    objectToEat.eat();
+    jeff.hunger.subtract(objectToEat.calories);
+    jeff.speak(objectToEat, "Yummy " + objectToEat.description + "!");
 }
 
 

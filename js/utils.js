@@ -67,7 +67,7 @@ MarkovProcess.prototype.update = function() {
 function DecayVariable(initialVal, incrementAmount, minVal, maxVal) {
     this.value = initialVal;
     this.incrementAmount = incrementAmount;
-    this.minVal = maxVal;
+    this.minVal = minVal;
     this.maxVal = maxVal;
 }
 DecayVariable.prototype.decrement = function() {
@@ -76,8 +76,11 @@ DecayVariable.prototype.decrement = function() {
 DecayVariable.prototype.increment = function() {
     this.value = Math.min(this.maxVal, this.value + this.incrementAmount);
 }
-DecayVariable.prototype.setValue = function(newVal) {
-    this.value = newVal;
+DecayVariable.prototype.add = function(amount) {
+    this.value = Math.min(this.maxVal, this.value + amount);
+}
+DecayVariable.prototype.subtract = function(amount) {
+    this.value = Math.max(this.minVal, this.value - amount);
 }
 
 /**
@@ -98,7 +101,7 @@ function setUpFood() {
         let rnd = game.rnd.integerInRange(1, 1);
         switch (rnd) {
             case 1:
-                addFoodItem("food_fruit_veggies", "fruits and veggies", 40);
+                addFoodItem("food_fruit_veggies", "fruits and veggies", 10);
                 break;
             default:
                 break;
