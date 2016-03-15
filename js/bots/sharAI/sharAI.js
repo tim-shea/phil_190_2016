@@ -9,7 +9,6 @@ sharAI.angleFromTarget = 0;
 sharAI.inputEnabled = true;
 sharAI.botRandom = -1;
 sharAI.ear = "";
-sharAI.voicebox = "";
 
 /**
  * Initializes sharAI
@@ -73,15 +72,13 @@ sharAI.lethargy = {
      * @return {string}
      */
     getMood: function() {
-    	if (this.value < this.satedPoint) {
-    		return "Calm"
-    	}
-    	else if (this.value > this.criticalPoint) {
-    		return "Anxious"
-    	}
-    	else {
-    		return "Content"
-    	}
+        if (this.value < this.satedPoint) {
+            return "Calm"
+        } else if (this.value > this.criticalPoint) {
+            return "Anxious"
+        } else {
+            return "Content"
+        }
     }
 }
 
@@ -112,15 +109,13 @@ sharAI.exhaustion = {
      * @return {string}
      */
     getMood: function() {
-    	if (this.value < this.satedPoint) {
-    		return "Calm"
-    	}
-    	else if (this.value > this.criticalPoint) {
-    		return "Anxious"
-    	}
-    	else {
-    		return "Content"
-    	}
+        if (this.value < this.satedPoint) {
+            return "Calm"
+        } else if (this.value > this.criticalPoint) {
+            return "Anxious"
+        } else {
+            return "Content"
+        }
     }
 }
 
@@ -151,15 +146,13 @@ sharAI.hunger = {
      * @return {string}
      */
     getMood: function() {
-    	if (this.value < this.satedPoint) {
-    		return "Calm"
-    	}
-    	else if (this.value > this.criticalPoint) {
-    		return "Anxious"
-    	}
-    	else {
-    		return "Content"
-    	}
+        if (this.value < this.satedPoint) {
+            return "Calm"
+        } else if (this.value > this.criticalPoint) {
+            return "Anxious"
+        } else {
+            return "Content"
+        }
     }
 }
 
@@ -198,15 +191,13 @@ sharAI.boredom = {
      * @return {string}
      */
     getMood: function() {
-    	if (this.value < this.satedPoint) {
-    		return "Calm"
-    	}
-    	else if (this.value > this.criticalPoint) {
-    		return "Anxious"
-    	}
-    	else {
-    		return "Content"
-    	}
+        if (this.value < this.satedPoint) {
+            return "Calm"
+        } else if (this.value > this.criticalPoint) {
+            return "Anxious"
+        } else {
+            return "Content"
+        }
     }
 }
 
@@ -351,16 +342,18 @@ sharAI.hunt = {
      * Runs when sharAI is hungry and runs into a non-sharAI and non-dylan bot
      * @return {void}
      */
-    eat: function() {
-        sharAI.hunger.value -= 300;
-        sharAI.hunger.value = Math.max(0, this.value)
-        sharAI.chomp.play();
-        sharAI.bite(bots[sharAI.botRandom], 25);
-        sharAI.speak(bots[sharAI.botRandom], "Thanks for the meal!");
-        sharAI.highFive(bots[sharAI.botRandom]);
-        sharAI.hunt.gotTarget = false;
-        // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
-        sharAI.need = sharAI.satisfied;
+    eatBot: function(bot) {
+        if (bot instanceof Bot) {
+            sharAI.hunger.value -= 300;
+            sharAI.hunger.value = Math.max(0, this.value)
+            sharAI.chomp.play();
+            sharAI.bite(bot, 25);
+            sharAI.speak("Thanks for the meal, " + bot.name + "!");
+            sharAI.highFive(bot);
+            sharAI.hunt.gotTarget = false;
+            // Placeholder until I can fix bug with sharAI.hungry.getNeedMode()
+            sharAI.need = sharAI.satisfied;
+        }
     }
 }
 
@@ -478,9 +471,18 @@ sharAI.need = sharAI.satisfied;
 //
 
 sharAI.emotions = new MarkovProcess("calm");
-sharAI.emotions.add("calm", ["content", "anxious", "calm"], [.1, .1, .8]);
-sharAI.emotions.add("content", ["content", "anxious", "calm"], [.8, .1, .1]);
-sharAI.emotions.add("anxious", ["content", "anxious", "calm"], [.1, .8, .1]);
+sharAI.emotions.add("calm", [
+    ["content", "anxious", "calm"],
+    [.1, .1, .8]
+]);
+sharAI.emotions.add("content", [
+    ["content", "anxious", "calm"],
+    [.8, .1, .1]
+]);
+sharAI.emotions.add("anxious", [
+    ["content", "anxious", "calm"],
+    [.1, .8, .1]
+]);
 sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
 
 /**
@@ -489,32 +491,30 @@ sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
  * @return {void}
  */
 sharAI.emotions.adjustTransitions = function(needArray) {
-	let currentNeedsArray = [];
+    let currentNeedsArray = [];
 
-	for (i = 0; i < needArray.length; i++) {
-		currentNeedsArray[i] = needArray[i].getMood();
-	}
+    for (i = 0; i < needArray.length; i++) {
+        currentNeedsArray[i] = needArray[i].getMood();
+    }
 
-	let fraction = .5 / needArray.length;
-	let calmCount = 0;
-	let contentCount = 0;
-	let anxiousCount = 0;
+    let fraction = .5 / needArray.length;
+    let calmCount = 0;
+    let contentCount = 0;
+    let anxiousCount = 0;
 
-	for (i = 0; i < currentNeedsArray.length; i++) {
-		if (currentNeedsArray[i] == "Calm") {
-			calmCount+= fraction;
-		}
-		else if (currentNeedsArray[i] == "Content") {
-			contentCount+= fraction;
-		}
-		else {
-			anxiousCount+= fraction;
-		}
-	}
+    for (i = 0; i < currentNeedsArray.length; i++) {
+        if (currentNeedsArray[i] == "Calm") {
+            calmCount += fraction;
+        } else if (currentNeedsArray[i] == "Content") {
+            contentCount += fraction;
+        } else {
+            anxiousCount += fraction;
+        }
+    }
 
-	this.changeTransitions("calm", [contentCount + .1, anxiousCount + .1, calmCount + .3]);
-	this.changeTransitions("content", [contentCount + .3, anxiousCount + .1, calmCount + .1]);
-	this.changeTransitions("anxious", [contentCount + .1, anxiousCount + .3, calmCount + .1]);
+    this.changeTransitions("calm", [contentCount + .1, anxiousCount + .1, calmCount + .3]);
+    this.changeTransitions("content", [contentCount + .3, anxiousCount + .1, calmCount + .1]);
+    this.changeTransitions("anxious", [contentCount + .1, anxiousCount + .3, calmCount + .1]);
 }
 
 //
@@ -526,8 +526,7 @@ sharAI.emotions.adjustTransitions = function(needArray) {
  * @return {String}
  */
 sharAI.getStatus = function() {
-    sharAI.textBox = sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n"
-    + sharAI.movement.stateText + sharAI.emotions.stateText + "\n" + sharAI.voicebox + "\n" + sharAI.ear;
+    sharAI.textBox = sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n" + sharAI.movement.stateText + sharAI.emotions.stateText + "\n" + sharAI.ear;
     return sharAI.textBox;
 }
 
@@ -568,7 +567,7 @@ sharAI.updatePerSec = function() {
     sharAI.movement.adjustNeeds();
     sharAI.need = sharAI.need.getNeedMode();
 
-    //sharAI.emotions.adjustTransitions(sharAI.needArray);
+    sharAI.emotions.adjustTransitions(sharAI.needArray);
     sharAI.emotions.update();
     sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
 }
@@ -579,8 +578,8 @@ sharAI.updatePerSec = function() {
  * @return {void}
  */
 sharAI.collision = function(object) {
-    if (object instanceof Bot && object != sharAI && object != dylan && sharAI.hunger.value > sharAI.hunger.satedPoint) {
-        sharAI.hunt.eat();
+    if (object instanceof Bot && object != sharAI && sharAI.hunger.value > sharAI.hunger.satedPoint) {
+        sharAI.hunt.eatBot(object);
     }
 }
 
@@ -590,7 +589,7 @@ sharAI.collision = function(object) {
  * @return {void}
  */
 sharAI.highFived = function(botWhoHighFivedMe) {
-    sharAI.speak(botWhoHighFivedMe, "Those are some nice phalanges you got there," + botWhoHighFivedMe.name + ". It would be a shame if something happened to them :)");
+    //sharAI.speak("A hand, for me? How kind of you, " + botWhoHighFivedMe.name + "!");
     sharAI.boredom.value -= 5;
 }
 
@@ -601,23 +600,8 @@ sharAI.highFived = function(botWhoHighFivedMe) {
  * @return {void}
  */
 sharAI.gotBit = function(botWhoAttackedMe, damage) {
-    sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that!");
+    sharAI.speak("Ow! You'll pay for that, " + botWhoAttackedMe.name + "!");
     sharAI.bite(botWhoAttackedMe, 25, 25);
-}
-
-/**
- * Override of Bot.speak
- * @param  {Bot} botToTalkTo The bot sharAI's talking to
- * @param  {String} whatToSay What sharAI will say to the bot they're speaking to
- * @return {void}
- */
-sharAI.speak = function(botToTalkTo, whatToSay) {
-    if (botToTalkTo instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
-            botToTalkTo.hear(this, whatToSay);
-        }
-    }
-    sharAI.voicebox = "sharAI says: " + whatToSay;
 }
 
 /**
