@@ -1,7 +1,7 @@
 /**
  * faust's bot
  */
-var faust = new Bot(300, 300, 'faust', 'js/bots/faust/person.png');
+var faust = new Bot(300, 300, 'faust', 'js/bots/faust/faust.png');
 
 /**
  * State variables
