@@ -3,6 +3,8 @@ duyen.angle = 90;
 duyen.speed = 100;
 
 duyen.stateText = "just flowing around";
+duyen.speechText = "Nothing";
+duyen.currentlyPursuing = "";
 
 duyen.init = function() {
 this.body = this.sprite.body;
@@ -173,6 +175,8 @@ duyen.getStatus = function() {
     statusString += "\nMotion: " + duyen.motionMode.description;
     statusString += "\n " + duyen.hunger.toString();
     statusString += "\n " + duyen.hygiene.toString();
+    statusString += "\nMoving to: " + duyen.currentlyPursuing;
+    statusString += "\nSpeech: " + duyen.speechText;
     return statusString;
 }
 
@@ -183,6 +187,7 @@ duyen.update = function() {
     }
     duyen.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.
     this.basicUpdate();
+    duyen.genericUpdate();
 };
 
 // Called every tenth of a second
@@ -208,6 +213,23 @@ duyen.hunger.eat(101);
 // Called every three minutes
 duyen.update3min = function() {
 duyen.hygiene.clean(101);
+}
+
+
+duyen.collision = function(object) {
+    // console.log("Object is edible: " + object.isEdible);
+    if (!duyen.speechText.contains(object.name)) {
+        duyen.speechText += "Hello " + object.name + ".";
+    }
+    duyen.speak(object, "Hello " + object.name);
+    // duyen.flee(object);
+    // duyen.pursue(object);
+}
+
+duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    if (!duyen.speechText.contains("Oh you")) {
+        duyen.speechText += " Oh you just said " + whatTheySaid + ".";
+    }
 }
 
 
