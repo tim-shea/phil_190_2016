@@ -23,6 +23,7 @@ var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey];
 var sprites = [];
 var entities = [];
 var currentBotIndex = defaultBotIndex;
+var sounds = {};
 
 //
 // Main game object. Size of visible region.
@@ -132,6 +133,9 @@ function create() {
 
     // Set up food items
     setUpFood();
+
+    // Set up global sounds
+    sounds.chomp = game.add.audio('chomp');
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);

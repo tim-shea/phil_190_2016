@@ -22,7 +22,6 @@ sharAI.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 1, sharAI.updatePerSec, this);
 
     sharAI.giggle = game.add.audio('doozer');
-    sharAI.chomp = game.add.audio('chomp');
 }
 
 /**
@@ -346,7 +345,7 @@ sharAI.hunt = {
         if (bot instanceof Bot) {
             sharAI.hunger.value -= 300;
             sharAI.hunger.value = Math.max(0, this.value)
-            sharAI.chomp.play();
+            sounds.chomp.play();
             sharAI.bite(bot, 25);
             sharAI.speak("Thanks for the meal, " + bot.name + "!");
             sharAI.highFive(bot);
