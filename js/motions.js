@@ -15,9 +15,8 @@ Motions.stop = {
     apply: function(botToMove) {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
-
         }
-        botToMove.botToMove.speed = 150;
+        botToMove.speed = 150;
         botToMove.basicUpdate();
     }
 }
@@ -75,7 +74,6 @@ Motions.sonicSpeed = {
         }
         //VERY fast
         botToMove.body.speed = 700;
-// >>>>>>> origin/master
         botToMove.basicUpdate();
     }
 }
@@ -91,7 +89,6 @@ Motions.moping = {
         botToMove.basicUpdate();
     }
 }
-// <<<<<<< HEAD
 Motions.energysaver = {
     description: "I need to conserve energy!",
     apply: function(botToMove) {
@@ -134,7 +131,7 @@ Motions.speeding = {
             botToMove.incrementAngle(5 * Math.random() - 5)
         }
         botToMove.body.speed = 575;
-        //botToMove.basicUpdade();
+        botToMove.basicUpdate();
     }
 } 
 
@@ -178,6 +175,6 @@ Motions.chaotic ={
     apply: function (botToMove) {
         botToMove.incrementAngle(140)
         botToMove.body.speed = 450;
+        botToMove.basicUpdate();
     }
 }
-// >>>>>>> origin/master
