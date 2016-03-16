@@ -366,6 +366,28 @@ Bot.prototype.crush = function(botToCrush, damage) {
 }
 
 /**
+ * Bow down to bot
+ * @param {Bot} botToBow the bot that is being bowed down to
+ */
+Bot.prototype.bow = function(botToBow) {
+	if (botToBow instanceof Bot) {
+		if(game.physics.arcade.distanceBetween(this.sprite, botToBow.sprite) < 15) {
+            botToBow.gotBow(this);
+        }
+	}
+};
+/**
+ * Override to react when bowed down to
+ * 
+ * @param {Bot} botWhoBowed bot who bowed down to me
+ * 
+ */
+Bot.prototype.bower = function(botWhoBowed) {
+	console.log(botWhoBowed.name + "bowed down to " + this.name);
+};
+
+
+/**
  * Lick a specified bot
  *
  * @param {Bot} botToLick the bot to lick

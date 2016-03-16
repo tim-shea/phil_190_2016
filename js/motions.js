@@ -93,6 +93,16 @@ Motions.speeding = {
     }
 } 
 
+Motions.tantrum = {
+    description: "throwing a tantrum",
+    apply: function(botToMove) {
+        if (Math.random() < .7) {
+            botToMove.incrementAngle(60 * Math.random() - 5)
+        }
+        botToMove.body.speed = 500;
+        botToMove.basicUpdate();
+    }
+}
 
 /**
  * Yang's Final Motion
