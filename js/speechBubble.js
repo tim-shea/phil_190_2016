@@ -1,5 +1,5 @@
 /**
- * From http://jsfiddle.net/lewster32/81pzgs4z/
+ * @file From {@link http://jsfiddle.net/lewster32/81pzgs4z/}
  *
  * @author Lewis Lane (http://www.rotates.org/)
  * 

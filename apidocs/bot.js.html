@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: bot.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: bot.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @fileOverview Parent object for all bots.
  */
 
@@ -28,9 +56,6 @@ function Bot(x, y, name, path) {
 
     // Eating each other is not yet supported.
     this.isEdible = false;
-
-    // Flag turned on during bot interactions to prevent infinite loops between bots.
-    this.isInteracting = false;
 
 };
 
@@ -77,7 +102,7 @@ Bot.prototype.atBoundary = function() {
     if (this.body.onFloor()) {
         return true;
     }
-    if (this.body.y < 1) {
+    if (this.body.y &lt; 1) {
         return true;
     }
     return false;
@@ -137,7 +162,7 @@ Bot.prototype.basicUpdate = function() {
  */
 Bot.objectsOverlap = function(item1, item2) {
     if (item1 != item2) {
-        // if(item1.body.enable && item2.body.enable) {
+        // if(item1.body.enable &amp;&amp; item2.body.enable) {
             return Phaser.Rectangle.intersects(item1.getBounds(), item2.getBounds());            
         // }
     }
@@ -230,7 +255,7 @@ Bot.prototype.getOverlappingEntities = function() {
 
     // Static entities (ignore background)
     entities.forEach(function(entity) {
-        if (entity.sprite.key && entity.sprite.key !== "background") {
+        if (entity.sprite.key &amp;&amp; entity.sprite.key !== "background") {
             if (Bot.objectsOverlap(me, entity.sprite)) {
                 overlappingObjects.push(entity);
             }
@@ -274,14 +299,11 @@ Bot.prototype.speak = function(botToTalkTo, whatToSay) {
     // TODO speech bubble has extra left padding often.
     // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
     this.speechBubble.visible = true;
-    game.time.events.add(Phaser.Timer.SECOND * 1, function() { 
-        this.speechBubble.visible = false; 
-        this.isInteracting = false;}, this);
+    game.time.events.add(Phaser.Timer.SECOND * 1, function() { this.speechBubble.visible = false; }, this);
 
     // Call the listeners "hear" function
-    if (botToTalkTo instanceof Bot && this.isInteracting === false) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
-            this.isInteracting = true;
+    if (botToTalkTo instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) &lt; 100) {
             botToTalkTo.hear(this, whatToSay);
         }
     }
@@ -304,7 +326,7 @@ Bot.prototype.hear = function(botWhoSpokeToMe, whatTheySaid) {
  */
 Bot.prototype.highFive = function(botToHighFive) {
     if (botToHighFive instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToHighFive.sprite) < 100) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToHighFive.sprite) &lt; 100) {
             botToHighFive.highFived(this);
         }
     }
@@ -327,7 +349,7 @@ Bot.prototype.highFived = function(botWhoHighFivedMe) {
  */
 Bot.prototype.bite = function(botToAttack, damage) {
     if (botToAttack instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) &lt; 50) {
             botToAttack.gotAttacked(this, damage);
         }
     }
@@ -352,41 +374,26 @@ Bot.prototype.antler_caress = function(botTocaress, message) {
 
 Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
     console.log(botWhocaresedMe.name + "attacked me!");
-};
+};</code></pre>
+        </article>
+    </section>
 
-/**
- * Crush a bot at close proximity
- * @param  {Bot} botToCrush the bot being crushed
- * @param  {number} damage     damage of crushing, should be higher than biting?
- * 
- */
-Bot.prototype.crush = function(botToCrush, damage) {
-    if (botToCrush instanceof Bot) {
-        if(game.physics.arcade.distanceBetween(this.sprite, botToCrush.sprite) < 10) {
-            botToCrush.gotCrushed(this, damage);
-        }
-    }
-}
 
-/**
- * Lick a specified bot
- *
- * @param {Bot} botToLick the bot to lick
- */
-Bot.prototype.lick = function(botTolick) {
-    if (botTolick instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botTolick.sprite) < 100) {
-            botTolick.gotLicked(this);
-        }
-    }
-};
 
-/**
- * Override to react when licked
- *
- * @param  {Bot} botWhoLickedToMe who licked me
- */
-Bot.prototype.gotLicked = function(botWhoLickedMe) {
-    console.log(botWhoLickedMe.name + " licked " + this.name);
-};
 
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addFoodItem">addFoodItem</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#DecayVariable">DecayVariable</a></li><li><a href="global.html#fireProductions">fireProductions</a></li><li><a href="global.html#jeff">jeff</a></li><li><a href="global.html#loadSpeechBubbleAssets">loadSpeechBubbleAssets</a></li><li><a href="global.html#MarkovProcess">MarkovProcess</a></li><li><a href="global.html#Motions">Motions</a></li><li><a href="global.html#Production">Production</a></li><li><a href="global.html#setUpFood">setUpFood</a></li><li><a href="global.html#yang">yang</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Mar 15 2016 12:46:45 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,49 +1,50 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: bots/yang/yang.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: bots/yang/yang.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Yang's Bot
- * @namespace yang
- * @constructor
+ * @type {Bot}
  */
 var yang = new Bot(2700, 2700, 'yang', 'js/bots/yang/yang.png');
-
-///////////////////////////////////////////////////////////////////////////
-//One leve of variable only contains :                                   //
-//basic variables and references                                         //
-//basic functions that manipulate basic variables and references         //
-//objects that has its own basic variables, basic functions and objects  //
-//"_" marks objects                                                      //
-///////////////////////////////////////////////////////////////////////////
-
 /**
- * combine all debug related stuff.
- * @memberOf yang
+ * One leve of variable only contains :
+ * basic variables and references
+ * basic functions that manipulate basic variables and references 
+ * objects that has its own basic variables, basic functions and objects 
+ * "_" marks objects
  */
-yang.test_ = {};
-/**
- * combine all text related varandfun.
- * @memberOf yang
- */
-yang.text_ = {};
-/**
- * combine all additional non-initializor functions.
- * @memberOf yang
- */
-yang.fun_ = {};
-/**
- * stores random number for repeated use.
- * @memberOf yang
- */
-yang.chaosmachine_ = {};
-/**
- * basic bio states of two resources.
- * @memberOf yang
- */
-yang.biomachine_ = {};
-/**
- * basic mind states of two spirit.
- * @memberOf yang
- */
-yang.mindmachine_ = {};
-yang.node_ = {}; //store non-default nodes.
+yang.test_ = {}; //combine all debug related stuff
+yang.text_ = {}; //combine all text related varandfun
+yang.fun_ = {}; //combine all additional non-initializor functions
+yang.chaosmachine_ = {}; //for random
+yang.biomachine_ = {}; //basic bio states of two resources
+yang.mindmachine_ = {}; //basic mind states of two spirit
+yang.node_ = {}; //store non-default nodes
 
 /**
  * major node reference, those index names are magic
@@ -63,24 +64,18 @@ yang["rotation_node"] = yang.void_node;
 yang.init = function() {
     //setup body
     this.body = this.sprite.body;
+    //recurrent event
+    game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
+    game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
     //Body
     yang.body.rotation = 0;
     yang.body.speed = 100;
-    yang.temp_speed = 0;//for special movements
     //other basic variables
     yang.control = false; //detect cursor
-    yang.basicupdate_disable = false;
-    yang.unstable = false;
     //non state machine objects
     yang.init_plus();
     //state machines objects
     yang.init_state();
-    //recurrent event
-    if (yang.test_.test_ongoing) {
-        game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
-    } else {
-        game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
-    }
 };
 
 yang.init_plus = function() { //object related initialization
@@ -88,8 +83,6 @@ yang.init_plus = function() { //object related initialization
     yang.text_.stateText = "No Message";
     yang.text_.rotationText = "No Message";
     yang.text_.motionText = "No Message";
-    yang.text_.interactiveText = "";
-    yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
     yang.test_.test_ongoing = false;
@@ -145,9 +138,8 @@ yang.getStatus = function() {
     if (yang.test_.test_ongoing) {
         yang.text_.stateText =
             "Test Mode" + "\n" +
-            yang.text_.testFeedBack + "\n" +
             "Test node description: " + "\n" +
-            //yang[yang.test_.current_testnode.type].description + "\n" +
+            yang[yang.test_.current_testnode.type].description + "\n" +
             yang.test_.current_testnode.type + " node description:" + "\n" +
             yang.test_.current_testnode.description + "\n" +
             yang.text_.rotationText + "\n" +
@@ -175,19 +167,10 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
         yang["mental_task_node"].always_fun();
         yang.fun_.AImotion_always_fun();
     }
-
-    if (!yang.basicupdate_disable) {
-        if (yang.unstable) {
-            yang.body.speed = yang.temp_speed;
-            yang.unstable = false;
-        }
-        game.physics.arcade.velocityFromRotation(
-            this.sprite.rotation,
-            this.sprite.body.speed,
-            this.sprite.body.velocity);
-    } else {
-        yang.basicupdate_disable = false;
-    }
+    game.physics.arcade.velocityFromRotation(
+        this.sprite.rotation,
+        this.sprite.body.speed,
+        this.sprite.body.velocity);
 };
 
 yang.update = function() {
@@ -204,7 +187,7 @@ yang.update = function() {
         yang.incrementAngle(100);
     }
     yang.chaosmachine_.chance = Math.random();
-    if (yang.chaosmachine_.chance <= .10) {
+    if (yang.chaosmachine_.chance &lt;= .10) {
         yang.incrementAngle(4);
     } else if (yang.chaosmachine_.chance >= .90) {
         yang.incrementAngle(-4);
@@ -250,9 +233,6 @@ yang.timedEvend = function() {
     yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
     //speical markov chain update
     yang.MRGPRB4.update();
-    Motions.zeleport.apply(yang);
-    //clear interactive messages
-    yang.text_.interactiveText = "";
 };
 
 /**
@@ -275,9 +255,6 @@ yang.fun_.AImotion_always_fun = function() { //this is the current state
  * Test Zone
  * @return {[type]} [description]
  */
-
-
-
 //to do
 //need to remove into a node
 yang.tag_game_obj = function() {
@@ -297,14 +274,11 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
-        /*
-        yang.test_.current_testnode = yang.def_node();
+        yang.test_.current_testnode = yang.node_.id_secondary_focus;
         yang.test_.current_testnode.init_fun();
         yang.test_.current_testnode.always_fun();
         yang.test_.current_testnode.current_fun();
         yang.test_.current_testnode.switch_to_this_node();
-        */   
-        
         yang.test_.ini++;
     }
 
@@ -312,21 +286,15 @@ yang.test_.node_test = function() { // test with a permanate state
     //
 };
 
-yang.test_.timed_test = function() {
-    Motions.zeleport.apply(yang);
-};
+yang.test_.timed_test = function() {};
 
 /**
  * Interaction Zone 
  * @Override
  */
-yang.collision = function(object) {//collision and highfive
+yang.collision = function(object) {
     yang.highFive(object);
-    if ((object instanceof Bot) && yang.text_.interactiveText != "")
-    {
-        yang.speak(object, yang.text_.interactiveText);
-    }
-    for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
+    for (var brakeloop = 0; brakeloop &lt; 2; brakeloop++) {    
         yang.node_.brake.brake();//slow down to high five
     }
     yang.biomachine_.metaresources_secondary += 0.2;
@@ -336,11 +304,6 @@ yang.collision = function(object) {//collision and highfive
 yang.highFived = function(botWhoHighFivedMe) {
     yang.speak (botWhoHighFivedMe, "Yoyoyo, let's party bruh.");
 }
-
-yang.hear = function (botWhoSpokeToMe, whatTheySaid) {
-     yang.text_.interactiveText = "mimic* " + botWhoSpokeToMe.name + ":" + whatTheySaid;
-}
-
 
 /**
  * Markov chain of MRGPRB4
@@ -368,6 +331,7 @@ yang.MRGPRB4.add("annoyed", [
     ["annoyed", "wary"],
     [.8, .2]
 ]);
+
 
 /**
  * Nodes
@@ -431,7 +395,7 @@ yang.node_.slow_node.current_fun = function() { //control sensitive
     yang.body.speed = Math.max(100, yang.body.speed);
 };
 yang.node_.slow_node.always_fun = function() {   
-    if (yang.biomachine_.metaresources_prime < 10) {
+    if (yang.biomachine_.metaresources_prime &lt; 10) {
         yang.node_.stop_node.switch_to_this_node();
     } else if (yang.biomachine_.metaresources_secondary >= 50) {
         yang.node_.fast_node.switch_to_this_node();
@@ -449,7 +413,7 @@ yang.node_.fast_node.current_fun = function() { //control sensitive
     yang.body.speed = Math.max(200, yang.body.speed);
 };
 yang.node_.fast_node.always_fun = function() {
-    if (yang.biomachine_.metaresources_secondary < 10) {
+    if (yang.biomachine_.metaresources_secondary &lt; 10) {
         yang.node_.slow_node.switch_to_this_node();
     }
 };
@@ -500,7 +464,7 @@ yang.node_.wander = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.wander.description = "Deer wanders.";
 yang.node_.wander.current_fun = function() { //control sensitive
     yang.chaosmachine_.chance = Math.random();
-    if (yang.chaosmachine_.chance <= .50) {
+    if (yang.chaosmachine_.chance &lt;= .50) {
         yang.body.speed += 5;
     } else if (yang.chaosmachine_.chance > .50) {
         yang.body.speed -= 4;
@@ -514,12 +478,12 @@ yang.node_.wander.current_fun = function() { //control sensitive
 yang.node_.gallop = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.gallop.description = "Deer is in motion.";
 yang.node_.gallop.current_fun = function() { //control sensitive
-    if (yang.mindmachine_.inspiration >= 70 && !yang.node_.leap.leap_loop) {
+    if (yang.mindmachine_.inspiration >= 70 &amp;&amp; !yang.node_.leap.leap_loop) {
         yang.node_.leap.switch_to_this_node();
     }
-    if (yang.body.speed < 300) {
+    if (yang.body.speed &lt; 300) {
         yang.chaosmachine_.chance = Math.random();
-        if (yang.chaosmachine_.chance <= .50) {
+        if (yang.chaosmachine_.chance &lt;= .50) {
             yang.body.speed += 2;
         } else if (yang.chaosmachine_.chance > .50) {
             yang.body.speed -= 1;
@@ -607,7 +571,7 @@ yang.node_.id_prime_focus.always_fun = function() { //ignore control
         "Deer senses a philoberry grows at " +
         yang.berry.berry_distance +
         " pixels away.";
-    if (yang.berry.berry_distance < 50) {
+    if (yang.berry.berry_distance &lt; 50) {
         //eat berry and grow a new one
         yang.biomachine_.metaresources_prime += 200;
         //berry spawn mechanic, currently disabled
@@ -634,7 +598,7 @@ yang.node_.superego_brood_focus.init_fun = function() { //only call once
     yang.chaosmachine_.randomness = 0;
 };
 yang.node_.superego_brood_focus.always_fun = function() { //control sensitive
-    if (yang.biomachine_.metaresources_prime < 10) {
+    if (yang.biomachine_.metaresources_prime &lt; 10) {
         yang.node_.id_prime_focus.switch_to_this_node();
     } else if (yang.biomachine_.metaresources_secondary >= 90) {
         yang.node_.superego_drain_focus.switch_to_this_node();
@@ -652,7 +616,7 @@ yang.node_.superego_drain_focus.init_fun = function() { //only call once
     yang.chaosmachine_.randomness = 0;
 };
 yang.node_.superego_drain_focus.always_fun = function() { //control sensitive
-    if (yang.biomachine_.metaresources_prime < 10) {
+    if (yang.biomachine_.metaresources_prime &lt; 10) {
         yang.node_.id_prime_focus.switch_to_this_node();
     } else if (yang.mindmachine_.emptyness >= 90) {
         yang.node_.superego_brood_focus.switch_to_this_node();
@@ -712,8 +676,8 @@ yang.incrementAngle = function(amount) {
 //other edits
 /* 
 botplayground.html
-<script src="bots/yang/yang.js"></script>
-<option value="yang">Yang</option>
+&lt;script src="bots/yang/yang.js">&lt;/script>
+&lt;option value="yang">Yang&lt;/option>
 
 /*under preload function
 game.load.image('oakTree', 'assets/oakTree.png');
@@ -743,5 +707,28 @@ Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
 
 
 /*extra resources
-http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
+http=//phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
 */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addFoodItem">addFoodItem</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#DecayVariable">DecayVariable</a></li><li><a href="global.html#fireProductions">fireProductions</a></li><li><a href="global.html#jeff">jeff</a></li><li><a href="global.html#loadSpeechBubbleAssets">loadSpeechBubbleAssets</a></li><li><a href="global.html#MarkovProcess">MarkovProcess</a></li><li><a href="global.html#Motions">Motions</a></li><li><a href="global.html#Production">Production</a></li><li><a href="global.html#setUpFood">setUpFood</a></li><li><a href="global.html#yang">yang</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Mar 15 2016 12:46:45 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

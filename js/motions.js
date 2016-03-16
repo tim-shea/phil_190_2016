@@ -70,6 +70,7 @@ Motions.moping = {
         botToMove.basicUpdate();
     }
 }
+
 Motions.weaving = {
     description: "weaving",
     apply: function(botToMove) {
@@ -91,3 +92,24 @@ Motions.speeding = {
         //botToMove.basicUpdade();
     }
 } 
+
+
+/**
+ * Yang's Final Motion
+ * @type {Object}
+ */
+Motions.zeleport = {
+    description: "Zeleporting",
+    apply: function(botToMove) {
+        botToMove.basicupdate_disable = true;//find a way to re-enable it after the movement.
+        botToMove.unstable = true;
+        botToMove.temp_speed = botToMove.body.speed;//remember to restore this speed otherwise bots go berserk
+        var temp_angle = Math.round( 
+        game.physics.arcade.moveToXY(botToMove, 
+            botToMove.body.x + Math.round(Math.random() * 10 - 5), 
+            botToMove.body.y + Math.round(Math.random() * 10 - 5), 
+            undefined, 7) / Math.PI * 180); //radius to angle
+        //yang.text_.testFeedBack = temp_angle; // for debug
+    }
+}
+
