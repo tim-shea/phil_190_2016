@@ -400,6 +400,12 @@ Bot.prototype.lick = function(botTolick) {
     }
 };
 
+Bot.prototype.shield = function(pursuantBot) {
+    if (game.physics.arcade.distanceBetween(this.sprite, pursuantBot.sprite) < 150) {
+        console.log("Shields up!");
+    }
+}
+
 /**
  * Override to react when licked
  *

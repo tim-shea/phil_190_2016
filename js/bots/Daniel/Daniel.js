@@ -10,9 +10,9 @@ Daniel.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 60, Daniel.updateMin, this);
 }
 
-//
-// Fear State
-//
+/**
+ * Fear State
+ */
 Daniel.fear = {
     amount: 0,
     reassure: function(ease_amount) {
@@ -21,7 +21,9 @@ Daniel.fear = {
     },
     update: function() {
         if (this.amount >= 100) {
-            //cry alot
+            /**
+             * cry alot
+             */
         } else {
             this.amount++;
         }
@@ -43,10 +45,9 @@ Daniel.fear = {
     }
 }
 
-
-//
-// Hunger State
-//
+/**
+ * Hunger State
+ */
 Daniel.hunger = {
     amount: 0,
     eat: function(food_amount) {
@@ -55,7 +56,9 @@ Daniel.hunger = {
     },
     update: function() {
         if (this.amount >= 100) {
-            //do nothing
+            /**
+             * do nothing
+             */
         } else if (Daniel.motionMode == Daniel.baseline) {
             this.amount += 1;;
         } else if (Daniel.motionMode == Daniel.powerwalking) {
@@ -80,10 +83,10 @@ Daniel.hunger = {
         return hungerLevel + " (Hunger = " + this.amount + "%)";
     }
 }
+/**
+ * Motion States
+ */
 
-//
-// Motion States
-//
 Daniel.baseline = {
     description: "Walking pace",
     update: function() {
@@ -117,71 +120,28 @@ Daniel.exhaustion = {
         }
     }
 }
+/**
+ * Mental States
+ */
 
-//
-// Mental States
-//
+Daniel.emotions = new MarkovProcess("Chill");
+Daniel.emotions.add("Chill", [
+    ["Chill", "Enthusiastic", "Apathetic"],
+    [.8, .1, .1]
+]);
+Daniel.emotions.add("Apathetic", [
+    ["Enthusiastic", "Chill", "Apathetic"],
+    [.05, .45, .5]
+]);
+Daniel.emotions.add("Enthusiastic", [
+    ["Apathetic", "Chill", "Enthusistic"],
+    [.05, .45, .5]
+]);
 
-Daniel.chill = {
-    name: "calm.",
-    transitionProb: .3,
-    transition: function() {
-        if (Math.random() < .4) {
-            return Daniel.enthusiastic;
-        } else {
-            return Daniel.apathetic;
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .9) {
-            return Daniel.baseline;
-        } else {
-            return Daniel.exhaustion;
-        }
-    }
-}
-Daniel.enthusiastic = {
-    name: "enthusiastic!",
-    transitionProb: .4,
-    transition: function() {
-        if (Math.random() < .3) {
-            return Daniel.chill;
-        } else {
-            return Daniel.enthusiastic
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .5) {
-            return Daniel.powerwalking;
-        } else {
-            return Daniel.sonic;
-        }
-    }
-}
-Daniel.apathetic = {
-    name: "bored.",
-    transitionProb: .7,
-    transition: function() {
-        if (Math.random() < .7) {
-            return Daniel.chill;
-        } else {
-            return Daniel.apathetic;
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .8) {
-            return Daniel.exhaustion;
-        } else {
-            return Daniel.baseline;
-        }
-    }
-}
-
-Daniel.emotion = Daniel.chill;
 Daniel.motionMode = Daniel.baseline;
 
 Daniel.getStatus = function() {
-    var statusString = "I am feeling " + Daniel.emotion.name;
+    var statusString = "I am feeling " + Daniel.emotions.current;
     statusString += "\n>------<";
     statusString += "\nSpeed: " + Daniel.motionMode.description;
     statusString += "\n" + Daniel.hunger.toString();
@@ -189,25 +149,50 @@ Daniel.getStatus = function() {
     return statusString;
 }
 
-Daniel.update = function() {
-    if (Daniel.atBoundary() === true) {
-        Daniel.incrementAngle(45);
+Daniel.collision = function(object) {
+    if (object.isEdible) {
+        Daniel.eatObject(object);
+    } else {
+        Daniel.speak(object, "Hello " + object.name);
     }
+    if (object instanceof Bot) {
+        object.highFive();
+    }
+    if (object instanceof Bot && Daniel.fear.amount > 75) {
+        console.log("Shielding against " + object);
+        Daniel.shield(object);
+    }
+}
+
+Daniel.eatObject = function(edibleObject) {
+    edibleObject.eat();
+    Daniel.hunger.eat(edibleObject.calories);
+    Daniel.speak(edibleObject, "Yummy " + edibleObject.description + "!");
+}
+
+Daniel.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    //console.log("Heard");
+    Daniel.speak(botWhoSpokeToMe, "I hear ya, " + botWhoSpokeToMe.name); 
+}
+ 
+Daniel.highFived = function(botWhoHighFivedMe) {
+    //console.log("High Fived");
+    Daniel.speak(botWhoHighFivedMe, "High five, " + botWhoHighFivedMe.name + "!");
+}
+
+Daniel.update = function() {
     Daniel.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.
     this.basicUpdate();
+    Daniel.genericUpdate();
 };
 
 Daniel.updateOneSecond = function() {
     Daniel.hunger.update();
     Daniel.fear.update();
-    if (Math.random() < Daniel.emotion.transitionProb) {
-        Daniel.emotion = Daniel.emotion.transition();
-    }
-    Daniel.motionMode = Daniel.emotion.getMotionMode();
 }
-
-//feeds every minute
+/*
+Feeds every minute
+ */
 Daniel.updateMin = function() {
-    Daniel.hunger.eat(75);
     Daniel.fear.reassure(100);
 }
