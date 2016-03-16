@@ -46,14 +46,26 @@ Motions.walking = {
         botToMove.basicUpdate();
     }
 }
+Motions.running = {
+    description: "running!",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(10 * Math.random() - 5);
+        }
+        //faster than walking
+        botToMove.body.speed = 350;
+        botToMove.basicUpdate();
+
+    }
+}
 Motions.sonicSpeed = {
     description: "SONIC SPEED!",
     apply: function(botToMove) {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
         }
-        //very fast
-        botToMove.body.speed = 500;
+        //VERY fast
+        botToMove.body.speed = 700;
         botToMove.basicUpdate();
 
     }

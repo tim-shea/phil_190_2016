@@ -54,7 +54,7 @@ faust.emotions.add("Calm", [
 ]);
 faust.emotions.add("Upbeat", [
     ["Upbeat", "Calm", "Happy",],
-    [.2, .3, .5,]
+    [.5, .3, .2,]
 ]);
 faust.emotions.add("Sad", [
     ["Sad", "Calm"],
@@ -125,6 +125,13 @@ faust.setMotion = function() {
             faust.currentMotion = Motions.still;
         } else {
             faust.currentMotion = Motions.walking;
+        }
+    } else if (faust.emotions.current === "Upbeat") {
+        let rnd = Math.random();
+        if (rnd < .5) {
+            faust.currentMotion = Motions.speeding;
+        } else {
+            faust.currentMotion = Motions.weaving;
         }
     } else if (faust.emotions.current === "Angry") {
         faust.currentMotion = Motions.spazzing;
