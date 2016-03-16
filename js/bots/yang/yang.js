@@ -63,18 +63,24 @@ yang["rotation_node"] = yang.void_node;
 yang.init = function() {
     //setup body
     this.body = this.sprite.body;
-    //recurrent event
-    game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
-    game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
     //Body
     yang.body.rotation = 0;
     yang.body.speed = 100;
+    yang.temp_speed = 0;//for special movements
     //other basic variables
     yang.control = false; //detect cursor
+    yang.basicupdate_disable = false;
+    yang.unstable = false;
     //non state machine objects
     yang.init_plus();
     //state machines objects
     yang.init_state();
+    //recurrent event
+    if (yang.test_.test_ongoing) {
+        game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
+    } else {
+        game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
+    }
 };
 
 yang.init_plus = function() { //object related initialization
@@ -83,6 +89,7 @@ yang.init_plus = function() { //object related initialization
     yang.text_.rotationText = "No Message";
     yang.text_.motionText = "No Message";
     yang.text_.interactiveText = "";
+    yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
     yang.test_.test_ongoing = false;
@@ -138,8 +145,9 @@ yang.getStatus = function() {
     if (yang.test_.test_ongoing) {
         yang.text_.stateText =
             "Test Mode" + "\n" +
+            yang.text_.testFeedBack + "\n" +
             "Test node description: " + "\n" +
-            yang[yang.test_.current_testnode.type].description + "\n" +
+            //yang[yang.test_.current_testnode.type].description + "\n" +
             yang.test_.current_testnode.type + " node description:" + "\n" +
             yang.test_.current_testnode.description + "\n" +
             yang.text_.rotationText + "\n" +
@@ -167,10 +175,19 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
         yang["mental_task_node"].always_fun();
         yang.fun_.AImotion_always_fun();
     }
-    game.physics.arcade.velocityFromRotation(
-        this.sprite.rotation,
-        this.sprite.body.speed,
-        this.sprite.body.velocity);
+
+    if (!yang.basicupdate_disable) {
+        if (yang.unstable) {
+            yang.body.speed = yang.temp_speed;
+            yang.unstable = false;
+        }
+        game.physics.arcade.velocityFromRotation(
+            this.sprite.rotation,
+            this.sprite.body.speed,
+            this.sprite.body.velocity);
+    } else {
+        yang.basicupdate_disable = false;
+    }
 };
 
 yang.update = function() {
@@ -233,8 +250,9 @@ yang.timedEvend = function() {
     yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
     //speical markov chain update
     yang.MRGPRB4.update();
+    Motions.zeleport.apply(yang);
     //clear interactive messages
-    yang.text_.interactiveText = [];
+    yang.text_.interactiveText = "";
 };
 
 /**
@@ -279,11 +297,14 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
-        yang.test_.current_testnode = yang.node_.id_secondary_focus;
+        /*
+        yang.test_.current_testnode = yang.def_node();
         yang.test_.current_testnode.init_fun();
         yang.test_.current_testnode.always_fun();
         yang.test_.current_testnode.current_fun();
         yang.test_.current_testnode.switch_to_this_node();
+        */   
+        
         yang.test_.ini++;
     }
 
@@ -291,7 +312,9 @@ yang.test_.node_test = function() { // test with a permanate state
     //
 };
 
-yang.test_.timed_test = function() {};
+yang.test_.timed_test = function() {
+    Motions.zeleport.apply(yang);
+};
 
 /**
  * Interaction Zone 
@@ -720,5 +743,5 @@ Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
 
 
 /*extra resources
-http=//phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
+http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
 */
