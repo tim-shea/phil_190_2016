@@ -135,3 +135,15 @@ Motions.zeleport = {
     }
 }
 
+
+/**
+ * Troi's motion_1
+ * @type {Object}
+ */
+Motions.chaotic ={
+    description: "chaotic movement",
+    apply: function (botToMove) {
+        botToMove.incrementAngle(140)
+        botToMove.body.speed = 450;
+    }
+}

@@ -415,3 +415,8 @@ Bot.prototype.gotLicked = function(botWhoLickedMe) {
     console.log(botWhoLickedMe.name + " licked " + this.name);
 };
 
+Bot.prototype.ignore = function (annoyingBot) {
+    this.incrementAngle(180);
+    this.body.speed = 250;
+    console.log(this.name + " ignored " + annoyingBot);
+}
