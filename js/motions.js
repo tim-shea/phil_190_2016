@@ -47,7 +47,7 @@ Motions.walking = {
     }
 }
 Motions.running = {
-    description: "running!",
+    description: "Running!",
     apply: function(botToMove) {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
@@ -55,7 +55,16 @@ Motions.running = {
         //faster than walking
         botToMove.body.speed = 350;
         botToMove.basicUpdate();
-
+    }
+}
+Motions.takingFlight = {
+    description: "Taking flight!",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(10 * Math.random() - 5);
+        }
+        botToMove.body.speed = 500;
+        botToMove.basicUpdate();
     }
 }
 Motions.sonicSpeed = {
@@ -64,15 +73,10 @@ Motions.sonicSpeed = {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
         }
-// <<<<<<< HEAD
-        //very fast
-        botToMove.body.speed = 1000;
-// =======
         //VERY fast
         botToMove.body.speed = 700;
 // >>>>>>> origin/master
         botToMove.basicUpdate();
-
     }
 }
 Motions.moping = {
@@ -97,7 +101,6 @@ Motions.energysaver = {
         //very slow
         botToMove.body.speed = 5;
         botToMove.basicUpdate();
-
     }
 }
 
@@ -110,11 +113,9 @@ Motions.dancing = {
         //very fast
         botToMove.body.speed = 300;
         botToMove.basicUpdate();
-
     }
 }
 // =======
-
 Motions.weaving = {
     description: "weaving",
     apply: function(botToMove) {
