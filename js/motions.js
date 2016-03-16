@@ -17,7 +17,7 @@ Motions.stop = {
             botToMove.incrementAngle(10 * Math.random() - 5);
 
         }
-        botToMove.botToMove.speed = 0;
+        botToMove.botToMove.speed = 150;
         botToMove.basicUpdate();
     }
 }
@@ -64,8 +64,13 @@ Motions.sonicSpeed = {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
         }
+// <<<<<<< HEAD
+        //very fast
+        botToMove.body.speed = 1000;
+// =======
         //VERY fast
         botToMove.body.speed = 700;
+// >>>>>>> origin/master
         botToMove.basicUpdate();
 
     }
@@ -82,6 +87,33 @@ Motions.moping = {
         botToMove.basicUpdate();
     }
 }
+// <<<<<<< HEAD
+Motions.energysaver = {
+    description: "I need to conserve energy!",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(10 * Math.random() - 5);
+        }
+        //very slow
+        botToMove.body.speed = 5;
+        botToMove.basicUpdate();
+
+    }
+}
+
+Motions.dancing = {
+    description: "I must dance!",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            rey.incrementAngle(50 * Math.random() - 5);
+        }
+        //very fast
+        botToMove.body.speed = 300;
+        botToMove.basicUpdate();
+
+    }
+}
+// =======
 
 Motions.weaving = {
     description: "weaving",
@@ -147,3 +179,4 @@ Motions.chaotic ={
         botToMove.body.speed = 450;
     }
 }
+// >>>>>>> origin/master

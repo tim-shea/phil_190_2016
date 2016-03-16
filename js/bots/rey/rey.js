@@ -1,201 +1,181 @@
-var rey = new Bot(1200, 1200, 'rey', 'js/bots/rey/whitedeer.png');
+/**
+ * rey's bot
+ */
+var rey = new Bot(1500, 1500, 'rey', 'js/bots/rey/whitedeer.png');
 
-// (Override) Initialize Bot
+/**
+ * State variables
+ */
+rey.currentMotion = Motions.still;
+
+/**
+ * Initialize bot
+ *
+ * @override
+ */
 rey.init = function() {
-        this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
-        this.body.rotation = 100; // Initial Angle
-        this.body.speed = 100; // Initial Speed
+    this.body = this.sprite.body;
+    this.body.rotation = 100; // Initial Angle
+    this.body.speed = 0; // Initial Speed
 
-        // Initialize Timed Updates
-        game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
-        game.time.events.loop(Phaser.Timer.SECOND * 60, rey.update1min, this);
-    }
-    //
-    // Id Hunger
-    //
-rey.hunger = {
-        amount: 0,
-        eat: function(food_amount) {
-            this.amount -= food_amount;
-            this.amount = Math.max(0, this.amount);
+    // Initialize Timed Updates
+    game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 10, rey.updateTenSecs, this);
+    //game.time.events.loop(Phaser.Timer.SECOND * 60, rey.update1min, this);
+
+    // Make productions.
+    eatingProduction1 = new Production("eating",
+        Production.priority.High,
+        function() {
+            return (rey.hunger.value > 10 && rey.hunger.value < 20);
         },
-        update: function() {
-            if (this.amount >= 40) {
-                // Do nothing.  Hunger is capped. 
-            } else {
-                this.amount++;
-            }
+        function() { console.log("Yum"); });
+    fleeingProduction = new Production("feeling",
+        Production.priority.Low,
+        function() {
+            return (rey.hunger.value < 10);
         },
-        toString: function() {
-            var hungerLevel = "";
-            if (this.amount < 15) {
-                hungerLevel = "Not hungry!";
-            } else if (this.amount < 25) {
-                hungerLevel = "I'm getting pretty hungry..";
-            } else if (this.amount < 38) {
-                hungerLevel = "Okay, now I'm hungry..";
-            } else {
-                hungerLevel = "FEED ME NOW!";
-            }
-            return hungerLevel + " (Hunger = " + this.amount + ")";
-        }
-    }
-    //
-    //Id Curiousity to explore 
-    //
-rey.Curiousity = {
-    amount: 40,
-    motivation: function(motivation_amount) {
-        this.amount -= motivation_amount;
-        this.amount = Math.max(0, this.amount);
-    },
-    update: function() {
-        if (this.amount <= 0) {} else {
-            this.amount--;
-        }
-    },
-    toString: function() {
-        var motivationLevel = "";
-        if (this.amount > 25) {
-            hungerLevel = "I want to explore the world!";
-        } else if (this.amount > 15) {
-            hungerLevel = "On second thought, the world is too big...";
-        } else if (this.amount > 2) {
-            hungerLevel = "I'm also getting tired..";
-        } else {
-            hungerLevel = "Okay I'm done exploring for a while until I can get food again.";
-        }
-        return hungerLevel + " (Curiousity = " + this.amount + ")";
-    }
-}
+        function() { console.log("I need to run away while I still have the energy!"); }); //I'll set this to where it flees only when it is threatened later
 
-// Motion modes
-//
-rey.walking = {
-    description: "Walking",
-    update: function() {
-        // Slight tilting when moving
-        if (Math.random() < .5) {
-            rey.incrementAngle(10 * Math.random() - 5);
 
-        }
-        // A leisurely place
-        rey.body.speed = 200;
-        // console.log("Someone join me!!!!");
-
-    }
-}
-rey.still = {
-    description: "Still",
-    update: function() {
-        // Stand still
-        rey.body.speed = 0;
-        // console.log("Taking a break!");
-    }
-}
-rey.dancing = {
-    description: "Dancing",
-    update: function() {
-        // Wilder steering changes
-        if (Math.random() < .5) {
-            rey.incrementAngle(50 * Math.random() - 5);
-        }
-        // Fast
-        rey.body.speed = 1000;
-        // console.log("Dun Dun Dun Dun");
-    }
+    // Populate production list
+    this.productions = [eatingProduction1, fleeingProduction];
 }
 
 
-//
-// Emotion states
-//
-rey.energized = {
-    name: "energized",
-    transitionProbability: .5,
-    transition: function() {
-        if (Math.random() < .4) {
-            return rey.energized;
-        } else {
-            return rey.exhausted;
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .33) {
-            return rey.walking;
-        } else {
-            return rey.dancing;
-        }
+
+/**
+ * Markov process controlling emotions
+ */
+rey.emotions = new MarkovProcess("Relaxed");
+rey.emotions.add("Relaxed", [
+    ["Relaxed", "Tired", "Hyper", "Not in the mood"],
+    [.4, .2, .3, .1]
+]);
+rey.emotions.add("Not in the mood", [
+    ["Not in the mood", "Relaxed"],
+    [.6, .4]
+]);
+rey.emotions.add("Hyper", [
+    ["Hyper", "Relaxed"],
+    [.5, .5]
+]);
+rey.emotions.add("Tired", [
+    ["Tired", "Relaxed"],
+    [.6, .4]
+]);
+
+/**
+ * Hunger Variable
+ */
+rey.hunger = new DecayVariable(0, 1, 0, 40);
+rey.hunger.toString = function() {
+    var hungerLevel = "";
+    if (this.value < 15) {
+        hungerLevel = "Not hungry";
+    } else if (this.value < 25) {
+        hungerLevel = "I'm getting hungry..";
+    } else if (this.value < 38) {
+        hungerLevel = "Okay, now I am hungry!";
+    } else {
+        hungerLevel = "FEED ME NOW!";
     }
-}
-rey.exhausted = {
-    name: "exhausted",
-    transitionProbability: .2,
-    transition: function() {
-        // Leave this state 80% of the time
-        if (Math.random() < .7) {
-            // If exiting, go to back to energized
-            return rey.energized;
-        } else {
-            return rey.exhausted;
-        }
-    },
-    getMotionMode: function() {
-        return rey.still;
-    }
-
+    return hungerLevel + " (Hunger = " + this.value + ")";
 }
 
-// Current States
-rey.emotion = rey.energized;
-rey.motionMode = rey.walking;
-
-// (Override) Populate status field motionMode.description
+/**
+ * Populate the status field
+ *
+ * @override
+ */
 rey.getStatus = function() {
-    var statusString = rey.motionMode.description;
-    statusString += " because I am ";
-    statusString += rey.emotion.name;
-    statusString += ".";
+    var statusString = "Emotion: " + rey.emotions.current;
+    statusString += "\nMotion: " + rey.currentMotion.description;
     statusString += "\n" + rey.hunger.toString();
-    statusString += "\n" + rey.Curiousity.toString();
     return statusString;
 }
 
-rey.update = function() {
-    if (rey.atBoundary() === true) {
-        rey.incrementAngle(45);
+/**
+ * Set the current motion state.  Currently updated every second.
+ */
+rey.setMotion = function() {
+
+    // Default markov chain movement patterns
+    // TODO: Add conditions that involve hunger, etc.
+    if (rey.emotions.current === "Not in the mood") {
+        rey.currentMotion = Motions.still;
+    } else if (rey.emotions.current === "Tired") {
+        rey.currentMotion = Motions.energysaver;
+    } else if (rey.emotions.current === "Relaxed") {
+        let rnd = Math.random();
+        if (rnd < .5) {
+            rey.currentMotion = Motions.dancing;
+        } else {
+            rey.currentMotion = Motions.energysaver;
+        }
+    } else if (rey.emotions.current === "Hyper") {
+        let rnd = Math.random();
+        if (rnd < .5) {
+            rey.currentMotion = Motions.spazzing;
+        } else {
+            rey.currentMotion = Motions.sonicSpeed;
+        }
     }
-    rey.motionMode.update();
-    this.basicUpdate();
+}
+
+
+//////////////////////
+// Update Functions //
+//////////////////////
+
+rey.update = function() {
+
+    // Apply current motion
+    this.currentMotion.apply(rey);
+    rey.genericUpdate();
 };
 
+
+/**
+ * Called every second
+ */
 rey.update1Sec = function() {
-    if (Math.random() < rey.emotion.transitionProbability) {
-        rey.emotion = rey.emotion.transition();
-    }
-    rey.motionMode = rey.emotion.getMotionMode();
-}
-rey.update1Sec = function() {
-    rey.hunger.update();
-    if (Math.random() < rey.emotion.transitionProbability) {
-        rey.emotion = rey.emotion.transition();
-    }
-    rey.motionMode = rey.emotion.getMotionMode();
-    rey.Curiousity.update();
-    if (Math.random() < rey.emotion.transitionProbability) {
-        rey.emotion = rey.emotion.transition();
-    }
-    rey.motionMode = rey.emotion.getMotionMode();
+    rey.hunger.increment();
+    rey.emotions.update();
+    rey.setMotion();
+    fireProductions(rey.productions);
+
 }
 
-// Called every one minutes
-rey.update1min = function() {
-        rey.hunger.eat(41);
+
+
+
+///////////////////////////
+// Interaction Functions //
+///////////////////////////
+
+
+/**
+ * React to a collision.
+ *
+ * @override
+ */
+rey.collision = function(object) {
+    // console.log("Object is edible: " + object.isEdible);
+    if (object.isEdible) {
+        rey.eatObject(object);
+    } else {
+        rey.speak(object, "What's up " + object.name + "!");
     }
-    // rey.update1Sec = function() {
 
+}
 
-// Called every one minutes
-// rey.update1min = function() {
-// rey.Curiousity.motivation(41);
-// }
+rey.eatObject = function(objectToEat) {
+    objectToEat.eat();
+    rey.hunger.subtract(objectToEat.calories);
+    rey.speak(objectToEat, "Ooohh my favorite snack " + objectToEat.description + "!");
+}
+
+rey.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    rey.speak(botWhoSpokeToMe, "That's awesome " + botWhoSpokeToMe.name + "!"); // TODO: Make more intelligent responses!
+}

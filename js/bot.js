@@ -420,3 +420,7 @@ Bot.prototype.ignore = function (annoyingBot) {
     this.body.speed = 250;
     console.log(this.name + " ignored " + annoyingBot);
 }
+
+// Bot.prototype.kick = function(botWhoBumpedIntoMe) {
+//     console.log(botWhoBumpedIntoMe.name + " take this " this.name);
+// };
