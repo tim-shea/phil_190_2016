@@ -1,10 +1,14 @@
 /**
  * Jeff's bot
+ *
+ * @namespace Jeff
+ * @augments Bot
  */
 var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
 
 /**
  * State variables
+ * @memberOf Jeff
  */
 jeff.currentlyPursuing = "Nothing";
 jeff.currentMotion = Motions.still;
@@ -12,6 +16,7 @@ jeff.currentMotion = Motions.still;
 /**
  * Initialize bot
  *
+ * @memberOf Jeff
  * @override
  */
 jeff.init = function() {
@@ -46,6 +51,7 @@ jeff.init = function() {
 
 /**
  * Markov process controlling emotions
+ * @memberOf Jeff
  */
 jeff.emotions = new MarkovProcess("Calm");
 jeff.emotions.add("Calm", [
@@ -67,6 +73,7 @@ jeff.emotions.add("Happy", [
 
 /**
  * Hunger Variable
+ * @memberOf Jeff
  */
 jeff.hunger = new DecayVariable(0, 1, 0, 100);
 jeff.hunger.toString = function() {
@@ -86,6 +93,7 @@ jeff.hunger.toString = function() {
 /**
  * Populate the status field
  *
+ * @memberOf Jeff
  * @override
  */
 jeff.getStatus = function() {
@@ -106,6 +114,7 @@ jeff.getStatus = function() {
 
 /**
  * Set the current motion state.  Currently updated every second.
+ * @memberOf Jeff
  */
 jeff.setMotion = function() {
 
@@ -130,6 +139,7 @@ jeff.setMotion = function() {
 /**
  * When a pursuit is completed reset the pursuit string.
  *
+ * @memberOf Jeff
  * @override
  */
 jeff.pursuitCompleted = function() {
@@ -144,6 +154,7 @@ jeff.pursuitCompleted = function() {
 /**
  * Main update called by the phaer game object (about 40 times / sec. on my machine).
  *
+ * @memberOf Jeff
  * @override
  */
 jeff.update = function() {
@@ -157,6 +168,7 @@ jeff.update = function() {
 
 /**
  * Called every second
+ * @memberOf Jeff
  */
 jeff.update1Sec = function() {
     jeff.hunger.increment();
@@ -167,6 +179,7 @@ jeff.update1Sec = function() {
 
 /**
  * Called every ten seconds
+ * @memberOf Jeff
  */
 jeff.updateTenSecs = function() {
     // Pursue a random entity
@@ -177,6 +190,7 @@ jeff.updateTenSecs = function() {
 
 /**
  *  Called every two minutes
+ *  @memberOf Jeff
  */
 jeff.update2min = function() {
     // jeff.hunger.setValue(0);
@@ -189,6 +203,7 @@ jeff.update2min = function() {
 /**
  * React to a collision.
  *
+ * @memberOf Jeff
  * @override
  */
 jeff.collision = function(object) {
@@ -210,6 +225,7 @@ jeff.collision = function(object) {
 /**
  * Call this when eating something.  
  *
+ * @memberOf Jeff
  * @param {Entity} objectToEat what to eat
  */
 jeff.eatObject = function(objectToEat) {
@@ -220,8 +236,7 @@ jeff.eatObject = function(objectToEat) {
 }
 
 /**
- * Reaction to hearing something.
- *
+ * @memberOf Jeff
  * @override
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
@@ -231,6 +246,7 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
 /**
  * React when someone high fives me.
  *
+ * @memberOf Jeff
  * @override
  */
 jeff.highFived = function(botWhoHighFivedMe) {

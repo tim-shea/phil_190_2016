@@ -1,11 +1,8 @@
 /**
- * @fileOverview Parent object for all bots.
- */
-
-/*
  * Construct a bot.
- * 
- * @constructor
+ *
+ * @class
+ *
  * @param {Number} x initial x coordinate
  * @param {Number} y initial y coordinate
  * @param {string} name name of the bot

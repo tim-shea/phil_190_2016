@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: bots/jeff/jeff.js</title>
+    <title>JSDoc: Source: bots/faust/faust.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: bots/jeff/jeff.js</h1>
+    <h1 class="page-title">Source: bots/faust/faust.js</h1>
 
     
 
@@ -27,48 +27,43 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * Jeff's bot
- *
- * @namespace Jeff
- * @augments Bot
+ * faust's bot
  */
-var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
+var faust = new Bot(300, 300, 'faust', 'js/bots/faust/faust.png');
 
 /**
  * State variables
- * @memberOf Jeff
  */
-jeff.currentlyPursuing = "Nothing";
-jeff.currentMotion = Motions.still;
+faust.currentlyPursuing = "Nothing";
+faust.currentMotion = Motions.still;
 
 /**
  * Initialize bot
  *
- * @memberOf Jeff
  * @override
  */
-jeff.init = function() {
+faust.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
     this.body.speed = 100; // Initial Speed
 
     // Initialize Timed Updates
-    game.time.events.loop(Phaser.Timer.SECOND * 1, jeff.update1Sec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * 10, jeff.updateTenSecs, this);
-    game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, jeff.update2min, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 1, faust.update1Sec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 10, faust.updateTenSecs, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, faust.update2min, this);
 
     // Make productions.  Very dumb productions for now.
     eatingProduction1 = new Production("eating", 
         Production.priority.High, 
-        function() {return (jeff.hunger.value > 10 &amp;&amp; jeff.hunger.value &lt; 20 );},
+        function() {return (faust.hunger.value > 10 &amp;&amp; faust.hunger.value &lt; 20 );},
         function() {console.log("Eating 1");});
     eatingProduction2 = new Production("eating", 
         Production.priority.Low, 
-        function() {return (jeff.hunger.value > 20 &amp;&amp; jeff.hunger.value &lt; 30);},
+        function() {return (faust.hunger.value > 20 &amp;&amp; faust.hunger.value &lt; 30);},
         function() {console.log("Eating 2");});
     eatingProduction3 = new Production("eating", 
         3, 
-        function() {return (jeff.hunger.value > 30 &amp;&amp; jeff.hunger.value &lt; 40);},
+        function() {return (faust.hunger.value > 30 &amp;&amp; faust.hunger.value &lt; 40);},
         function() {console.log("Eating 3");});
 
     // Populate production list
@@ -79,32 +74,34 @@ jeff.init = function() {
 
 /**
  * Markov process controlling emotions
- * @memberOf Jeff
  */
-jeff.emotions = new MarkovProcess("Calm");
-jeff.emotions.add("Calm", [
-    ["Calm", "Happy", "Angry", "Sad"],
-    [.8, .1, .05, .05]
+faust.emotions = new MarkovProcess("Calm");
+faust.emotions.add("Calm", [
+    ["Calm", "Upbeat", "Happy", "Angry", "Sad"],
+    [.6, .2, .1, .05, .05]
 ]);
-jeff.emotions.add("Sad", [
+faust.emotions.add("Upbeat", [
+    ["Upbeat", "Calm", "Happy",],
+    [.2, .3, .5,]
+]);
+faust.emotions.add("Sad", [
     ["Sad", "Calm"],
     [.7, .3]
 ]);
-jeff.emotions.add("Angry", [
+faust.emotions.add("Angry", [
     ["Angry", "Calm"],
     [.5, .5]
 ]);
-jeff.emotions.add("Happy", [
+faust.emotions.add("Happy", [
     ["Happy", "Calm"],
     [.7, .3]
 ]);
 
 /**
  * Hunger Variable
- * @memberOf Jeff
  */
-jeff.hunger = new DecayVariable(0, 1, 0, 100);
-jeff.hunger.toString = function() {
+faust.hunger = new DecayVariable(0, 1, 0, 100);
+faust.hunger.toString = function() {
     var hungerLevel = "";
     if (this.value &lt; 20) {
         hungerLevel = "Not hungry";
@@ -121,57 +118,52 @@ jeff.hunger.toString = function() {
 /**
  * Populate the status field
  *
- * @memberOf Jeff
  * @override
  */
-jeff.getStatus = function() {
-    var statusString = "Emotion: " + jeff.emotions.current;
-    statusString += "\nMotion: " + jeff.currentMotion.description;
-    statusString += "\n" + jeff.hunger.toString();
+faust.getStatus = function() {
+    var statusString = "Emotion: " + faust.emotions.current;
+    statusString += "\nMotion: " + faust.currentMotion.description;
+    statusString += "\n" + faust.hunger.toString();
     // statusString += "\nEntity collisions: " +
-    //     jeff.getOverlappingEntities().map(function(item) {
+    //     faust.getOverlappingEntities().map(function(item) {
     //         return item.name;
     //     });
     // statusString += "\nBot collisions: " +
-    //     jeff.getOverlappingBots().map(function(item) {
+    //     faust.getOverlappingBots().map(function(item) {
     //         return item.name;
     //     });
-    statusString += "\nMoving to: " + jeff.currentlyPursuing;
+    statusString += "\nMoving to: " + faust.currentlyPursuing;
     return statusString;
 }
 
 /**
  * Set the current motion state.  Currently updated every second.
- * @memberOf Jeff
  */
-jeff.setMotion = function() {
+faust.setMotion = function() {
 
     // Default markov chain movement patterns
     // TODO: Add conditions that involve hunger, etc.
-    if (jeff.emotions.current === "Sad") {
-        jeff.currentMotion = Motions.moping;
-    } else if (jeff.emotions.current === "Happy") {
-        jeff.currentMotion = Motions.walking;
-    } else if (jeff.emotions.current === "Calm") {
+    if (faust.emotions.current === "Sad") {
+        faust.currentMotion = Motions.moping;
+    } else if (faust.emotions.current === "Happy") {
+        faust.currentMotion = Motions.sonicSpeed;
+    } else if (faust.emotions.current === "Calm") {
         let rnd = Math.random();
         if (rnd &lt; .5) {
-            jeff.currentMotion = Motions.still;
+            faust.currentMotion = Motions.still;
         } else {
-            jeff.currentMotion = Motions.walking;
+            faust.currentMotion = Motions.walking;
         }
-    } else if (jeff.emotions.current === "Angry") {
-        jeff.currentMotion = Motions.spazzing;
+    } else if (faust.emotions.current === "Angry") {
+        faust.currentMotion = Motions.spazzing;
     }
 }
 
 /**
  * When a pursuit is completed reset the pursuit string.
- *
- * @memberOf Jeff
- * @override
  */
-jeff.pursuitCompleted = function() {
-    jeff.currentlyPursuing = "Nothing";
+faust.pursuitCompleted = function() {
+    faust.currentlyPursuing = "Nothing";
     this.currentMotion = Motions.still;
 }
 
@@ -182,103 +174,98 @@ jeff.pursuitCompleted = function() {
 /**
  * Main update called by the phaer game object (about 40 times / sec. on my machine).
  *
- * @memberOf Jeff
  * @override
  */
-jeff.update = function() {
+faust.update = function() {
 
     // Apply current motion
-    this.currentMotion.apply(jeff);
+    this.currentMotion.apply(faust);
     // "Superclass" update method
-    jeff.genericUpdate();
+    faust.genericUpdate();
 };
 
 
 /**
  * Called every second
- * @memberOf Jeff
  */
-jeff.update1Sec = function() {
-    jeff.hunger.increment();
-    jeff.emotions.update();
-    jeff.setMotion();
-    // fireProductions(jeff.productions);
+faust.update1Sec = function() {
+    faust.hunger.increment();
+    faust.emotions.update();
+    faust.setMotion();
+    fireProductions(faust.productions);
+
 }
 
 /**
  * Called every ten seconds
- * @memberOf Jeff
  */
-jeff.updateTenSecs = function() {
+faust.updateTenSecs = function() {
     // Pursue a random entity
     if (Math.random() &lt; .9) {
-        // jeff.currentlyPursuing = this.pursueRandomObject(2000).name;
+        // faust.currentlyPursuing = this.pursueRandomObject(2000).name;
     }
 }
 
 /**
  *  Called every two minutes
- *  @memberOf Jeff
  */
-jeff.update2min = function() {
-    // jeff.hunger.setValue(0);
+faust.update2min = function() {
+    // faust.hunger.setValue(0);
 }
 
 ///////////////////////////
 // Interaction Functions //
 ///////////////////////////
 
+
 /**
  * React to a collision.
  *
- * @memberOf Jeff
  * @override
  */
-jeff.collision = function(object) {
+faust.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
     if (object.isEdible) {
-        jeff.eatObject(object);
+        faust.eatObject(object);
     } else {
-        jeff.speak(object, "Hello " + object.name);
+        faust.speak(object, "Hello " + object.name);
     }
     // I'm a nice guy
     if (object instanceof Bot) {
         object.highFive();
     }
 
-    // jeff.flee(object);
-    // jeff.pursue(object);
+    // faust.flee(object);
+    // faust.pursue(object);
  }
 
 /**
  * Call this when eating something.  
  *
- * @memberOf Jeff
  * @param {Entity} objectToEat what to eat
  */
-jeff.eatObject = function(objectToEat) {
+faust.eatObject = function(objectToEat) {
     objectToEat.eat();
-    jeff.hunger.subtract(objectToEat.calories);
-    jeff.speak(objectToEat, "Yummy " + objectToEat.description + "!");
-    sounds.chomp.play();
+    faust.hunger.subtract(objectToEat.calories);
+    faust.speak(objectToEat, "Yummy " + objectToEat.description + "!");
 }
 
 /**
- * @memberOf Jeff
+ * Reaction to hearing something.
+ *
  * @override
  */
-jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
+faust.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    faust.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
 }
 
 /**
  * React when someone high fives me.
  *
- * @memberOf Jeff
  * @override
  */
-jeff.highFived = function(botWhoHighFivedMe) {
-    jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
+faust.highFived = function(botWhoHighFivedMe) {
+    faust.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
 </code></pre>
         </article>

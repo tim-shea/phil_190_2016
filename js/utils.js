@@ -128,7 +128,7 @@ function addFoodItem(imagePath, description, calories) {
             tempSprite.reset(-10,-10);
             tempSprite.visible = false;
             // Respawn food in 5 seconds.
-            //  TODO: Note that sprite.kill(), .exists, and body.enable all failed...
+            //  TODO: Note that sprite.kill(), .exists, and body.   all failed...
             //   So I place the sprite off screen then bring it back
             if (!tempSprite.visible) {
                 game.time.events.add(Phaser.Timer.SECOND * 1, function() {

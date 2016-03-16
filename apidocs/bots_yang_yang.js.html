@@ -28,23 +28,50 @@
         <article>
             <pre class="prettyprint source linenums"><code>/**
  * Yang's Bot
- * @type {Bot}
+ * @namespace yang
+ * @constructor
  */
 var yang = new Bot(2700, 2700, 'yang', 'js/bots/yang/yang.png');
+
+///////////////////////////////////////////////////////////////////////////
+//One leve of variable only contains :                                   //
+//basic variables and references                                         //
+//basic functions that manipulate basic variables and references         //
+//objects that has its own basic variables, basic functions and objects  //
+//"_" marks objects                                                      //
+///////////////////////////////////////////////////////////////////////////
+
 /**
- * One leve of variable only contains :
- * basic variables and references
- * basic functions that manipulate basic variables and references 
- * objects that has its own basic variables, basic functions and objects 
- * "_" marks objects
+ * combine all debug related stuff.
+ * @memberOf yang
  */
-yang.test_ = {}; //combine all debug related stuff
-yang.text_ = {}; //combine all text related varandfun
-yang.fun_ = {}; //combine all additional non-initializor functions
-yang.chaosmachine_ = {}; //for random
-yang.biomachine_ = {}; //basic bio states of two resources
-yang.mindmachine_ = {}; //basic mind states of two spirit
-yang.node_ = {}; //store non-default nodes
+yang.test_ = {};
+/**
+ * combine all text related varandfun.
+ * @memberOf yang
+ */
+yang.text_ = {};
+/**
+ * combine all additional non-initializor functions.
+ * @memberOf yang
+ */
+yang.fun_ = {};
+/**
+ * stores random number for repeated use.
+ * @memberOf yang
+ */
+yang.chaosmachine_ = {};
+/**
+ * basic bio states of two resources.
+ * @memberOf yang
+ */
+yang.biomachine_ = {};
+/**
+ * basic mind states of two spirit.
+ * @memberOf yang
+ */
+yang.mindmachine_ = {};
+yang.node_ = {}; //store non-default nodes.
 
 /**
  * major node reference, those index names are magic
@@ -64,18 +91,24 @@ yang["rotation_node"] = yang.void_node;
 yang.init = function() {
     //setup body
     this.body = this.sprite.body;
-    //recurrent event
-    game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
-    game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
     //Body
     yang.body.rotation = 0;
     yang.body.speed = 100;
+    yang.temp_speed = 0;//for special movements
     //other basic variables
     yang.control = false; //detect cursor
+    yang.basicupdate_disable = false;
+    yang.unstable = false;
     //non state machine objects
     yang.init_plus();
     //state machines objects
     yang.init_state();
+    //recurrent event
+    if (yang.test_.test_ongoing) {
+        game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
+    } else {
+        game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
+    }
 };
 
 yang.init_plus = function() { //object related initialization
@@ -83,6 +116,8 @@ yang.init_plus = function() { //object related initialization
     yang.text_.stateText = "No Message";
     yang.text_.rotationText = "No Message";
     yang.text_.motionText = "No Message";
+    yang.text_.interactiveText = "";
+    yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
     yang.test_.test_ongoing = false;
@@ -138,8 +173,9 @@ yang.getStatus = function() {
     if (yang.test_.test_ongoing) {
         yang.text_.stateText =
             "Test Mode" + "\n" +
+            yang.text_.testFeedBack + "\n" +
             "Test node description: " + "\n" +
-            yang[yang.test_.current_testnode.type].description + "\n" +
+            //yang[yang.test_.current_testnode.type].description + "\n" +
             yang.test_.current_testnode.type + " node description:" + "\n" +
             yang.test_.current_testnode.description + "\n" +
             yang.text_.rotationText + "\n" +
@@ -167,10 +203,19 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
         yang["mental_task_node"].always_fun();
         yang.fun_.AImotion_always_fun();
     }
-    game.physics.arcade.velocityFromRotation(
-        this.sprite.rotation,
-        this.sprite.body.speed,
-        this.sprite.body.velocity);
+
+    if (!yang.basicupdate_disable) {
+        if (yang.unstable) {
+            yang.body.speed = yang.temp_speed;
+            yang.unstable = false;
+        }
+        game.physics.arcade.velocityFromRotation(
+            this.sprite.rotation,
+            this.sprite.body.speed,
+            this.sprite.body.velocity);
+    } else {
+        yang.basicupdate_disable = false;
+    }
 };
 
 yang.update = function() {
@@ -233,6 +278,9 @@ yang.timedEvend = function() {
     yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
     //speical markov chain update
     yang.MRGPRB4.update();
+    Motions.zeleport.apply(yang);
+    //clear interactive messages
+    yang.text_.interactiveText = "";
 };
 
 /**
@@ -255,6 +303,9 @@ yang.fun_.AImotion_always_fun = function() { //this is the current state
  * Test Zone
  * @return {[type]} [description]
  */
+
+
+
 //to do
 //need to remove into a node
 yang.tag_game_obj = function() {
@@ -274,11 +325,14 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
-        yang.test_.current_testnode = yang.node_.id_secondary_focus;
+        /*
+        yang.test_.current_testnode = yang.def_node();
         yang.test_.current_testnode.init_fun();
         yang.test_.current_testnode.always_fun();
         yang.test_.current_testnode.current_fun();
         yang.test_.current_testnode.switch_to_this_node();
+        */   
+        
         yang.test_.ini++;
     }
 
@@ -286,14 +340,20 @@ yang.test_.node_test = function() { // test with a permanate state
     //
 };
 
-yang.test_.timed_test = function() {};
+yang.test_.timed_test = function() {
+    Motions.zeleport.apply(yang);
+};
 
 /**
  * Interaction Zone 
  * @Override
  */
-yang.collision = function(object) {
+yang.collision = function(object) {//collision and highfive
     yang.highFive(object);
+    if ((object instanceof Bot) &amp;&amp; yang.text_.interactiveText != "")
+    {
+        yang.speak(object, yang.text_.interactiveText);
+    }
     for (var brakeloop = 0; brakeloop &lt; 2; brakeloop++) {    
         yang.node_.brake.brake();//slow down to high five
     }
@@ -304,6 +364,11 @@ yang.collision = function(object) {
 yang.highFived = function(botWhoHighFivedMe) {
     yang.speak (botWhoHighFivedMe, "Yoyoyo, let's party bruh.");
 }
+
+yang.hear = function (botWhoSpokeToMe, whatTheySaid) {
+     yang.text_.interactiveText = "mimic* " + botWhoSpokeToMe.name + ":" + whatTheySaid;
+}
+
 
 /**
  * Markov chain of MRGPRB4
@@ -331,7 +396,6 @@ yang.MRGPRB4.add("annoyed", [
     ["annoyed", "wary"],
     [.8, .2]
 ]);
-
 
 /**
  * Nodes
@@ -707,7 +771,7 @@ Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
 
 
 /*extra resources
-http=//phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
+http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
 */
 </code></pre>
         </article>
@@ -719,13 +783,13 @@ http=//phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addFoodItem">addFoodItem</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#DecayVariable">DecayVariable</a></li><li><a href="global.html#fireProductions">fireProductions</a></li><li><a href="global.html#jeff">jeff</a></li><li><a href="global.html#loadSpeechBubbleAssets">loadSpeechBubbleAssets</a></li><li><a href="global.html#MarkovProcess">MarkovProcess</a></li><li><a href="global.html#Motions">Motions</a></li><li><a href="global.html#Production">Production</a></li><li><a href="global.html#setUpFood">setUpFood</a></li><li><a href="global.html#yang">yang</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Bot.html">Bot</a></li><li><a href="yang.html">yang</a></li></ul><h3>Namespaces</h3><ul><li><a href="Jeff.html">Jeff</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addFoodItem">addFoodItem</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#DecayVariable">DecayVariable</a></li><li><a href="global.html#dylan">dylan</a></li><li><a href="global.html#faust">faust</a></li><li><a href="global.html#fireProductions">fireProductions</a></li><li><a href="global.html#loadSpeechBubbleAssets">loadSpeechBubbleAssets</a></li><li><a href="global.html#MarkovProcess">MarkovProcess</a></li><li><a href="global.html#Motions">Motions</a></li><li><a href="global.html#Production">Production</a></li><li><a href="global.html#setUpFood">setUpFood</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Mar 15 2016 12:46:45 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Mar 15 2016 21:58:02 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
