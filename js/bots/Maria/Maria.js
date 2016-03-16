@@ -22,7 +22,7 @@ maria.init = function() {
  */
 maria.emotions = new MarkovProcess("Calm");
 maria.emotions.add("Calm", [
-    ["Calm", "Happy", "Angry", "Sad"]
+    ["Calm", "Happy", "Angry", "Sad"], // <-- A comma was missing
     [.5, .2, .15, .15]
 ]);
 maria.emotions.add("Happy", [
@@ -37,18 +37,16 @@ maria.emotions.add("Angry", [
     ["Angry", "Calm"],
     [.4, .6]
 ]);
-maria.emotions.add("C", [
-    ["Happy", "Calm"],
-    [.8, .2]
-]);
-maria.emotions.add("Hyper", [
-    ["Happy", "Calm"],
-    [.5, .5]
-]);
-maria.emotions.add("Sleepy", [
-    ["Happy", "Calm"],
-    [.2, .8]
-]);
+// States below are not called above.
+// 
+// maria.emotions.add("Hyper", [
+//     ["Happy", "Calm"],
+//     [.5, .5]
+// ]);
+// maria.emotions.add("Sleepy", [
+//     ["Happy", "Calm"],
+//     [.2, .8]
+// ]);
 
 /**
  * Hunger

@@ -20,7 +20,7 @@ rey.init = function() {
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * 10, rey.updateTenSecs, this);
+    // game.time.events.loop(Phaser.Timer.SECOND * 10, rey.updateTenSecs, this); <-- Rey you did not have this
     //game.time.events.loop(Phaser.Timer.SECOND * 60, rey.update1min, this);
 
     // Make productions.
@@ -41,7 +41,6 @@ rey.init = function() {
     // Populate production list
     this.productions = [eatingProduction1, fleeingProduction];
 }
-
 
 
 /**
