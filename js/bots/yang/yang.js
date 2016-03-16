@@ -1,22 +1,49 @@
 /**
  * Yang's Bot
- * @type {Bot}
+ * @namespace yang
+ * @constructor
  */
 var yang = new Bot(2700, 2700, 'yang', 'js/bots/yang/yang.png');
+
+///////////////////////////////////////////////////////////////////////////
+//One leve of variable only contains :                                   //
+//basic variables and references                                         //
+//basic functions that manipulate basic variables and references         //
+//objects that has its own basic variables, basic functions and objects  //
+//"_" marks objects                                                      //
+///////////////////////////////////////////////////////////////////////////
+
 /**
- * One leve of variable only contains :
- * basic variables and references
- * basic functions that manipulate basic variables and references 
- * objects that has its own basic variables, basic functions and objects 
- * "_" marks objects
+ * combine all debug related stuff.
+ * @memberOf yang
  */
-yang.test_ = {}; //combine all debug related stuff
-yang.text_ = {}; //combine all text related varandfun
-yang.fun_ = {}; //combine all additional non-initializor functions
-yang.chaosmachine_ = {}; //for random
-yang.biomachine_ = {}; //basic bio states of two resources
-yang.mindmachine_ = {}; //basic mind states of two spirit
-yang.node_ = {}; //store non-default nodes
+yang.test_ = {};
+/**
+ * combine all text related varandfun.
+ * @memberOf yang
+ */
+yang.text_ = {};
+/**
+ * combine all additional non-initializor functions.
+ * @memberOf yang
+ */
+yang.fun_ = {};
+/**
+ * stores random number for repeated use.
+ * @memberOf yang
+ */
+yang.chaosmachine_ = {};
+/**
+ * basic bio states of two resources.
+ * @memberOf yang
+ */
+yang.biomachine_ = {};
+/**
+ * basic mind states of two spirit.
+ * @memberOf yang
+ */
+yang.mindmachine_ = {};
+yang.node_ = {}; //store non-default nodes.
 
 /**
  * major node reference, those index names are magic
@@ -55,6 +82,7 @@ yang.init_plus = function() { //object related initialization
     yang.text_.stateText = "No Message";
     yang.text_.rotationText = "No Message";
     yang.text_.motionText = "No Message";
+    yang.text_.interactiveText = "";
     //test related
     yang.test_.ini = 0;
     yang.test_.test_ongoing = false;
@@ -205,6 +233,8 @@ yang.timedEvend = function() {
     yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
     //speical markov chain update
     yang.MRGPRB4.update();
+    //clear interactive messages
+    yang.text_.interactiveText = [];
 };
 
 /**
@@ -227,6 +257,9 @@ yang.fun_.AImotion_always_fun = function() { //this is the current state
  * Test Zone
  * @return {[type]} [description]
  */
+
+
+
 //to do
 //need to remove into a node
 yang.tag_game_obj = function() {
@@ -264,8 +297,12 @@ yang.test_.timed_test = function() {};
  * Interaction Zone 
  * @Override
  */
-yang.collision = function(object) {
+yang.collision = function(object) {//collision and highfive
     yang.highFive(object);
+    if ((object instanceof Bot) && yang.text_.interactiveText != "")
+    {
+        yang.speak(object, yang.text_.interactiveText);
+    }
     for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
         yang.node_.brake.brake();//slow down to high five
     }
@@ -276,6 +313,11 @@ yang.collision = function(object) {
 yang.highFived = function(botWhoHighFivedMe) {
     yang.speak (botWhoHighFivedMe, "Yoyoyo, let's party bruh.");
 }
+
+yang.hear = function (botWhoSpokeToMe, whatTheySaid) {
+     yang.text_.interactiveText = "mimic* " + botWhoSpokeToMe.name + ":" + whatTheySaid;
+}
+
 
 /**
  * Markov chain of MRGPRB4
@@ -303,7 +345,6 @@ yang.MRGPRB4.add("annoyed", [
     ["annoyed", "wary"],
     [.8, .2]
 ]);
-
 
 /**
  * Nodes
