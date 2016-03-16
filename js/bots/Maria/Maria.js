@@ -167,5 +167,5 @@ maria.update1Sec = function() {
 
 //Called every 30 seconds
 maria.update30Sec = function() {
-    maria.hunger.eat(51);
+    // maria.hunger.eat(51); <-- this is not a function.
 }
