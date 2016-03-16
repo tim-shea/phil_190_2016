@@ -348,7 +348,7 @@ Bot.prototype.antler_caress = function(botTocaress, message) {
 };
 
 Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
-    console.log(botWhocaresedMe.name + "attacked me!");
+    console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
 };
 
 /**
