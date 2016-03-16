@@ -70,3 +70,24 @@ Motions.moping = {
         botToMove.basicUpdate();
     }
 }
+Motions.weaving = {
+    description: "weaving",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(45 * Math.random() - 5)
+        }
+        botToMove.body.speed = 125;
+        botToMove.basicUpdate();
+    }
+}
+
+Motions.speeding = {
+    description: "speeding",
+    apply: function(botToMove) {
+        if (Math.random() < .05) {
+            botToMove.incrementAngle(5 * Math.random() - 5)
+        }
+        botToMove.body.speed = 575;
+        //botToMove.basicUpdade();
+    }
+} 

@@ -342,3 +342,16 @@ Bot.prototype.antler_caress = function(botTocaress, message) {
 Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
     console.log(botWhocaresedMe.name + "attacked me!");
 };
+/**
+ * Crush a bot at close proximity
+ * @param  {Bot} botToCrush the bot being crushed
+ * @param  {number} damage     damage of crushing, should be higher than biting?
+ * 
+ */
+Bot.prototype.crush = function(botToCrush, damage) {
+    if (botToCrush instanceof Bot) {
+        if(game.physics.arcade.distanceBetween(this.sprite, botToCrush.sprite) < 10) {
+            botToCrush.gotCrushed(this, damage);
+        }
+    }
+}
