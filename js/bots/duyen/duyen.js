@@ -3,8 +3,8 @@ duyen.angle = 90;
 duyen.speed = 100;
 
 duyen.stateText = "just flowing around";
-duyen.speechText = "Nothing";
-duyen.currentlyPursuing = "";
+duyen.speechText = "";
+duyen.currentlyPursuing = "Nothing";
 
 duyen.init = function() {
 this.body = this.sprite.body;
@@ -17,6 +17,7 @@ duyen.body.speed = 50;
   	game.time.events.loop(Phaser.Timer.SECOND * 60*2, duyen.update2min, this);
  	game.time.events.loop(Phaser.Timer.SECOND * 60*3, duyen.update3min, this);
 }
+
 
 // Hunger 
 duyen.hunger = {
@@ -205,10 +206,11 @@ duyen.hygiene.update();
     duyen.motionMode = duyen.emotion.getMotionMode();
 }
 
+
 // Called every two minutes
 duyen.update2min = function() {
 duyen.hunger.eat(101);
-}
+
 
 // Called every three minutes
 duyen.update3min = function() {
@@ -224,39 +226,84 @@ duyen.collision = function(object) {
     duyen.speak(object, "Hello " + object.name);
     // duyen.flee(object);
     // duyen.pursue(object);
+    objectToEat.eat();
+    duyen.hunger.subtract(objectToEat.calories);
+    duyen.speak(objectToEat, "That " + objectToEat.description + " hit the spot!");
+    }
 }
 
+
+
 duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    // 
     if (!duyen.speechText.contains("Oh you")) {
         duyen.speechText += " Oh you just said " + whatTheySaid + ".";
     }
 }
 
 
+duyen.highFive = function(botToHighFive) {
+    if (botToHighFive instanceof Bot) {
+        duyen.speak(botToHighFive, "Hey " + botToHighFive.description + "!");
+        }
+    }
 
-// }
 
-// duyen.timedEvend = function() {
-//     console.log(game.time.totalElapsedSeconds());   
-//     }
 
-// duyen.getStatus = function() {
-//   return duyen.stateText;
-// }
+duyen.highFived = function(botWhoHighFivedMe) {
+    duyen.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
+}
 
-// duyen.update = function() {
-//   if (Math.random() < .1) {
-//   duyen.angle +=5;
-//   duyen.angle = duyen.angle % 120; 
-//  }
-// if (Math.random() < 0.1) {
-// if (Math.random() < 0.05) {
-// duyen.speed = 10;
-//   }
-//   else {
-//   duyen.speed = 100;
-//   }
-//   }
 
-//   duyen.basicUpdate();
-//  };
+duyen.eatObject = function(objectToEat) {
+    objectToEat.eat();
+    duyen.hunger.subtract(objectToEat.calories);
+    duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
+}
+
+
+
+duyen.punch = function(botToPunch, damage) {
+    if (botToAttack instanceof Bot) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
+            botToAttack.gotAttacked(this, damage);
+        }
+    }
+};
+
+
+duyen.gotPunched = function(botWhoPunchedMe, damage) {
+    console.log("Ouch! " + botWhoAttackedMe.name + " punched me!");
+};
+
+
+duyen.emotions = new MarkovProcess("calm");
+duyen.emotions.add("calm", [
+    ["calm", "happy", "mad", "sad"],
+    [.7, .2, .05, .05]
+]);
+duyen.emotions.add("happy", [
+    ["happy", "calm"],
+    [.7, .3]
+]);
+duyen.emotions.add("mad", [
+    ["mad", "calm", "sad"],
+    [.7, .1, .2]
+]);
+duyen.emotions.add("sad", [
+    ["sad", "calm", "mad"],
+    [.6, .2, .2]
+]);
+
+
+/*findFood [high]([duyen.hungerLevel(70, 100), !duyen.perceiveDanger()] -> [duyen.findFood()])
+eatingProduction [high]([duyen.hungerLevel(70, 100), !duyen.perceiveDanger()] -> [duyen.eat()])
+cleaningProduction [medium]([duyen.hygieneLevel(85,100), !duyen.perceiveDanger] -> [duyen.clean()])
+restingState [high]([duyen.energyLevel(10, 100), !duyen.perceiveDanger()] -> [duyen.rest()])
+flyingProduction [high]([duyen.energyLevel(100, 100), duyen.perceiveDanger(), duyen.hungerLevel(70, 100)] -> [duyen.fly()])
+attackEnemy [medium]([duyen.energyLevel(70, 100), duyen.madLevel(80, 100), duyen.hungerLevel(80, 100), duyen.perceiveDanger()] -> [duyen.attack()])
+fleeAway [high]([duyen.energyLevel(10,100), duyen.sadLevel(80,100), duyen.perceiveDanger()] -> [duyen.flee()])
+pursueMate [low]([duyen.energyLevel(40, 100), duyen.sadLevel(90, 100), !duyen.perceiveDanger()] -> [duyen.pursue()])
+avoidDanger [high]([duyen.perceiveDanger(), duyen.energyLevel(40, 100)] -> [duyen.avoid()])
+dancingProduction [low]([duyen.happyLevel(80, 100), duyen.hungerLevel(30, 100), duyen.energyLevel(70, 100), !duyen.perceiveDanger] -> [duyen.dance()]
+*/
