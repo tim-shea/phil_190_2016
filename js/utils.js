@@ -112,13 +112,13 @@ function setUpFood() {
 /**
  * Add one item of food
  *
- * @param {string} imagePath path to the food asset
- * @param {string} description description of the food
+ * @param {string} id id of the food asset
+ * @param {string} description description of the food item
  * @param {string} calories how many calories it has
  */
-function addFoodItem(imagePath, description, calories) {
-    if (imagePath != "") {
-        food = new Entity(Math.random() * worldSizeX, Math.random() * worldSizeY, imagePath);
+function addFoodItem(image_id, description, calories) {
+    if (image_id != "") {
+        food = new Entity(Math.random() * worldSizeX, Math.random() * worldSizeY, image_id);
         food.description = description;
         food.calories = calories;
         food.isEdible = true;

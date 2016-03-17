@@ -29,24 +29,35 @@ jeff.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 10, jeff.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, jeff.update2min, this);
 
-    // Make productions.  Very dumb productions for now.
-    eatingProduction1 = new Production("eating", 
-        Production.priority.High, 
-        function() {return (jeff.hunger.value > 10 && jeff.hunger.value < 20 );},
-        function() {console.log("Eating 1");});
-    eatingProduction2 = new Production("eating", 
-        Production.priority.Low, 
-        function() {return (jeff.hunger.value > 20 && jeff.hunger.value < 30);},
-        function() {console.log("Eating 2");});
-    eatingProduction3 = new Production("eating", 
-        3, 
-        function() {return (jeff.hunger.value > 30 && jeff.hunger.value < 40);},
-        function() {console.log("Eating 3");});
+    // Make productions
+    this.makeProductions();
+}
+
+/**
+ * Create the list of productions for this agent.
+ *
+ * @memberOf Jeff
+ */
+jeff.makeProductions = function() {
+    eatingProduction1 = new Production("eating",
+        Production.priority.High,
+        function() {
+            return (jeff.hunger.value > 10 && jeff.hunger.value < 20); },
+        function() { console.log("Eating 1"); });
+    eatingProduction2 = new Production("eating",
+        Production.priority.Low,
+        function() {
+            return (jeff.hunger.value > 20 && jeff.hunger.value < 30); },
+        function() { console.log("Eating 2"); });
+    eatingProduction3 = new Production("eating",
+        3,
+        function() {
+            return (jeff.hunger.value > 30 && jeff.hunger.value < 40); },
+        function() { console.log("Eating 3"); });
 
     // Populate production list
     this.productions = [eatingProduction1, eatingProduction2, eatingProduction3];
 }
-
 
 
 /**
@@ -174,7 +185,7 @@ jeff.update1Sec = function() {
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();
-    // fireProductions(jeff.productions);
+    fireProductions(jeff.productions);
 }
 
 /**
@@ -220,7 +231,7 @@ jeff.collision = function(object) {
 
     // jeff.flee(object);
     // jeff.pursue(object);
- }
+}
 
 /**
  * Call this when eating something.  
