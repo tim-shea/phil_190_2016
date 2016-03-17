@@ -37,7 +37,7 @@ maria.emotions.add("Angry", [
     ["Angry", "Calm"],
     [.4, .6]
 ]);
-<<<<<<< HEAD
+
 maria.emotions.add("Hyper", [
     ["Happy", "Calm"],
     [.5, .5]
@@ -46,7 +46,7 @@ maria.emotions.add("Sleepy", [
     ["Happy", "Calm"],
     [.2, .8]
 ]);
-=======
+
 // States below are not called above.
 // 
 // maria.emotions.add("Hyper", [
@@ -57,7 +57,7 @@ maria.emotions.add("Sleepy", [
 //     ["Happy", "Calm"],
 //     [.2, .8]
 // ]);
->>>>>>> origin/master
+
 
 /**
  * Hunger
