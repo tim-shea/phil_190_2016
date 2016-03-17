@@ -45,16 +45,16 @@ troi.emotion.add("neutral", [
     [0.75, 0.025, 0.10, 0.10, 0.025]
 ]);
 troi.emotion.add("happy", [
-    ["euphoric", "happy", "neutral"],
-    [0.65, 0.30, 0.05]
+    ["happy", "euphoric", "neutral", "agitated"],
+    [0.65, 0.25, 0.075, .025]
 ]);
 troi.emotion.add("agitated", [
-    ["agitated", "neutral", "angry"],
-    [0.65, 0.25, 0.10]
+    ["agitated", "neutral", "angry", "happy"],
+    [0.65, 0.25, 0.075, 0.025]
 ]);
 troi.emotion.add("euphoric", [
-    ["euphoric", "happy", "neutral"],
-    [0.55, 0.30, 0.15]
+    ["euphoric", "happy", "neutral", "angry"],
+    [0.549, 0.30, 0.15, 0.001]
 ]);
 troi.emotion.add("angry", [
     ["angry", "agitated", "neutral"],
