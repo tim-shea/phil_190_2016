@@ -66,17 +66,17 @@ maria.emotions.add("Sleepy", [
 
 maria.hunger = new DecayVariable(0, 1, 0, 100);
 maria.hunger.toString = function() {
-        var hungerLevel = "";
-        if (this.value < 25) {
-            hungerLevel = "Not hungry";
-        } else if (this.value < 35) {
-            hungerLevel = "Starting to get hungry";
-        } else if (this.value < 47) {
-            hungerLevel = "I'm hungry!!";
-        } else {
-            hungerLevel = "I NEED FOOD!";
-        }
-        return hungerLevel + " (Hunger = " + this.value + ")";
+    var hungerLevel = "";
+    if (this.value < 25) {
+        hungerLevel = "Not hungry";
+    } else if (this.value < 35) {
+        hungerLevel = "Starting to get hungry";
+    } else if (this.value < 47) {
+        hungerLevel = "I'm hungry!!";
+    } else {
+        hungerLevel = "I NEED FOOD!";
+    }
+    return hungerLevel + " (Hunger = " + this.value + ")";
 }
 
 
@@ -148,7 +148,7 @@ maria.hear = function(botWhoSpokeToMe, whatTheySaid) {
  * React when someone highfives me
  * @override
  */
-maria.highFived = function(botWhoHighFivedMe){
+maria.highFived = function(botWhoHighFivedMe) {
     maria.speak(botWhoHighFivedMe, "Hey wassup hello " + botWhoHighFivedMe.name + ".");
 }
 

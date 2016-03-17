@@ -67,6 +67,7 @@ function preload() {
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
 
+
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
@@ -76,6 +77,8 @@ function preload() {
 
     // Load food items
     game.load.image('food_fruit_veggies', 'assets/food_fruit_veggies.png');
+    game.load.image('cupCake', 'assets/cupCake.png');
+    game.load.image('diet_pepsi', 'assets/diet_pepsi.png');
 
 }
 
