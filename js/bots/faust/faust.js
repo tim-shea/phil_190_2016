@@ -65,8 +65,8 @@ faust.emotions.add("Angry", [
     [.5, .5]
 ]);
 faust.emotions.add("Happy", [
-    ["Happy", "Calm"],
-    [.7, .3]
+    ["Happy", "Upbeat", "Calm"],
+    [.6, .3, .1]
 ]);
 
 /**
