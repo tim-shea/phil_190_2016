@@ -454,15 +454,15 @@ sharAI.need = sharAI.satisfied;
 sharAI.emotions = new MarkovProcess("calm");
 sharAI.emotions.add("calm", [
     ["content", "anxious", "calm"],
-    [.1, .1, .8]
+    [.3, .1, .6]
 ]);
 sharAI.emotions.add("content", [
     ["content", "anxious", "calm"],
-    [.8, .1, .1]
+    [.6, .2, .2]
 ]);
 sharAI.emotions.add("anxious", [
     ["content", "anxious", "calm"],
-    [.1, .8, .1]
+    [.1, .6, .3]
 ]);
 sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
 
