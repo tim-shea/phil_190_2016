@@ -347,18 +347,18 @@ Bot.prototype.bite = function(botToAttack, damage) {
  * @param {Number} damage The amount of damage done
  */
 Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
-    console.log(botWhoAttackedMe.name + "attacked me!");
+    // console.log(botWhoAttackedMe.name + "attacked me!");
 };
 
 /**
  * Yang's action - reaction
  */
 Bot.prototype.antler_caress = function(botTocaress, message) {
-    console.log(botTocaress.name + message);
+    // console.log(botTocaress.name + message);
 };
 
 Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
-    console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
+    // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
 };
 
 /**
@@ -393,7 +393,7 @@ Bot.prototype.bow = function(botToBow) {
  * 
  */
 Bot.prototype.gotBow = function(botWhoBowed) {
-	console.log(botWhoBowed.name + "bowed down to " + this.name);
+	// console.log(botWhoBowed.name + "bowed down to " + this.name);
 };
 
 
@@ -416,12 +416,12 @@ Bot.prototype.lick = function(botTolick) {
  * @param  {Bot} botWhoLickedToMe who licked me
  */
 Bot.prototype.gotLicked = function(botWhoLickedMe) {
-    console.log(botWhoLickedMe.name + " licked " + this.name);
+    // console.log(botWhoLickedMe.name + " licked " + this.name);
 };
 
 
 Bot.prototype.ignore = function (annoyingBot) {
     this.incrementAngle(180);
     this.body.speed = 250;
-    console.log(this.name + " ignored " + annoyingBot);
+    // console.log(this.name + " ignored " + annoyingBot);
 }
