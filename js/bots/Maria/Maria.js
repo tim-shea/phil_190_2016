@@ -37,10 +37,6 @@ maria.emotions.add("Angry", [
     ["Angry", "Calm"],
     [.4, .6]
 ]);
-maria.emotions.add("C", [
-    ["Happy", "Calm"],
-    [.8, .2]
-]);
 maria.emotions.add("Hyper", [
     ["Happy", "Calm"],
     [.5, .5]
