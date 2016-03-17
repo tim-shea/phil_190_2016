@@ -555,13 +555,16 @@ sharAI.updatePerSec = function() {
  */
 sharAI.collision = function(object) {
     if (object instanceof Bot && object != sharAI) {
-    	sharAI.speak(object, "Hello lunch");
-    	if (sharAI.hunger.value > sharAI.hunger.satedPoint) {
-    		sharAI.hunt.bite(object, 25);
-    	}
-    	if (sharAI.boredom.value > sharAI.boredom.satedPoint) {
-    		sharAI.highFive(object);
-    	}
+        if (sharAI.hunger.value > sharAI.hunger.satedPoint) {
+            sharAI.hunt.bite(object, 25);
+        }
+        else if (sharAI.boredom.value > sharAI.boredom.satedPoint) {
+            sharAI.highFive(object);
+            sharAI.speak(object, "How's it hanging, " + object.name + "?");
+        }
+        else {
+        	sharAI.speak(object, "Hello lunch");
+        }
     }
 }
 
@@ -603,14 +606,52 @@ sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
  */
 sharAI.bite = function(botToAttack, damage) {
     if (botToAttack instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
-        	sharAI.hunger.value -= 300;
+        if (game.physics.arcade.distanceBetween(sharAI.sprite, botToAttack.sprite) < 100) {
+            sharAI.hunger.value -= 300;
         	sharAI.hunger.value = Math.max(0, sharAI.hunger.value)
         	sounds.chomp.play();
         	botToAttack.gotBit(this, damage);
-        	sharAI.speak(bot, "Thanks for the meal, " + bot.name + "!");
-            sharAI.highFive(bot);
-            sharAI.hunt.gotTarget = false;
-        }
-    }
+        	sharAI.speak(botToAttack, "Thanks for the meal, " + botToAttack.name + "!");
+        	sharAI.hunt.gotTarget = false;
+    	}
+	}
 };
+
+/**
+ * Override of Bot.antler_caressed
+ * @param  {Bot} botWhoCaressedMe The bot that caressed me
+ * @param  {String} message          The message sent by the 
+ * @return {void}                  
+ */
+sharAI.antler_caressed = function(botWhoCaressedMe, message) {
+    sharAI.speak(botWhoCaressedMe, "Hey! Don't rub your horns on me, " + botWhoCaressedMe.name + "!");
+    sharAI.hear(botWhoCaressedMe, message);
+}
+
+/**
+ * Override of Bot.gotBow
+ * @param  {Bot} botWhoBowed The bot that bowed to me
+ * @return {void}             
+ */
+sharAI.gotBow = function(botWhoBowed) {
+    sharAI.speak(botWhoBowed, "What are you bending your body for, " + botWhoBowed.name + "?");
+}
+
+/**
+ * Override of Bot.gotLicked
+ * @param  {Bot} botWhoLickedMe The bot that licked me
+ * @return {void}                
+ */
+sharAI.gotLicked = function(botWhoLickedMe) {
+    sharAI.speak(botWhoLickedMe, "Haha! My turn, " + botWhoLickedMe.name + "!");
+    sharAI.lick(botWhoLickedMe);
+}
+
+/**
+ * Override of Bot.gotIgnored
+ * @param  {Bot} botWhoIgnoredMe The bot that's ignoring me
+ * @return {void}                 
+ */
+sharAI.gotIgnored = function(botWhoIgnoredMe) {
+    sharAI.speak(botWhoIgnoredMe, "Hey, pay attention to me, " + botWhoIgnoredMe.name + "!");
+}
