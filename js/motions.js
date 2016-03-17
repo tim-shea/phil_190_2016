@@ -135,3 +135,13 @@ Motions.zeleport = {
     }
 }
 
+Motions.dancing = {
+    description: "Let's dance!",
+    apply: function(botToMove) {
+        if (Math.random() < .7) {
+            rey.incrementAngle(50 * Math.random() - 5);
+        }
+        botToMove.body.speed = 1000;
+        botToMove.basicUpdate();
+    }
+}
