@@ -30,11 +30,12 @@ rey.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, rey.update2min, this);
 
     // Make productions.  Very dumb productions for now.
-    eatingProduction1 = new Production("eating", 
-        Production.priority.High, 
-        function() {return (rey.hunger.value > 10 && rey.hunger.value < 20 );},
-        function() {console.log("Eating 1");});
-    
+    eatingProduction1 = new Production("eating",
+        Production.priority.High,
+        function() {
+            return (rey.hunger.value > 10 && rey.hunger.value < 20); },
+        function() { console.log("Eating 1"); });
+
 
     // Populate production list
     this.productions = [eatingProduction1];
@@ -49,7 +50,7 @@ rey.init = function() {
 rey.emotions = new MarkovProcess("Relaxed");
 rey.emotions.add("Relaxed", [
     ["Relaxed", "Hyper", "Sleepy", "Not in the mood"],
-    [.6, .3, .05, .05]
+    [.4, .2, .2, .2],
 ]);
 rey.emotions.add("Not in the mood", [
     ["Not in the mood", "Relaxed"],
@@ -68,17 +69,17 @@ rey.emotions.add("Hyper", [
  * Hunger Variable
  * @memberOf rey
  */
-rey.hunger = new DecayVariable(0, 1, 0, 100);
+rey.hunger = new DecayVariable(0, 1, 0, 50);
 rey.hunger.toString = function() {
     var hungerLevel = "";
     if (this.value < 20) {
-        hungerLevel = "Not hungry";
-    } else if (this.value < 60) {
-        hungerLevel = "Hungry";
-    } else if (this.value < 80) {
-        hungerLevel = "Starving!!";
+        hungerLevel = "Eh, not hungry.";
+    } else if (this.value < 35) {
+        hungerLevel = "Okay, I'm getting hungry.";
+    } else if (this.value < 49) {
+        hungerLevel = "I'm starving now..";
     } else {
-        hungerLevel = "FEED ME!";
+        hungerLevel = "MOVE I NEED TO EAT!";
     }
     return hungerLevel + " (Hunger = " + this.value + ")";
 }
@@ -103,7 +104,6 @@ rey.getStatus = function() {
 rey.setMotion = function() {
 
     // Default markov chain movement patterns
-    // TODO: Add conditions that involve hunger, etc.
     if (rey.emotions.current === "Not in the mood") {
         rey.currentMotion = Motions.still;
     } else if (rey.emotions.current === "Hyper") {
@@ -123,16 +123,6 @@ rey.setMotion = function() {
             rey.currentMotion = Motions.moping;
         }
     }
-}
-
-/**
- *
- * @memberOf rey
- * @override
- */
-rey.pursuitCompleted = function() {
-    rey.currentlyPursuing = "Nothing";
-    this.currentMotion = Motions.still;
 }
 
 //////////////////////
@@ -202,7 +192,7 @@ rey.collision = function(object) {
         rey.speak(object, "What's up " + object.name + "!");
     }
 
- }
+}
 
 /**
  * Call this when eating something.  
