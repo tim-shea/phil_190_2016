@@ -22,7 +22,7 @@ maria.init = function() {
  */
 maria.emotions = new MarkovProcess("Calm");
 maria.emotions.add("Calm", [
-    ["Calm", "Happy", "Angry", "Sad"]
+    ["Calm", "Happy", "Angry", "Sad"], // <-- A comma was missing
     [.5, .2, .15, .15]
 ]);
 maria.emotions.add("Happy", [
@@ -37,6 +37,7 @@ maria.emotions.add("Angry", [
     ["Angry", "Calm"],
     [.4, .6]
 ]);
+<<<<<<< HEAD
 maria.emotions.add("Hyper", [
     ["Happy", "Calm"],
     [.5, .5]
@@ -45,6 +46,18 @@ maria.emotions.add("Sleepy", [
     ["Happy", "Calm"],
     [.2, .8]
 ]);
+=======
+// States below are not called above.
+// 
+// maria.emotions.add("Hyper", [
+//     ["Happy", "Calm"],
+//     [.5, .5]
+// ]);
+// maria.emotions.add("Sleepy", [
+//     ["Happy", "Calm"],
+//     [.2, .8]
+// ]);
+>>>>>>> origin/master
 
 /**
  * Hunger
@@ -165,5 +178,5 @@ maria.update1Sec = function() {
 
 //Called every 30 seconds
 maria.update30Sec = function() {
-    maria.hunger.eat(51);
+    // maria.hunger.eat(51); <-- this is not a function.
 }
