@@ -128,7 +128,7 @@ function addFoodItem(image_id, description, calories) {
         food.calories = calories;
         food.isEdible = true;
         food.eat = function() {
-            console.log("Eating " + this.description + " with " + this.calories + " calories");
+            // console.log("Eating " + this.description + " with " + this.calories + " calories");
             let tempSprite = this.sprite;
             tempSprite.reset(-10,-10);
             tempSprite.visible = false;
