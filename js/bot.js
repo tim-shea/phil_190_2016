@@ -382,7 +382,7 @@ Bot.prototype.bow = function(botToBow) {
  * @param {Bot} botWhoBowed bot who bowed down to me
  * 
  */
-Bot.prototype.bower = function(botWhoBowed) {
+Bot.prototype.gotBow = function(botWhoBowed) {
 	console.log(botWhoBowed.name + "bowed down to " + this.name);
 };
 
