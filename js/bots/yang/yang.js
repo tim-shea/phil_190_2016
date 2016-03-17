@@ -349,7 +349,7 @@ yang.hear = function (botWhoSpokeToMe, whatTheySaid) {
 yang.MRGPRB4 = new MarkovProcess("wary");
 yang.MRGPRB4.add("wary", [
     ["wary", "alert", "demanding", "caress", "annoyed"],
-    [.5, .45, .02, .03]
+    [.5, .45, .2, .1, .2]
 ]);
 yang.MRGPRB4.add("caress", [
     ["caress", "annoyed"],
