@@ -75,7 +75,7 @@ function preload() {
     // Load speech bubble assets
     loadSpeechBubbleAssets();
 
-    // Load food items
+    // Load food items with a specified id and path
     game.load.image('food_fruit_veggies', 'assets/food_fruit_veggies.png');
     game.load.image('cupCake', 'assets/cupCake.png');
     game.load.image('diet_pepsi', 'assets/diet_pepsi.png');

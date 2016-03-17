@@ -12,6 +12,7 @@ var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
  */
 jeff.currentlyPursuing = "Nothing";
 jeff.currentMotion = Motions.still;
+jeff.extraText = ""; 
 
 /**
  * Initialize bot
@@ -39,24 +40,29 @@ jeff.init = function() {
  * @memberOf Jeff
  */
 jeff.makeProductions = function() {
-    eatingProduction1 = new Production("eating",
+    hungerProduction = new Production("eating",
         Production.priority.High,
         function() {
-            return (jeff.hunger.value > 10 && jeff.hunger.value < 20); },
-        function() { console.log("Eating 1"); });
-    eatingProduction2 = new Production("eating",
+            return (
+                jeff.hunger.value > 50 && 
+                jeff.emotions.current === "Angry");
+            },
+            function() { 
+                jeff.currentMotion = Motions.tantrum;
+                jeff.extraText = "I need food!"; });
+    admireCar = new Production("admiring car",
         Production.priority.Low,
         function() {
-            return (jeff.hunger.value > 20 && jeff.hunger.value < 30); },
-        function() { console.log("Eating 2"); });
-    eatingProduction3 = new Production("eating",
-        3,
-        function() {
-            return (jeff.hunger.value > 30 && jeff.hunger.value < 40); },
-        function() { console.log("Eating 3"); });
+            let d = game.physics.arcade.distanceBetween(jeff.sprite, dylan.sprite);
+            if ((d > 100) && (d < 500)) {
+                return true;
+            };
+            return false;
+        },
+        function() { jeff.speakTimed(dylan, "Nice car!", 10); });
 
     // Populate production list
-    this.productions = [eatingProduction1, eatingProduction2, eatingProduction3];
+    this.productions = [hungerProduction, admireCar];
 }
 
 
@@ -111,6 +117,7 @@ jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
     statusString += "\nMotion: " + jeff.currentMotion.description;
     statusString += "\n" + jeff.hunger.toString();
+    statusString += "\nExtra text:   " + jeff.extraText;
     // statusString += "\nEntity collisions: " +
     //     jeff.getOverlappingEntities().map(function(item) {
     //         return item.name;

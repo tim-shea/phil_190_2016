@@ -260,18 +260,28 @@ Bot.prototype.collision = function(object) {
 }
 
 /**
- * Say something to the specified bot.
+ * Say something to the specified bot for 1 second.
  *
  * @param {Bot} botToTalkTo the bot to talk to
  * @param {String} whatToSay what was said
  */
 Bot.prototype.speak = function(botToTalkTo, whatToSay) {
+    this.speakTimed(botToTalkTo, whatToSay, 1);
+}
+
+/**
+ * Say something to the specified bot for a specified amount of time in seconds.
+ * @param {Bot} botToTalkTo the bot to talk to
+ * @param {String} whatToSay what was said
+ * @param  {Number} howLong how long to say it for
+ */
+Bot.prototype.speakTimed = function(botToTalkTo, whatToSay, howLong) {
     // Activate the speech Bubble
     this.speechBubble.bitmapText.text = whatToSay;
     // TODO speech bubble has extra left padding often.
     // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
     this.speechBubble.visible = true;
-    game.time.events.add(Phaser.Timer.SECOND * 1, function() { 
+    game.time.events.add(Phaser.Timer.SECOND * howLong, function() { 
         this.speechBubble.visible = false; 
         this.isInteracting = false;}, this);
 

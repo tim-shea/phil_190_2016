@@ -178,9 +178,6 @@ function fireProductions(productions) {
     activeProductions = productions.filter(function(production) {return production.condition();});
     activeProductions = activeProductions.sort(
         function(a,b) {return (a.priorityLevel < b.priorityLevel);});
-    // for (var i = 0; i < activeProductions.length; i++) {
-    //     console.log(activeProductions[i]);
-    // }
     if(activeProductions.length > 0) {
         activeProductions[0].action();
     }
