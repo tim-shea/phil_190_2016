@@ -105,12 +105,14 @@ function setUpFood() {
                 break;
             case 2:
                 addFoodItem("cupCake", "cupCake", 130);
+                break;
             case 3:
             	addFoodItem("diet_pepsi", "Diet Pepsi", 0);
             	break;
             case 4:
                 addFoodItem("jerry_can", "Gasoline", 100);
-                //31,500 cals in a gallon of gasoline, about 5 gallons in a j100 can    
+                //31,500 cals in a gallon of gasoline, about 5 gallons in a j100 can  
+                break;  
             default:
                 break;
         }
