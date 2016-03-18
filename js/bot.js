@@ -375,6 +375,10 @@ Bot.prototype.crush = function(botToCrush, damage) {
     }
 }
 
+Bot.prototype.gotCrushed = function(botToCrush) {
+    //console.log(botToCrush.name + " got crushed by dylan.");
+};
+
 /**
  * Bow down to bot
  * @param {Bot} botToBow the bot that is being bowed down to

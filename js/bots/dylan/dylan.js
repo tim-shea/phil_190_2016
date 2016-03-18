@@ -37,24 +37,24 @@ dylan.emotions.add("Sad", [
     [.7, .3]
 ]);
 dylan.emotions.add("Angry", [
-    ["Angry", "Calm"],
-    [.5, .5]
+    ["Angry", "Calm", "Playful"],
+    [.5, .5, .5]
 ]);
 dylan.emotions.add("Happy", [
     ["Happy", "Calm"],
     [.7, .3]
 ]);
 dylan.emotions.add("Playful," [
-    ["Happy", "Calm"],
-    [.8, .6]
+    ["Playful", "Happy", "Calm"],
+    [.5, .8, .6]
 ]);
 dylan.emotions.add("Scared," [
-    ["Nervous", "Calm"],
-    [.7, .3]
+    ["Scared", "Nervous", "Calm"],
+    [.7, .7, .3]
 ]);
 dylan.emotions.add("Nervous," [
-    ["Scared", "Calm"],
-    [.5, .5]
+    ["Nervous", "Scared", "Calm"],
+    [.7, .5, .5]
 ]);
 
 /**
