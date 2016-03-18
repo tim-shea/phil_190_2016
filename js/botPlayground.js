@@ -79,6 +79,7 @@ function preload() {
     game.load.image('food_fruit_veggies', 'assets/food_fruit_veggies.png');
     game.load.image('cupCake', 'assets/cupCake.png');
     game.load.image('diet_pepsi', 'assets/diet_pepsi.png');
+    game.load.image('jerry_can' , 'assets/jerry_can.png');
 
 }
 

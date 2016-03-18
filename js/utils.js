@@ -98,7 +98,7 @@ function setUpFood() {
 
     // Add 20 pieces of food in various categories
     for (var i = 0; i < 20; i++) {
-        let rnd = game.rnd.integerInRange(1, 3);
+        let rnd = game.rnd.integerInRange(1, 3, 4);
         switch (rnd) {
             case 1:
                 addFoodItem("food_fruit_veggies", "fruits and veggies", 10);
@@ -108,6 +108,9 @@ function setUpFood() {
             case 3:
             	addFoodItem("diet_pepsi", "Diet Pepsi", 0);
             	break;
+            case 4:
+                addFoodItem("jerry_can", "Gasoline", 157500);
+                //31,500 cals in a gallon of gasoline, about 5 gallons in a jerry can    
             default:
                 break;
         }
