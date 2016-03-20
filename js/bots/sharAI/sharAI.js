@@ -11,7 +11,7 @@ var sharAI = new Bot(2950, 75, 'sharAI', 'js/bots/sharAI/sharAI.png');
  * @memberOf sharAI
  */
 sharAI.motionText = "sharAI is getting ready";
-sharAI.isPursuing = true;
+sharAI.isPursuing = false;
 sharAI.currentMotion = Motions.stop;
 sharAI.ear = "";
 sharAI.currentTarget;
