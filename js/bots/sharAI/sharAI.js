@@ -1,587 +1,432 @@
-//
-// INIT
-//
-
+/**
+ * sharAI's bot
+ *
+ * @namespace sharAI
+ * @augments Bot
+ */
 var sharAI = new Bot(2950, 75, 'sharAI', 'js/bots/sharAI/sharAI.png');
-sharAI.THRESHOLD_MULT = 1.5;
-sharAI.DRIVE_CAP = 600;
-sharAI.angleFromTarget = 0;
-sharAI.inputEnabled = true;
-sharAI.botRandom = -1;
-sharAI.ear = "";
 
 /**
- * Initializes sharAI
- * @return {void}
+ * State variables
+ * @memberOf sharAI
+ */
+sharAI.motionText = "sharAI is getting ready";
+sharAI.isPursuing = true;
+sharAI.currentMotion = Motions.stop;
+sharAI.ear = "";
+sharAI.currentTarget;
+
+/**
+ * Initialize bot
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.init = function() {
     this.body = this.sprite.body;
-    sharAI.body.rotation = 100;
-    sharAI.body.speed = 100;
+    this.body.rotation = 100; // Initial Angle
+    this.body.speed = 100; // Initial Speed
 
+    // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, sharAI.updatePerSec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 5, sharAI.updateFiveSecs, this);
 
-    sharAI.giggle = game.add.audio('doozer');
+    // Make productions
+    this.makeProductions();
 }
 
 /**
- * A customized version of Bot.pursue
- * @param  {Game Object} target The target to pursue
- * @param  {Number} speed The speed to chase the target at
- * @return {void}
+ * Create the list of productions for this agent.
+ *
+ * @memberOf sharAI
  */
-sharAI.pursue = function(target, speed) {
-    sharAI.angleFromTarget = game.physics.arcade.angleBetween(sharAI.sprite, target.sprite);
-    sharAI.sprite.rotation = sharAI.angleFromTarget;
-    game.physics.arcade.velocityFromRotation(
-        sharAI.angleFromTarget,
-        speed,
-        sharAI.sprite.body.velocity);
-}
-
-//
-// DRIVES
-//
-
-sharAI.lethargy = {
-    value: 0,
-    threshold: 420,
-    criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
-    satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
-    /**
-     * Prints lethargy value to string
-     * @return {void}
-     */
-    toString: function() {
-        let lethargyBar = "Lethargy:\t\t";
-        let lethargyAmount = Math.floor(sharAI.lethargy.value / 60);
-        let iCount = 0;
-        for (i = 0; i < lethargyAmount; i++) {
-            lethargyBar += "▓"
-            iCount++;
-        }
-        for (i = 0; i < (10 - iCount); i++) {
-            lethargyBar += "░"
-        }
-        return lethargyBar;
-    },
-    /**
-     * Returns current need status to sharAI.emotions.adjustTransitions()
-     * @return {string}
-     */
-    getMood: function() {
-        if (this.value < this.satedPoint) {
-            return "Calm"
-        } else if (this.value > this.criticalPoint) {
-            return "Anxious"
-        } else {
-            return "Content"
-        }
-    }
-}
-
-sharAI.exhaustion = {
-    value: 0,
-    threshold: 480,
-    criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
-    satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
-    /**
-     * Prints exhaustion value to string
-     * @return {void}
-     */
-    toString: function() {
-        let exhaustionBar = "Exhaustion:\t";
-        let exhaustionAmount = Math.floor(sharAI.exhaustion.value / 60);
-        let iCount = 0;
-        for (i = 0; i < exhaustionAmount; i++) {
-            exhaustionBar += "▓"
-            iCount++;
-        }
-        for (i = 0; i < (10 - exhaustionAmount); i++) {
-            exhaustionBar += "░"
-        }
-        return exhaustionBar;
-    },
-    /**
-     * Returns current need status to sharAI.emotions.adjustTransitions()
-     * @return {string}
-     */
-    getMood: function() {
-        if (this.value < this.satedPoint) {
-            return "Calm"
-        } else if (this.value > this.criticalPoint) {
-            return "Anxious"
-        } else {
-            return "Content"
-        }
-    }
-}
-
-sharAI.hunger = {
-    value: 0,
-    threshold: 300,
-    criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
-    satedPoint: this.threshold / sharAI.THRESHOLD_MULT,
-    /**
-     * Prints hunger value to string
-     * @return {void}
-     */
-    toString: function() {
-        let hungerBar = "Hunger:\t\t";
-        let hungerAmount = Math.floor(sharAI.hunger.value / 60);
-        let iCount = 0;
-        for (i = 0; i < hungerAmount; i++) {
-            hungerBar += "▓"
-            iCount++;
-        }
-        for (i = 0; i < (10 - iCount); i++) {
-            hungerBar += "░"
-        }
-        return hungerBar;
-    },
-    /**
-     * Returns current need status to sharAI.emotions.adjusTransitions()
-     * @return {string}
-     */
-    getMood: function() {
-        if (this.value < this.satedPoint) {
-            return "Calm"
-        } else if (this.value > this.criticalPoint) {
-            return "Anxious"
-        } else {
-            return "Content"
-        }
-    }
-}
-
-sharAI.boredom = {
-    value: 0,
-    threshold: 180,
-    criticalPoint: this.threshold * sharAI.THRESHOLD_MULT,
-    satedPoint: this.threshold * sharAI.THRESHOLD_MULT,
-    /**
-     * Runs when sharAI is clicked on (in the future, that is)
-     * @return {void}
-     */
-    tickle: function() {
-        sharAI.boredom.value -= 100;
-        sharAI.giggle.play();
-    },
-    /**
-     * Prints boredom value to string
-     * @return {void}
-     */
-    toString: function() {
-        let boredomBar = "Boredom:\t\t";
-        let boredomAmount = Math.floor(sharAI.boredom.value / 60);
-        let iCount = 0;
-        for (i = 0; i < boredomAmount; i++) {
-            boredomBar += "▓"
-            iCount++;
-        }
-        for (i = 0; i < (10 - iCount); i++) {
-            boredomBar += "░"
-        }
-        return boredomBar;
-    },
-    /**
-     * Returns current need status to sharAI.emotions.adjustTransitions()
-     * @return {string}
-     */
-    getMood: function() {
-        if (this.value < this.satedPoint) {
-            return "Calm"
-        } else if (this.value > this.criticalPoint) {
-            return "Anxious"
-        } else {
-            return "Content"
-        }
-    }
-}
-
-sharAI.needArray = [sharAI.lethargy, sharAI.exhaustion, sharAI.hunger, sharAI.boredom]
-
-//
-// MOVEMENT STATES
-//
-
-sharAI.walk = {
-    name: "Walk",
-    stateText: "sharAI is moving around",
-    /**
-     * Runs during update when walk is current movement state
-     * @return {void}
-     */
-    update: function() {
-        Motions.walking.apply(sharAI);
-    },
-    /**
-     * Runs every second when walk is current movement state
-     * @return {void}
-     */
-    adjustNeeds: function() {
-        if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
-            sharAI.lethargy.value++;
-        }
-        if (sharAI.exhaustion.value < sharAI.DRIVE_CAP) {
-            sharAI.exhaustion.value++;
-        }
-        if (sharAI.hunger.value < sharAI.DRIVE_CAP) {
-            sharAI.hunger.value++;
-        }
-        if (sharAI.boredom.value < sharAI.DRIVE_CAP) {
-            sharAI.boredom.value++;
-        }
-    }
-}
-
-sharAI.stop = {
-    name: "Stop",
-    stateText: "sharAI is looking around.",
-    /**
-     * Runs during update when stop is current movement state
-     * @return {void}
-     */
-    update: function() {
-        Motions.stop.apply(sharAI);
-    },
-    /**
-     * Runs every second when stop is current movement state
-     * @return {void}
-     */
-    adjustNeeds: function() {
-        if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
-            sharAI.lethargy.value++;
-        }
-        if (sharAI.exhaustion.value > 0) {
-            sharAI.exhaustion.value--;
-        }
-        if (sharAI.hunger.value < sharAI.DRIVE_CAP) {
-            sharAI.hunger.value++;
-        }
-        if (sharAI.boredom.value < sharAI.DRIVE_CAP) {
-            sharAI.boredom.value++;
-        }
-    }
-}
-
-sharAI.nap = {
-    name: "Nap",
-    stateText: "sharAI is napping",
-    /**
-     * Runs during update when nap is current movement state
-     * @return {void}
-     */
-    update: function() {
-        Motions.still.apply(sharAI);
-    },
-    /**
-     * Runs every second when nap is current movement state
-     * @return {void}
-     */
-    adjustNeeds: function() {
-        if (sharAI.lethargy.value > 0) {
-            sharAI.lethargy.value--;
-        }
-        if (sharAI.exhaustion.value > 0) {
-            sharAI.exhaustion.value--;
-        }
-        if (sharAI.hunger.value < sharAI.DRIVE_CAP) {
-            sharAI.hunger.value++;
-        }
-        if (sharAI.boredom.value > 0) {
-            sharAI.boredom.value--;
-        }
-    }
-}
-
-sharAI.hunt = {
-    name: "Hunt",
-    stateText: "sharAI is hunting ",
-    gotTarget: false,
-    /**
-     * Runs during update when hunt is current movement state
-     * @return {void}
-     */
-    update: function() {
-        // Get a bot to target
-        if (sharAI.hunt.gotTarget == false) {
-            do {
-                sharAI.botRandom = Math.floor(sharAI.getRandom(0, bots.length - 1)); // Get random bot
-            } while (sharAI.botRandom == 1) // The while statement prevents sharAI from hunting themself
-
-            sharAI.hunt.stateText = "sharAI is hunting " + bots[sharAI.botRandom].name;
-            sharAI.hunt.gotTarget = true;
-        }
-
-        // Then pursue the target
-        sharAI.pursue(bots[sharAI.botRandom], 200);
-    },
-    /**
-     * Runs every second when hunt is current movement state
-     * @return {void}
-     */
-    adjustNeeds: function() {
-        if (sharAI.lethargy.value < sharAI.DRIVE_CAP) {
-            sharAI.lethargy.value++;
-        }
-        if (sharAI.exhaustion.value < sharAI.DRIVE_CAP) {
-            sharAI.exhaustion.value += 2;
-            sharAI.exhaustion.value = Math.min(sharAI.exhaustion.value, sharAI.DRIVE_CAP);
-        }
-        if (sharAI.hunger.value < sharAI.DRIVE_CAP) {
-            sharAI.hunger.value++;
-        }
-        if (sharAI.boredom.value > 0) {
-            sharAI.boredom.value--;
-        }
-    }
-}
-
-sharAI.movement = sharAI.walk;
-
-//
-// NEED STATES
-//
-
-sharAI.satisfied = {
-    name: "Satisfied",
-    /**
-     * Controls the current need state
-     * @return {void}
-     */
-    getNeedMode: function() {
-        if (sharAI.lethargy.value > sharAI.lethargy.threshold) { // First checks to see if sharAI is sleepy
-            return sharAI.sleepy;
-        } else if (sharAI.hunger.value > sharAI.hunger.threshold) {
-            return sharAI.hungry
-        } else if (sharAI.exhaustion.value > sharAI.exhaustion.threshold) { // Then checks to see if sharAI is tired
-            return sharAI.tired;
-        } else { // If sharAI is none of the above, then they are fine
-            return sharAI.satisfied;
-        }
-    },
-    /**
-     * Sets the current movement mode to walk while need state is satisfied
-     * @return {void}
-     */
-    getMovementMode: function() {
-        return sharAI.walk;
-    },
-}
-
-sharAI.sleepy = {
-    name: "Sleepy",
-    /**
-     * Controls the current need state
-     * @return {void}
-     */
-    getNeedMode: function() {
-        if (sharAI.lethargy.value < sharAI.lethargy.satedPoint) { // If sharAI is not sleepy anymore and ...
-            if (sharAI.exhaustion.value >= sharAI.exhaustion.threshold) { // ...sharAI is tired, switch to the tired state
-                return sharAI.tired;
+sharAI.makeProductions = function() {
+    huntingProduction = new Production("eating",
+        10,
+        function() {
+            return (
+                sharAI.hunger.value > 50);
+        },
+        function() {
+            if (sharAI.isPursuing == false) {
+                do {
+                    sharAI.currentTarget = sharAI.getRandomObject()
+                    if (randomObject.isEdible == true) {
+                        sharAI.pursue(sharAI.currentTarget, 30);
+                    }
+                } while (randomObject.isEdible == false)
             }
-            return sharAI.satisfied; //...sharAI is not tired, then sharAI is satisfied
-        } else { // Else, sharAI is still sleepy
-            return sharAI.sleepy;
-        }
-    },
-    /**
-     * Sets the current movement mode to nap while need state is sleepy
-     * @return {void}
-     */
-    getMovementMode: function() {
-        return sharAI.nap;
-    }
+        });
+
+    // Populate production list
+    this.productions = [huntingProduction];
 }
 
-sharAI.tired = {
-    name: "Tired",
-    /**
-     * Controls the current need state
-     * @return {void}
-     */
-    getNeedMode: function() {
-        if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) { // If sharAI is going to pass out from drowsiness, let them sleep
-            return sharAI.sleepy;
-        } else if (sharAI.exhaustion.value < sharAI.exhaustion.satedPoint) { // If sharAI is not feeling tired anymore, then they feel fine
-            return sharAI.satisfied;
-        } else { // Otherwise, sharAI still feels tired.
-            return sharAI.tired
-        }
-    },
-    /**
-     * Sets the current movement mode to stop while need state is tired
-     * @return {void}
-     */
-    getMovementMode: function() {
-        return sharAI.stop;
-    }
-}
-
-sharAI.hungry = {
-    name: "Hungry",
-    /**
-     * Controls the current need state
-     * @return {void}
-     */
-    getNeedMode: function() {
-        if (sharAI.lethargy.value >= sharAI.lethargy.criticalPoint) {
-            return sharAI.sleepy
-        } else if (sharAI.exhaustion.value >= sharAI.exhaustion.criticalPoint) {
-            return sharAI.tired;
-        } else if (sharAI.hunger.value < sharAI.hunger.satedPoint) {
-            return sharAI.satisfied;
-        } else {
-            return sharAI.hungry;
-        }
-    },
-    /**
-     * Sets the current movement mode to hunt while need state is hungry
-     * @return {void}
-     */
-    getMovementMode: function() {
-        return sharAI.hunt;
-    }
-}
-
-sharAI.need = sharAI.satisfied;
-
-//
-// EMOTIONS
-//
-
-sharAI.emotions = new MarkovProcess("calm");
-sharAI.emotions.add("calm", [
-    ["content", "anxious", "calm"],
+/**
+ * Markov process controlling energy level
+ * @memberOf sharAI
+ */
+sharAI.energyLevel = new MarkovProcess("Calm");
+sharAI.energyLevel.add("Calm", [
+    ["Content", "Anxious", "Calm"],
     [.1, .1, .8]
 ]);
-sharAI.emotions.add("content", [
-    ["content", "anxious", "calm"],
+sharAI.energyLevel.add("Content", [
+    ["Content", "Anxious", "Calm"],
     [.8, .1, .1]
 ]);
-sharAI.emotions.add("anxious", [
-    ["content", "anxious", "calm"],
+sharAI.energyLevel.add("Anxious", [
+    ["Content", "Anxious", "Calm"],
     [.1, .8, .1]
 ]);
-sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
 
 /**
- * Changes transitions according to what sharAI's current needs are.
- * @param  {String Array} needArray An array of needs
- * @return {void}
+ * Markov process controlling mood
+ * @memberOf sharAI
  */
-sharAI.emotions.adjustTransitions = function(needArray) {
-    let currentNeedsArray = [];
+sharAI.mood = new MarkovProcess("Happy");
+sharAI.mood.add("Happy", [
+    ["Happy", "Sad", "Angry", "Fearful"],
+    [.7, .1, .1, .1]
+]);
+sharAI.mood.add("Sad", [
+    ["Happy", "Sad", "Angry", "Fearful"],
+    [.1, .7, .1, .1]
+]);
+sharAI.mood.add("Angry", [
+    ["Happy", "Sad", "Angry", "Fearful"],
+    [.1, .1, .7, .1]
+]);
+sharAI.mood.add("Fearful", [
+    ["Happy", "Sad", "Angry", "Fearful"],
+    [.1, .1, .1, .7]
+]);
 
-    for (i = 0; i < needArray.length; i++) {
-        currentNeedsArray[i] = needArray[i].getMood();
+/**
+ * Hunger Variable
+ * @memberOf sharAI
+ */
+sharAI.hunger = new DecayVariable(0, 1, 0, 100);
+sharAI.hunger.toString = function() {
+    let hungerBar = "Hunger:\t\t";
+    let hungerAmount = Math.floor(sharAI.hunger.value / 10);
+    let iCount = 0;
+    for (i = 0; i < hungerAmount; i++) {
+        hungerBar += "▓"
+        iCount++;
     }
-
-    let fraction = .5 / needArray.length;
-    let calmCount = 0;
-    let contentCount = 0;
-    let anxiousCount = 0;
-
-    for (i = 0; i < currentNeedsArray.length; i++) {
-        if (currentNeedsArray[i] == "Calm") {
-            calmCount += fraction;
-        } else if (currentNeedsArray[i] == "Content") {
-            contentCount += fraction;
-        } else {
-            anxiousCount += fraction;
-        }
+    for (i = 0; i < (10 - iCount); i++) {
+        hungerBar += "░"
     }
-
-    this.changeTransitions("calm", [contentCount + .1, anxiousCount + .1, calmCount + .3]);
-    this.changeTransitions("content", [contentCount + .3, anxiousCount + .1, calmCount + .1]);
-    this.changeTransitions("anxious", [contentCount + .1, anxiousCount + .3, calmCount + .1]);
+    return hungerBar;
 }
 
-//
-// THE OTHER STUFF
-//
+/**
+ * Lethargy Variable
+ * @memberOf sharAI
+ */
+sharAI.lethargy = new DecayVariable(0, 1, 0, 100);
+sharAI.lethargy.toString = function() {
+    let lethargyBar = "Lethargy:\t\t";
+    let lethargyAmount = Math.floor(sharAI.lethargy.value / 10);
+    let iCount = 0;
+    for (i = 0; i < lethargyAmount; i++) {
+        lethargyBar += "▓"
+        iCount++;
+    }
+    for (i = 0; i < (10 - iCount); i++) {
+        lethargyBar += "░"
+    }
+    return lethargyBar;
+}
 
 /**
- * Compiles all of the toStrings and other assorted things together
- * @return {String}
+ * Exhaustion Variable
+ * @memberOf sharAI
+ */
+sharAI.exhaustion = new DecayVariable(0, 1, 0, 100);
+sharAI.exhaustion.toString = function() {
+    let exhaustionBar = "Exhaustion:\t";
+    let exhaustionAmount = Math.floor(sharAI.exhaustion.value / 10);
+    let iCount = 0;
+    for (i = 0; i < exhaustionAmount; i++) {
+        exhaustionBar += "▓"
+        iCount++;
+    }
+    for (i = 0; i < (10 - iCount); i++) {
+        exhaustionBar += "░"
+    }
+    return exhaustionBar;
+}
+
+/**
+ * Boredom Variable
+ * @memberOf sharAI
+ */
+sharAI.boredom = new DecayVariable(0, 1, 0, 100);
+sharAI.boredom.toString = function() {
+    let boredomBar = "Boredom:\t\t";
+    let boredomAmount = Math.floor(sharAI.boredom.value / 10);
+    let iCount = 0;
+    for (i = 0; i < boredomAmount; i++) {
+        boredomBar += "▓"
+        iCount++;
+    }
+    for (i = 0; i < (10 - iCount); i++) {
+        boredomBar += "░"
+    }
+    return boredomBar;
+}
+
+/**
+ * Health Variable
+ * @memberOf sharAI
+ */
+sharAI.health = new DecayVariable(100, 1, 0, 100);
+sharAI.health.toString = function() {
+    let healthBar = "Health:\t\t";
+    let healthAmount = Math.floor(sharAI.health.value / 10);
+    let iCount = 0;
+    for (i = 0; i < healthAmount; i++) {
+        healthBar += "▓"
+        iCount++;
+    }
+    for (i = 0; i < (10 - iCount); i++) {
+        healthBar += "░"
+    }
+    return healthBar;
+}
+
+/**
+ * Populate the status field
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.getStatus = function() {
-    sharAI.textBox = sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n\n" + sharAI.movement.stateText + sharAI.emotions.stateText + "\n" + sharAI.ear;
-    return sharAI.textBox;
+    let statusString = sharAI.health.toString() + "\n" + sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n" + sharAI.motionText + "\n" + sharAI.ear;
+    return statusString;
 }
 
 /**
- * Override of basicUpdate
- * @return {void}
+ * Set the current motion state.  Currently updated every second.
+ * @memberOf sharAI
  */
-sharAI.basicUpdate = function() {
-    if (sharAI.movement != sharAI.hunt) {
-        game.physics.arcade.velocityFromRotation(
-            sharAI.sprite.rotation,
-            sharAI.sprite.body.speed,
-            sharAI.sprite.body.velocity);
+sharAI.setMotion = function() {
+    let rnd = Math.random();
+    if (sharAI.energyLevel.current === "Calm") {
+        if (sharAI.mood.current === "Happy") {
+            sharAI.currentMotion = Motions.stop;
+            sharAI.motionText = "sharAI is curled up all cozy";
+        } else if (sharAI.mood.current === "Sad") {
+            sharAI.currentMotion = Motions.still;
+            sharAI.motionText = "sharAI is staring at the ground";
+        } else if (sharAI.mood.current === "Angry") {
+            sharAI.currentMotion = Motions.moping;
+            sharAI.motionText = "sharAI is brooding";
+        } else {
+            sharAI.currentMotion = Motions.walking;
+            sharAI.motionText = "sharAI is pacing";
+        }
+    } else if (sharAI.energyLevel.current === "Content") {
+        if (sharAI.mood.current === "Happy") {
+            sharAI.currentMotion = Motions.walking;
+            sharAI.motionText = "sharAI is going on a walk";
+        } else if (sharAI.mood.current === "Sad") {
+            sharAI.currentMotion = Motions.moping;
+            sharAI.motionText = "sharAI is trying to hide their face";
+        } else if (sharAI.mood.current === "Angry") {
+            sharAI.currentMotion = Motions.stop;
+            sharAI.motionText = "sharAI is grinding their maxilla";
+        } else {
+            sharAI.currentMotion = Motions.running;
+            sharAI.motionText = "sharAI is in a hurry";
+        }
+    } else {
+        if (sharAI.mood.current === "Happy") {
+            sharAI.currentMotion = Motions.dancing;
+            sharAI.motionText = "sharAI is jumping and twirling";
+        } else if (sharAI.mood.current === "Sad") {
+            sharAI.currentMotion = Motions.spazzing;
+            sharAI.motionText = "sharAI can\'t hide their sorrow";
+        } else if (sharAI.mood.current === "Angry") {
+            sharAI.currentMotion = Motions.tantrum;
+            sharAI.motionText = "sharAI is cursing and flailing their legs";
+        } else {
+            sharAI.currentMotion = Motions.still;
+            sharAI.motionText = "sharAI is paralyzed stiff with fear";
+        }
     }
 }
 
 /**
- * main() equivalent
- * @return {void}
+ * Increments or decrements decay variables based on the current motion type
+ * 
+ * @memberOf sharAI
+ */
+sharAI.incrementDecayVariables = function() {
+    if (sharAI.currentMotion == Motions.still) {
+        sharAI.exhaustion.decrement();
+        sharAI.boredom.increment();
+    }
+    else if (sharAI.currentMotion == Motions.stop) {
+        sharAI.exhaustion.decrement();
+    }
+    else if (sharAI.currentMotion == Motions.spazzing) {
+        sharAI.exhaustion.add(3);
+        sharAI.boredom.decrement();
+    }
+    else if (sharAI.currentMotion == Motions.walking) {
+        sharAI.exhaustion.increment();
+        sharAI.boredom.increment();
+    }
+    else if (sharAI.currentMotion == Motions.running) {
+        sharAI.exhaustion.add(2);
+    }
+    else if (sharAI.currentMotion == Motions.tantrum) {
+        sharAI.exhaustion.add(3);
+    }
+    else if (sharAI.currentMotion == Motions.dancing) {
+        sharAI.exhaustion.increment(2);
+        sharAI.boredom.decrement();
+    }
+    // Motions.moping doesn't have additional increments or decrements that isn't shared by all movement types
+    // Always increment hunger and lethargy no matter what motion state sharAI's in
+    sharAI.hunger.increment();
+    sharAI.lethargy.increment();
+}
+
+/**
+ * Will heal sharAI when called if conditions are met
+ * 
+ * @memberOf sharAI
+ */
+sharAI.regenerateHealth = function() {
+    if (sharAI.hunger.value < 50 && sharAI.lethargy.value < 50 && sharAI.exhaustion.value < 50) {
+        sharAI.health.increment();
+    }
+}
+
+/**
+ * Override of Bot.pursue
+ *
+ * @memberOf sharAI
+ * @override
+ */
+sharAI.pursue = function(objectToPursue, duration) {
+    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
+    var pursuitTween = game.add.tween(this.sprite);
+    pursuitTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, Phaser.Easing.Exponential.InOut);
+    pursuitTween.onComplete.add(this.pursuitCompleted);
+    pursuitTween.start();
+    this.isPursuing = true;
+}
+
+/**
+ * When a pursuit is completed reset the pursuit string.
+ *
+ * @memberOf sharAI
+ * @override
+ */
+sharAI.pursuitCompleted = function() {
+    sharAI.isPursuing = false;
+    this.currentMotion = Motions.stop;
+}
+
+//////////////////////
+// Update Functions //
+//////////////////////
+
+/**
+ * Main update called by the phaer game object (about 40 times / sec. on my machine).
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.update = function() {
-    sharAI.movement = sharAI.need.getMovementMode();
-    sharAI.movement.update();
-    sharAI.basicUpdate();
+
+    // Apply current motion
+    sharAI.currentMotion.apply(sharAI);
+    // "Superclass" update method
     sharAI.genericUpdate();
-}
+};
+
 
 /**
- * Runs these methods every second
- * @return {void}
+ * Called every second
+ * @memberOf sharAI
  */
 sharAI.updatePerSec = function() {
-    sharAI.movement.adjustNeeds();
-    sharAI.need = sharAI.need.getNeedMode();
-
-    sharAI.emotions.adjustTransitions(sharAI.needArray);
-    sharAI.emotions.update();
-    sharAI.emotions.stateText = " and is feeling " + sharAI.emotions.current
+    sharAI.incrementDecayVariables();
+    sharAI.energyLevel.update();
+    sharAI.mood.update();
+    sharAI.setMotion();
+    fireProductions(sharAI.productions);
 }
 
 /**
- * Override of Bot.collision. sharAI will bite any objects they run into that are bots
- * @param  {Game Object} object An object in the world
- * @return {void}
+ * Called every ten seconds
+ * @memberOf sharAI
+ */
+sharAI.updateFiveSecs = function() {
+    sharAI.regenerateHealth();
+}
+
+///////////////////////////
+// Interaction Functions //
+///////////////////////////
+
+/**
+ * React to a collision.
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.collision = function(object) {
-    if (object instanceof Bot && object != sharAI) {
-        if (sharAI.hunger.value > sharAI.hunger.satedPoint) {
-            sharAI.hunt.bite(object, 25);
-        }
-        else if (sharAI.boredom.value > sharAI.boredom.satedPoint) {
-            sharAI.highFive(object);
-            sharAI.speak(object, "How's it hanging, " + object.name + "?");
-        }
-        else {
-        	sharAI.speak(object, "Hello lunch");
-        }
+    if (object.isEdible) {
+        sharAI.eatObject(object);
+    } else if (object instanceof Bot) {
+        sharAI.speak(object, "How you doin\', " + object.name + "?");
+        object.highFive();
     }
 }
 
 /**
- * Override of Bot.highFived
- * @param  {Bot} botWhoHighFivedMe The bot that high-fived sharAI
- * @return {void}
+ * Call this when eating something.  
+ *
+ * @memberOf sharAI
+ * @param {Entity} objectToEat what to eat
+ */
+sharAI.eatObject = function(objectToEat) {
+    objectToEat.eat();
+    sharAI.hunger.subtract(objectToEat.calories);
+    sharAI.speak(objectToEat, "Om nom nom");
+    sounds.chomp.play();
+}
+
+/**
+ * @memberOf sharAI
+ * @override
+ */
+sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
+}
+
+/**
+ * React when someone high fives me.
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.highFived = function(botWhoHighFivedMe) {
-    sharAI.boredom.value -= 5;
+    sharAI.boredom.subtract(5);
 }
 
 /**
  * Override of Bot.gotBit
- * @param  {Bot} botWhoAttackedMe The bot that attacked sharAI
- * @param  {Number} damage The amount of damage dealt to sharAI
- * @return {void}
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.gotBit = function(botWhoAttackedMe, damage) {
     sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that, " + botWhoAttackedMe.name + "!");
@@ -590,48 +435,30 @@ sharAI.gotBit = function(botWhoAttackedMe, damage) {
 
 /**
  * Override of Bot.hear
- * @param  {Bot} botWhoSpokeToMe The bot who spoke to sharAI
- * @param  {String} whatTheySaid What the bot said to sharAI
- * @return {void}
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
     sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
 }
 
 /**
- * Override of Bot.bite
- * @param  {Bot} botToAttack The bot to bite
- * @param  {Number} damage      Strength of bite
- * @return {void}
- */
-sharAI.bite = function(botToAttack, damage) {
-    if (botToAttack instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(sharAI.sprite, botToAttack.sprite) < 100) {
-            sharAI.hunger.value -= 300;
-        	sharAI.hunger.value = Math.max(0, sharAI.hunger.value)
-        	sounds.chomp.play();
-        	botToAttack.gotBit(this, damage);
-        	sharAI.speak(botToAttack, "Thanks for the meal, " + botToAttack.name + "!");
-        	sharAI.hunt.gotTarget = false;
-    	}
-	}
-};
-
-/**
  * Override of Bot.antler_caressed
- * @param  {Bot} botWhoCaressedMe The bot that caressed me
- * @param  {String} message          The message sent by the 
- * @return {void}                  
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.antler_caressed = function(botWhoCaressedMe, message) {
-    sharAI.speak(botWhoCaressedMe, "Hey! Don't rub your horns on me, " + botWhoCaressedMe.name + "!");
     sharAI.hear(botWhoCaressedMe, message);
+    sharAI.speak(botWhoCaressedMe, "Hey! Don't rub your horns on me, " + botWhoCaressedMe.name + "!");
 }
 
 /**
  * Override of Bot.gotBow
- * @param  {Bot} botWhoBowed The bot that bowed to me
- * @return {void}             
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.gotBow = function(botWhoBowed) {
     sharAI.speak(botWhoBowed, "What are you bending your body for, " + botWhoBowed.name + "?");
@@ -639,18 +466,21 @@ sharAI.gotBow = function(botWhoBowed) {
 
 /**
  * Override of Bot.gotLicked
- * @param  {Bot} botWhoLickedMe The bot that licked me
- * @return {void}                
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.gotLicked = function(botWhoLickedMe) {
     sharAI.speak(botWhoLickedMe, "Haha! My turn, " + botWhoLickedMe.name + "!");
     sharAI.lick(botWhoLickedMe);
+    sharAI.boredom.subtract(5);
 }
 
 /**
  * Override of Bot.gotIgnored
- * @param  {Bot} botWhoIgnoredMe The bot that's ignoring me
- * @return {void}                 
+ *
+ * @memberOf sharAI
+ * @override
  */
 sharAI.gotIgnored = function(botWhoIgnoredMe) {
     sharAI.speak(botWhoIgnoredMe, "Hey, pay attention to me, " + botWhoIgnoredMe.name + "!");

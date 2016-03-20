@@ -427,5 +427,14 @@ Bot.prototype.gotLicked = function(botWhoLickedMe) {
 Bot.prototype.ignore = function (annoyingBot) {
     this.incrementAngle(180);
     this.body.speed = 250;
-    // console.log(this.name + " ignored " + annoyingBot);
+    annoyingBot.gotIgnored(this);
+}
+
+/**
+ * Override to react when ignored
+ *
+ * @param  {Bot} botWhoIgnoredToMe who ignored me
+ */
+Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
+
 }

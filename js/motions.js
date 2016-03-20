@@ -15,9 +15,8 @@ Motions.stop = {
     apply: function(botToMove) {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
-
         }
-        botToMove.botToMove.speed = 0;
+        botToMove.speed = 0;
         botToMove.basicUpdate();
     }
 }
