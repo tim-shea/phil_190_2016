@@ -2,3 +2,4 @@
 2. redesign nodes accordingly to the main update
 3. add another object
 4. the philoberry spawn design
+5. eating action
