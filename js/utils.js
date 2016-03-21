@@ -98,7 +98,7 @@ function setUpFood() {
 
     // Add 20 pieces of food in various categories
     for (var i = 0; i < 20; i++) {
-        let rnd = game.rnd.integerInRange(1, 11);
+        let rnd = game.rnd.integerInRange(1, 4);
         switch (rnd) {
             case 1:
                 addFoodItem("food_fruit_veggies", "fruits and veggies", 10);
@@ -112,24 +112,6 @@ function setUpFood() {
             case 4:
                 addFoodItem("jerry_can", "Gasoline", 100);
                 //31,500 cals in a gallon of gasoline, about 5 gallons in a j100 can  
-                break;
-            case 5:
-                addFoodItem("Philoberry", "Organic Philosopher's Stone", 5); 
-                break;
-            case 7:
-                addFoodItem("Cheri_berry", "Pokemon berry #01", 1);
-                break;
-            case 8:
-                addFoodItem("Enigma_berry", "Pokemon berry #60", 1);
-                break;
-            case 9:
-                addFoodItem("Hondew_berry", "Pokemon berry #24", 1);
-                break;
-            case 10:
-                addFoodItem("Passo_berry", "Pokemon berry #37", 1);
-                break;  
-            case 11:
-                addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -10);
                 break;  
             default:
                 break;

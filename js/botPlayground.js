@@ -59,6 +59,7 @@ function preload() {
     game.load.image('Cherry Blossom Tree', 'assets/Blossom.png');
     game.load.image('Eastern Castle', 'assets/eastCastle.png');
     game.load.image('Treasure', 'assets/treasurechest.gif');
+    game.load.image('Philoberry', 'assets/Philoberry.png');
     game.load.image('Treehouse', 'assets/Deer_Treehouse.png');
     game.load.image('DeerCrossingSign', 'assets/deercrossing.png');
     game.load.image('grassyrock', 'assets/grassyrock.png');
@@ -79,12 +80,6 @@ function preload() {
     game.load.image('cupCake', 'assets/cupCake.png');
     game.load.image('diet_pepsi', 'assets/diet_pepsi.png');
     game.load.image('jerry_can' , 'assets/jerry_can.png');
-    game.load.image('Philoberry', 'assets/Philoberry.png');
-    game.load.image('Cheri_berry', 'assets/Cheri_Berry.png');
-    game.load.image('Enigma_berry', 'assets/Enigma_Berry.png');
-    game.load.image('Hondew_berry', 'assets/Hondew_Berry.png');
-    game.load.image('Passo_berry', 'assets/Passo_Berry.png');
-    game.load.image('Devil_Fruit_rubber', 'assets/gomu_gomu_no_mi.png');
 
 }
 
