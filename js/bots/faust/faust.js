@@ -25,22 +25,92 @@ faust.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, faust.update2min, this);
 
     // Make productions.  Very dumb productions for now.
-    eatingProduction1 = new Production("eating", 
-        Production.priority.High, 
-        function() {return (faust.hunger.value > 10 && faust.hunger.value < 20 );},
-        function() {console.log("Eating 1");});
-    eatingProduction2 = new Production("eating", 
-        Production.priority.Low, 
-        function() {return (faust.hunger.value > 20 && faust.hunger.value < 30);},
-        function() {console.log("Eating 2");});
-    eatingProduction3 = new Production("eating", 
-        3, 
-        function() {return (faust.hunger.value > 30 && faust.hunger.value < 40);},
-        function() {console.log("Eating 3");});
+    eatingProduction1 = new Production("eating",
+        Production.priority.High,
+        function() {
+            return (faust.hunger.value > 10 && faust.hunger.value < 20);
+        },
+        function() { console.log("Eating 1"); });
+    eatingProduction2 = new Production("eating",
+        Production.priority.Low,
+        function() {
+            return (faust.hunger.value > 20 && faust.hunger.value < 30);
+        },
+        function() { console.log("Eating 2"); });
+    eatingProduction3 = new Production("eating",
+        3,
+        function() {
+            return (faust.hunger.value > 30 && faust.hunger.value < 40);
+        },
+        function() { console.log("Eating 3"); });
 
     // Populate production list
     this.productions = [eatingProduction1, eatingProduction2, eatingProduction3];
 }
+
+//faust.makeProductions = function() {
+//    eatingProduction = new Production("eating",
+//        Production.priority.High,
+//        function() {
+//            return (
+//                faust.hunger.value > 50;
+//            )
+//        },
+//        function() { 
+//            faust.extraText = "I have a craving only food can satisfy";
+//        }
+//    );
+//    sleepingProduction = new Production("sleeping",
+//        Production.priority.High,
+//        function() {
+//            return (
+//                faust.energy.value < 20
+//            );
+//        },
+//        function() { 
+//            faust.currentMotion = Motions.still;
+//            faust.extraText = "So...tired...Zzzz"; 
+//        }
+//    );
+//    singingProduction = new Production("singing",
+//        Production.priority.Low,
+//        function() {
+//            return (
+//                faust.energy.value > 20 &&
+//                faust.emotions.current === "Happy"
+//            );
+//        },
+//        function() { 
+//            faust.extraText = "Do ray me~!"; 
+//        }
+//    );                         
+//    beingFriendly = new Production("making friends",
+//        Production.priority.High,
+//        function() {
+//            let d = game.physics.arcade.distanceBetween(faust.sprite, this.sprite);
+//            if ((d > 100) && (d < 500)) && faust.emotions.current === "Happy" {
+//                return true;
+//            };
+//            return false;
+//        }
+//    );
+//    teleportProduction = new Production("teleport",
+//        Production.priority.High,
+//        function() {
+//              return (
+//                  faust.energy.value < 10 &&
+//                  faust.emotions.current === "Sad"
+//              ); 
+//        },
+//        function() {
+//              faust.currentMotion = Motions.zeleport;
+//        }
+//    
+//    )
+//
+//    // Populate production list
+//    this.productions = [eatingProduction, ];
+//}
 
 
 
@@ -53,8 +123,8 @@ faust.emotions.add("Calm", [
     [.6, .2, .1, .05, .05]
 ]);
 faust.emotions.add("Upbeat", [
-    ["Upbeat", "Calm", "Happy",],
-    [.5, .3, .2,]
+    ["Upbeat", "Calm", "Happy", ],
+    [.5, .3, .2, ]
 ]);
 faust.emotions.add("Sad", [
     ["Sad", "Calm"],
@@ -209,14 +279,13 @@ faust.collision = function(object) {
     } else {
         faust.speak(object, "Hello " + object.name);
     }
-    // I'm a nice guy
     if (object instanceof Bot) {
         object.highFive();
     }
 
     // faust.flee(object);
     // faust.pursue(object);
- }
+}
 
 /**
  * Call this when eating something.  
