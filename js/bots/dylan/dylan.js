@@ -44,14 +44,15 @@ dylan.makeProductions = function() {
         });
     curiosityProduction = new Production("curious",
         Production.priority.Low,
-        function() {
-            return (
-                dylan.emotions.current === "Happy" || dylan.emotions.current === "Playful");
-            let d = game.physics.arcade.distanceBetween(dylan.sprite, this.sprite);
-            if ((d > 100) && (d < 350)) {
-                return true;
-            };
-            return false;
+        function() { 
+                return false; // <-- just forcing this production not to get triggered for now.  we can work together to reimplement this
+                // dylan.emotions.current === "Happy" || dylan.emotions.current === "Playful");
+                // let d = game.physics.arcade.distanceBetween(dylan.sprite, this.sprite);
+                // if ((d > 100) && (d < 350)) {
+                //     return true;
+                // } else {
+                //     return false;
+                // }
         },
         function() { dylan.speakTimed(this.sprite, "What's your story?", 10); });
 
@@ -180,7 +181,7 @@ dylan.setMotion = function() {
 dylan.update = function() {
 
     // Apply current motion
-    this.currentMotion.apply(dylan);
+    // this.currentMotion.apply(dylan);
     // "Superclass" update method
     dylan.genericUpdate();
 };

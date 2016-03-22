@@ -12,7 +12,7 @@ var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
  */
 jeff.currentlyPursuing = "Nothing";
 jeff.currentMotion = Motions.still;
-jeff.extraText = ""; 
+jeff.extraText = "";
 
 /**
  * Initialize bot
@@ -44,22 +44,23 @@ jeff.makeProductions = function() {
         Production.priority.High,
         function() {
             return (
-                jeff.hunger.value > 50 && 
+                jeff.hunger.value > 50 &&
                 jeff.emotions.current === "Angry");
-            },
-            function() { 
-                jeff.currentMotion = Motions.tantrum;
-                jeff.extraText = "I need food!"; });
+        },
+        function() {
+            jeff.currentMotion = Motions.tantrum;
+            jeff.extraText = "I need food!";
+        });
     admireCar = new Production("admiring car",
         Production.priority.Low,
         function() {
             let d = game.physics.arcade.distanceBetween(jeff.sprite, dylan.sprite);
-            if ((d > 100) && (d < 500)) {
+            if ((d > 40) && (d < 400)) {
                 return true;
             };
             return false;
         },
-        function() { jeff.speakTimed(dylan, "Nice car!", 10); });
+        function() { jeff.speakTimed(dylan, "Nice car!", 5); });
 
     // Populate production list
     this.productions = [hungerProduction, admireCar];

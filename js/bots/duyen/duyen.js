@@ -220,10 +220,10 @@ duyen.updateTenthSec = function() {
 duyen.update1Sec = function() {
 duyen.hunger.update();
 duyen.hygiene.update();
-    if (Math.random() < duyen.emotion.transitionProbability) {
-        duyen.emotion = duyen.emotion.transition();
-    }
-    duyen.motionMode = duyen.emotion.getMotionMode();
+    // if (Math.random() < duyen.emotion.transitionProbability) {
+    //     duyen.emotion = duyen.emotion.transition();
+    // }
+    // duyen.motionMode = duyen.emotion.getMotionMode();
 }
 
 
