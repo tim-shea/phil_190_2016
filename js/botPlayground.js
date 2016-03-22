@@ -86,6 +86,7 @@ function preload() {
     game.load.image('Passo_berry', 'assets/Passo_Berry.png');
     game.load.image('Devil_Fruit_rubber', 'assets/gomu_gomu_no_mi.png');
     game.load.image('steak', 'assets/steak.gif');
+    game.load.image('pink_candy', 'assests/pink_candy.png');
 
 }
 

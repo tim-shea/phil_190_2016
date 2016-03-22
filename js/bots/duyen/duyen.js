@@ -113,7 +113,7 @@ duyen.flying = {
 //
 // Emotion states
 //
-duyen.happy = {
+/*duyen.happy = {
     name: "happy",
     transitionProbability: .05,
     transition: function() {
@@ -164,7 +164,27 @@ duyen.sad = {
             return duyen.flying;
         }
     }
-}
+}*/
+
+duyen.emotions = new MarkovProcess("calm");
+duyen.emotions.add("calm", [
+    ["calm", "happy", "mad", "sad"],
+    [.7, .2, .05, .05]
+]);
+duyen.emotions.add("happy", [
+    ["happy", "calm"],
+    [.7, .3]
+]);
+duyen.emotions.add("mad", [
+    ["mad", "calm", "sad"],
+    [.7, .1, .2]
+]);
+duyen.emotions.add("sad", [
+    ["sad", "calm", "mad"],
+    [.6, .2, .2]
+]);
+
+
 
 // Current States
 duyen.emotion = duyen.happy;
@@ -226,10 +246,6 @@ duyen.collision = function(object) {
     duyen.speak(object, "Hello " + object.name);
     // duyen.flee(object);
     // duyen.pursue(object);
-    objectToEat.eat();
-    duyen.hunger.subtract(objectToEat.calories);
-    duyen.speak(objectToEat, "That " + objectToEat.description + " hit the spot!");
-    }
 }
 
 
@@ -274,26 +290,11 @@ duyen.punch = function(botToPunch, damage) {
 
 duyen.gotPunched = function(botWhoPunchedMe, damage) {
     console.log("Ouch! " + botWhoAttackedMe.name + " punched me!");
+}
 };
 
 
-duyen.emotions = new MarkovProcess("calm");
-duyen.emotions.add("calm", [
-    ["calm", "happy", "mad", "sad"],
-    [.7, .2, .05, .05]
-]);
-duyen.emotions.add("happy", [
-    ["happy", "calm"],
-    [.7, .3]
-]);
-duyen.emotions.add("mad", [
-    ["mad", "calm", "sad"],
-    [.7, .1, .2]
-]);
-duyen.emotions.add("sad", [
-    ["sad", "calm", "mad"],
-    [.6, .2, .2]
-]);
+
 
 
 /*findFood [high]([duyen.hungerLevel(70, 100), !duyen.perceiveDanger()] -> [duyen.findFood()])
