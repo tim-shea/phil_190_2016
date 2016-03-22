@@ -98,7 +98,7 @@ function setUpFood() {
 
     // Add 20 pieces of food in various categories
     for (var i = 0; i < 20; i++) {
-        let rnd = game.rnd.integerInRange(1, 11);
+        let rnd = game.rnd.integerInRange(1, 14);
         switch (rnd) {
             case 1:
                 addFoodItem("food_fruit_veggies", "fruits and veggies", 10);
