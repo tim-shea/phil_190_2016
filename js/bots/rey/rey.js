@@ -5,15 +5,14 @@ var rey = new Bot(1200, 1200, 'rey', 'js/bots/rey/whitedeer.png');
 rey.currentMotion = Motions.still;
 
 rey.init = function() {
-    this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
-    this.body.rotation = 100; // Initial Angle
-    this.body.speed = 100; // Initial Speed
+    this.body = this.sprite.body; 
+    this.body.rotation = 100; 
+    this.body.speed = 100; 
 
 
     game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, rey.update2min, this);
 
-    // Make productions.  Very dumb productions for now.
     eatingProduction1 = new Production("eating",
         Production.priority.High,
         function() {
@@ -41,8 +40,20 @@ rey.init = function() {
             function() {console.log("I need to find me some food..");
         });
 
-
-    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction];
+    playingProduction = new Production("playing",
+        Production.priority.Low,
+        function() {
+            return (rey.emotions.current == "Hyper"); },
+        function() {console.log("Play with me!!");
+        });
+    sleepingProduction = new Production("sleeping",
+        Production.priority.Low,
+        function() {
+            return (rey.emotions.current == "Sleepy" && rey.hunger.value > 40 ); },
+        function() {console.log("I'm about to take a nap..");
+        });
+    
+    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction];
 }
 
 
