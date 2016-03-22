@@ -67,6 +67,7 @@ function preload() {
     game.load.image('carousel', 'assets/carousel.png');
 
 
+
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
@@ -87,6 +88,7 @@ function preload() {
     game.load.image('Devil_Fruit_rubber', 'assets/gomu_gomu_no_mi.png');
     game.load.image('steak', 'assets/steak.gif');
     game.load.image('pink_candy', 'assests/pink_candy.png');
+    game.load.image('Cream_Cake', 'assets/Cream_Cake.png');
 
 }
 

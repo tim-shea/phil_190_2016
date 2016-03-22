@@ -1,59 +1,80 @@
-/**
- * rey's bot
- *
- * @namespace rey
- * @augments Bot
- */
 var rey = new Bot(1200, 1200, 'rey', 'js/bots/rey/whitedeer.png');
 
-/**
- * State variables
- * @memberOf rey
- */
 
 rey.currentMotion = Motions.still;
 
-/**
- * Initialize bot
- *
- * @memberOf rey
- * @override
- */
 rey.init = function() {
-    this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
-    this.body.rotation = 100; // Initial Angle
-    this.body.speed = 100; // Initial Speed
+    this.body = this.sprite.body;
+    this.body.rotation = 100;
+    this.body.speed = 100;
 
-    // Initialize Timed Updates
+
     game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * 10, rey.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, rey.update2min, this);
 
-    // Make productions.  Very dumb productions for now.
     eatingProduction1 = new Production("eating",
         Production.priority.High,
         function() {
-            return (rey.hunger.value > 10 && rey.hunger.value < 20); },
-        function() { console.log("Eating 1"); });
+            return (rey.hunger.value > 10 && rey.hunger.value < 20);
+        },
+        function() { console.log("Yum!"); });
 
+    fleeingProduction = new Production("fleeing",
+        Production.priority.High,
+        function() {
+            return (rey.emotions.current == "Not in the mood");
+        },
+        function() {
+            console.log("Get away from meee!");
+        });
 
-    // Populate production list
-    this.productions = [eatingProduction1];
+    dancingProduction = new Production("dancing",
+        Production.priority.High,
+        function() {
+            return (rey.currentMotion == Motions.dancing);
+        },
+        function() {
+            console.log("Someone come dance with me pls!");
+        });
+
+    lookingforfoodProduction = new Production("scavaging",
+        Production.priority.Low,
+        function() {
+            return (rey.hunger.value > 30 && rey.emotions.current !== "Sleepy");
+        },
+        function() {
+            console.log("I need to find me some food..");
+        });
+
+    playingProduction = new Production("playing",
+        Production.priority.Low,
+        function() {
+            return (rey.emotions.current == "Hyper");
+        },
+        function() {
+            console.log("Play with me!!");
+        });
+    sleepingProduction = new Production("sleeping",
+        Production.priority.Low,
+        function() {
+            return (rey.emotions.current == "Sleepy" && rey.hunger.value > 40);
+        },
+        function() {
+            console.log("I'm about to take a nap..");
+        });
+
+    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction];
 }
 
 
 
-/**
- * Markov process controlling emotions
- * @memberOf rey
- */
 rey.emotions = new MarkovProcess("Relaxed");
 rey.emotions.add("Relaxed", [
     ["Relaxed", "Hyper", "Sleepy", "Not in the mood"],
-    [.4, .2, .2, .2],
+    [.6, .3, .05, .05],
 ]);
 rey.emotions.add("Not in the mood", [
-    ["Not in the mood", "Relaxed"],
+    ["Not in the mood", "Sleepy"],
     [.6, .4]
 ]);
 rey.emotions.add("Sleepy", [
@@ -61,14 +82,11 @@ rey.emotions.add("Sleepy", [
     [.5, .5]
 ]);
 rey.emotions.add("Hyper", [
-    ["Hyper", "Relaxed"],
-    [.6, .4]
+    ["Hyper", "Relaxed", "Sleepy"],
+    [.7, .25, .05]
 ]);
 
-/**
- * Hunger Variable
- * @memberOf rey
- */
+
 rey.hunger = new DecayVariable(0, 1, 0, 50);
 rey.hunger.toString = function() {
     var hungerLevel = "";
@@ -84,12 +102,7 @@ rey.hunger.toString = function() {
     return hungerLevel + " (Hunger = " + this.value + ")";
 }
 
-/**
- * Populate the status field
- *
- * @memberOf rey
- * @override
- */
+
 rey.getStatus = function() {
     var statusString = "Emotion: " + rey.emotions.current;
     statusString += "\nMotion: " + rey.currentMotion.description;
@@ -97,13 +110,9 @@ rey.getStatus = function() {
     return statusString;
 }
 
-/**
- * Set the current motion state.  Currently updated every second.
- * @memberOf rey
- */
+
 rey.setMotion = function() {
 
-    // Default markov chain movement patterns
     if (rey.emotions.current === "Not in the mood") {
         rey.currentMotion = Motions.still;
     } else if (rey.emotions.current === "Hyper") {
@@ -125,67 +134,26 @@ rey.setMotion = function() {
     }
 }
 
-//////////////////////
-// Update Functions //
-//////////////////////
 
-/**
- * Main update called by the phaer game object (about 40 times / sec. on my machine).
- *
- * @memberOf rey
- * @override
- */
 rey.update = function() {
 
-    // Apply current motion
     this.currentMotion.apply(rey);
-    // "Superclass" update method
     rey.genericUpdate();
 };
 
 
-/**
- * Called every second
- * @memberOf rey
- */
 rey.update1Sec = function() {
     rey.hunger.increment();
     rey.emotions.update();
     rey.setMotion();
-    // fireProductions(rey.productions);
+    fireProductions(rey.productions);
 }
 
-/**
- * Called every ten seconds
- * @memberOf rey
- */
-rey.updateTenSecs = function() {
-    // Pursue a random entity
-    if (Math.random() < .9) {
-        // rey.currentlyPursuing = this.pursueRandomObject(2000).name;
-    }
-}
 
-/**
- *  Called every two minutes
- *  @memberOf rey
- */
-rey.update2min = function() {
-    // rey.hunger.setValue(0);
-}
+rey.update2min = function() {}
 
-///////////////////////////
-// Interaction Functions //
-///////////////////////////
 
-/**
- * React to a collision.
- *
- * @memberOf rey
- * @override
- */
 rey.collision = function(object) {
-    // console.log("Object is edible: " + object.isEdible);
     if (object.isEdible) {
         rey.eatObject(object);
     } else {
@@ -194,12 +162,7 @@ rey.collision = function(object) {
 
 }
 
-/**
- * Call this when eating something.  
- *
- * @memberOf rey
- * @param {Entity} objectToEat what to eat
- */
+
 rey.eatObject = function(objectToEat) {
     objectToEat.eat();
     rey.hunger.subtract(objectToEat.calories);
@@ -207,20 +170,12 @@ rey.eatObject = function(objectToEat) {
     sounds.chomp.play();
 }
 
-/**
- * @memberOf rey
- * @override
- */
+
 rey.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    rey.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
+    rey.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name);
 }
 
-/**
- * React when someone high fives me.
- *
- * @memberOf rey
- * @override
- */
+
 rey.highFived = function(botWhoHighFivedMe) {
     rey.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }

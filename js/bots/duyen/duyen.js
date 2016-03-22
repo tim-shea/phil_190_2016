@@ -156,7 +156,16 @@ duyen.updateTenthSec = function() {
 
 // Called every second
 duyen.update1Sec = function() {
+<<<<<<< HEAD
     duyen.hunger.increment();
+=======
+duyen.hunger.update();
+duyen.hygiene.update();
+    // if (Math.random() < duyen.emotion.transitionProbability) {
+    //     duyen.emotion = duyen.emotion.transition();
+    // }
+    // duyen.motionMode = duyen.emotion.getMotionMode();
+>>>>>>> origin/master
 }
 
 // Called every two minutes
