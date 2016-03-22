@@ -61,10 +61,10 @@ rey.init = function() {
 rey.emotions = new MarkovProcess("Relaxed");
 rey.emotions.add("Relaxed", [
     ["Relaxed", "Hyper", "Sleepy", "Not in the mood"],
-    [.4, .2, .2, .2],
+    [.6, .3, .05, .05],
 ]);
 rey.emotions.add("Not in the mood", [
-    ["Not in the mood", "Relaxed"],
+    ["Not in the mood", "Sleepy"],
     [.6, .4]
 ]);
 rey.emotions.add("Sleepy", [
@@ -72,8 +72,8 @@ rey.emotions.add("Sleepy", [
     [.5, .5]
 ]);
 rey.emotions.add("Hyper", [
-    ["Hyper", "Relaxed"],
-    [.6, .4]
+    ["Hyper", "Relaxed", "Sleepy"],
+    [.7, .25, .05]
 ]);
 
 
