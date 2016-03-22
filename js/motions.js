@@ -54,7 +54,17 @@ Motions.running = {
         //faster than walking
         botToMove.body.speed = 350;
         botToMove.basicUpdate();
-
+    }
+}
+Motions.flying = {
+    description: "Flying!",
+    apply: function(botToMove) {
+        if (Math.random() < .5) {
+            botToMove.incrementAngle(10 * Math.random() - 5);
+        }
+        //dragons fly when they are happy
+        botToMove.body.speed = 500;
+        botToMove.basicUpdate();
     }
 }
 Motions.sonicSpeed = {

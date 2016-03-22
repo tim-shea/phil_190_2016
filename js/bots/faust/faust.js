@@ -118,7 +118,7 @@ faust.setMotion = function() {
     if (faust.emotions.current === "Sad") {
         faust.currentMotion = Motions.moping;
     } else if (faust.emotions.current === "Happy") {
-        faust.currentMotion = Motions.sonicSpeed;
+        faust.currentMotion = Motions.flying;
     } else if (faust.emotions.current === "Calm") {
         let rnd = Math.random();
         if (rnd < .5) {
@@ -129,7 +129,7 @@ faust.setMotion = function() {
     } else if (faust.emotions.current === "Upbeat") {
         let rnd = Math.random();
         if (rnd < .5) {
-            faust.currentMotion = Motions.speeding;
+            faust.currentMotion = Motions.running;
         } else {
             faust.currentMotion = Motions.weaving;
         }
