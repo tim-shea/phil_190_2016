@@ -130,6 +130,9 @@ function setUpFood() {
                 break;  
             case 11:
                 addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -10);
+                break;
+            case 12:
+                addFoodItem("steak", "Fresh meat", 10);
                 break;  
             default:
                 break;
