@@ -116,6 +116,8 @@ function setUpFood() {
             case 5:
                 addFoodItem("Philoberry", "Organic Philosopher's Stone", 5); 
                 break;
+            case 6:
+                break;
             case 7:
                 addFoodItem("Cheri_berry", "Pokemon berry #01", 1);
                 break;
