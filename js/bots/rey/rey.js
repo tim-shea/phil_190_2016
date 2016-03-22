@@ -1,13 +1,12 @@
-
 var rey = new Bot(1200, 1200, 'rey', 'js/bots/rey/whitedeer.png');
 
 
 rey.currentMotion = Motions.still;
 
 rey.init = function() {
-    this.body = this.sprite.body; 
-    this.body.rotation = 100; 
-    this.body.speed = 100; 
+    this.body = this.sprite.body;
+    this.body.rotation = 100;
+    this.body.speed = 100;
 
 
     game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
@@ -16,43 +15,54 @@ rey.init = function() {
     eatingProduction1 = new Production("eating",
         Production.priority.High,
         function() {
-            return (rey.hunger.value > 10 && rey.hunger.value < 20); },
+            return (rey.hunger.value > 10 && rey.hunger.value < 20);
+        },
         function() { console.log("Yum!"); });
 
     fleeingProduction = new Production("fleeing",
         Production.priority.High,
         function() {
-            return (rey.emotions.current == "Not in the mood"); },
-        function() {console.log("Get away from meee!");
+            return (rey.emotions.current == "Not in the mood");
+        },
+        function() {
+            console.log("Get away from meee!");
         });
 
     dancingProduction = new Production("dancing",
         Production.priority.High,
         function() {
-            return (rey.currentMotion == Motions.dancing); },
-        function() {console.log("Someone come dance with me pls!");
+            return (rey.currentMotion == Motions.dancing);
+        },
+        function() {
+            console.log("Someone come dance with me pls!");
         });
 
     lookingforfoodProduction = new Production("scavaging",
         Production.priority.Low,
         function() {
-            return (rey.hunger.value > 30 && rey.emotions.current !== "Sleepy"); },
-            function() {console.log("I need to find me some food..");
+            return (rey.hunger.value > 30 && rey.emotions.current !== "Sleepy");
+        },
+        function() {
+            console.log("I need to find me some food..");
         });
 
     playingProduction = new Production("playing",
         Production.priority.Low,
         function() {
-            return (rey.emotions.current == "Hyper"); },
-        function() {console.log("Play with me!!");
+            return (rey.emotions.current == "Hyper");
+        },
+        function() {
+            console.log("Play with me!!");
         });
     sleepingProduction = new Production("sleeping",
         Production.priority.Low,
         function() {
-            return (rey.emotions.current == "Sleepy" && rey.hunger.value > 40 ); },
-        function() {console.log("I'm about to take a nap..");
+            return (rey.emotions.current == "Sleepy" && rey.hunger.value > 40);
+        },
+        function() {
+            console.log("I'm about to take a nap..");
         });
-    
+
     this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction];
 }
 
@@ -140,8 +150,7 @@ rey.update1Sec = function() {
 }
 
 
-rey.update2min = function() {
-}
+rey.update2min = function() {}
 
 
 rey.collision = function(object) {
