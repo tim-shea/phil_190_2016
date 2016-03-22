@@ -8,6 +8,7 @@ var dylan = new Bot(1021, 1000, 'dylan', 'js/bots/dylan/player_car.png');
  * State variable
  */
 dylan.currentMotion = Motions.still;
+dylan.productionText = "";
 
 /**
  * Initialize bot
@@ -22,10 +23,69 @@ dylan.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 5, dylan.update5Sec, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 4, dylan.update4min, this);
 
+    this.makeProductions();
 
 }
+/**
+ * Create 5 productions from list
+ *
+ */
 
+dylan.makeProductions = function() {
+    insanityProduction = new Production("insane",
+        Production.priority.Low,
+        function() {
+            return (
+                dylan.fuel.value > 90 && dylan.emotions.current === "Scared");
+        },
+        function() {
+            dylan.currentMotion = Motions.spazzing;
+            dylan.productionText = "WE RIDE TO VALHALLA!"
+        });
+    curiosityProduction = new Production("curious",
+        Production.priority.Low,
+        function() {
+            return (
+                dylan.emotions.current === "Happy" || dylan.emotions.current === "Playful");
+            let d = game.physics.arcade.distanceBetween(dylan.sprite, this.sprite);
+            if ((d > 100) && (d < 350)) {
+                return true;
+            };
+            return false;
+        },
+        function() { dylan.speakTimed(this.sprite, "What's your story?", 10); });
 
+    revengeProduction = new Production("seeking revenge",
+        Production.priority.Medium,
+        function() {
+            return (
+                dylan.emotions.current === "Angry" && dylan.collisionCheck === true);
+        },
+        function() {
+            dylan.currentMotion = Motions.running;
+            dylan.productionText = "Whoever that was, I AM COMING FOR YOU!"
+            dylan.pursueRandomObject
+        });
+    fleeingProduction = new Production("fleeing",
+        Production.priority.High,
+        function() {
+            return (
+               dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
+        },
+        function() {
+            dylan.productionText = "MUST HIDE FROM EVERYONE!"
+        });
+    deleriumProduction = new Production("delerious",
+        Production.priority.Low,
+        function() {
+            return (
+                dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
+        },
+        function() {
+            dylan.productionText = "Everything's going fuzzy..."
+        });
+    this.productions = [insanityProduction, curiosityProduction, revengeProduction, fleeingProduction, deleriumProduction];
+}
 
 dylan.emotions = new MarkovProcess("Calm");
 dylan.emotions.add("Calm", [
@@ -131,6 +191,7 @@ dylan.update1Sec = function() {
     dylan.fuel.increment();
     dylan.emotions.update();
     dylan.setMotion();
+    fireProductions(dylan.productions);
 }
 
 
