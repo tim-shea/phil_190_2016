@@ -48,16 +48,13 @@ sharAI.makeProductions = function() {
                 sharAI.hunger.value > 50);
         },
         function() {
-            if (sharAI.isPursuing == false) {
-                // 
-                // randomObject not defined
-                // 
-                // do {
-                //     sharAI.currentTarget = sharAI.getRandomObject()
-                //     if (randomObject.isEdible == true) {
-                //         sharAI.pursue(sharAI.currentTarget, 30);
-                //     }
-                // } while (randomObject.isEdible == false)
+            if (sharAI.isPursuing == false) { 
+                 do {
+                     sharAI.currentTarget = sharAI.getRandomObject()
+                     if (currentTarget.isEdible == true) {
+                         sharAI.pursue(sharAI.currentTarget, 30);
+                     }
+                } while (currentTarget.isEdible == false)
             }
         });
 
