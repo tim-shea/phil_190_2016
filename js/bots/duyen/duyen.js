@@ -116,9 +116,9 @@ duyen.hygiene.toString = function() {
 
 // (Override) Populate status field
 duyen.getStatus = function() {
-    var statusString = "Emotion: " + duyen.emotion.name;
-    statusString += "\nMotion: " + duyen.motionMode.description;
-    statusString += "\n " + duyen.hunger.toString();
+    // var statusString = "Emotion: " + duyen.emotion.name;
+    // statusString += "\nMotion: " + duyen.motionMode.description;
+    var statusString = "\n " + duyen.hunger.toString();
     statusString += "\n " + duyen.hygiene.toString();
     statusString += "\nMoving to: " + duyen.currentlyPursuing;
     statusString += "\nSpeech: " + duyen.speechText;

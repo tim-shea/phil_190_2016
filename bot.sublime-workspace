@@ -1,0 +1,939 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"current",
+				"currentMotion"
+			],
+			[
+				"con",
+				"constructor	@constructor"
+			],
+			[
+				"eating",
+				"eatingProduction3"
+			],
+			[
+				"acti",
+				"activeProductions"
+			],
+			[
+				"pro",
+				"productions"
+			],
+			[
+				"eain",
+				"eatingProduction"
+			],
+			[
+				"object",
+				"objectToEat"
+			],
+			[
+				"world",
+				"worldSizeY"
+			],
+			[
+				"worldSize",
+				"worldSizeX"
+			],
+			[
+				"what",
+				"whatToSay"
+			],
+			[
+				"spee",
+				"speechText"
+			],
+			[
+				"is",
+				"isEdible"
+			],
+			[
+				"proto",
+				"prototype"
+			],
+			[
+				"pursu",
+				"pursuitMode"
+			],
+			[
+				"coll",
+				"collisionCheck"
+			],
+			[
+				"purs",
+				"pursuitMode"
+			],
+			[
+				"for",
+				"for	JS - For loop"
+			],
+			[
+				"getOver",
+				"getOverlappingBots"
+			],
+			[
+				"bot",
+				"botToHighFive"
+			],
+			[
+				"max",
+				"maxVal"
+			],
+			[
+				"curr",
+				"currentMotion"
+			],
+			[
+				"spz",
+				"spazzing"
+			],
+			[
+				"motion",
+				"motionStateMachine"
+			],
+			[
+				"if",
+				"ife	JS - if else"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "js/botPlayground.js",
+			"settings":
+			{
+				"buffer_size": 6787,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/bot.js",
+			"settings":
+			{
+				"buffer_size": 11998,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/motions.js",
+			"settings":
+			{
+				"buffer_size": 4149,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/utils.js",
+			"settings":
+			{
+				"buffer_size": 6419,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/bots/dylan/dylan.js",
+			"settings":
+			{
+				"buffer_size": 4525,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"repar",
+				"DocBlockr: Reparse comment block"
+			],
+			[
+				"d",
+				"DocBlockr: Reparse comment block"
+			],
+			[
+				"dock",
+				"DocBlockr: Decorate line comment"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"ent",
+				"Emmet: Next Edit Point"
+			],
+			[
+				"docb",
+				"DocBlockr: Decorate line comment"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"do",
+				"DocBlockr: Decorate line comment"
+			],
+			[
+				"rei",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"docbl",
+				"DocBlockr: Reparse comment block"
+			],
+			[
+				"doc",
+				"DocBlockr: Decorate line comment"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"pacak",
+				"Package Control: List Packages"
+			],
+			[
+				"split",
+				"Emmet: Split\\Join Tag"
+			],
+			[
+				"javatar",
+				"Javatar: Builds..."
+			],
+			[
+				"reinde",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"java",
+				"Javatar: Browse Commands..."
+			],
+			[
+				"javat",
+				"Javatar: Create new..."
+			],
+			[
+				"reinden",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"lower",
+				"Convert Case: Lower Case"
+			],
+			[
+				"upp",
+				"Convert Case: Upper Case"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/jyoshimi/gitstuff/phil_190_2016/assets",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js"
+	],
+	"file_history":
+	[
+		"/Users/jyoshimi/gitstuff/phil_190_2016/botPlayground.html",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/jeff/jeff.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/faust/faust.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/troi/troi.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/Daniel/Daniel.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/dylan/dylan.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/rey/rey.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/duyen/duyen.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/Maria/Maria.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/sharAI/sharAI.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/motions.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/yang/yang.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/utils.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/botPlayground.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bot.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/speechBubble.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/entity.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/network.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/phaser.min.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/js/bots/jeff/EmotionsTemp.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/bots/sharAI/sharAI.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/botPlayground.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/bots/bot.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/entity.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/bots/jeff/jeff.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/bots/Daniel/Daniel.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/bots/duyen/duyen.js",
+		"/Users/jyoshimi/gitstuff/phil_190_2016/preferences.js",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/Week6_FreudEtc.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/Week5_StateMachines_2.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/190_coming_up.txt",
+		"/Users/jyoshimi/Desktop/FreudCh1.txt",
+		"/Users/jyoshimi/Documents/Teaching/Cogs_202/Spring_2016/Week5_ComandLine_MTurk copy.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/Week5_StateMachines.txt",
+		"/Users/jyoshimi/Documents/Teaching/Cogs_202/Spring_2016/Week4_Behaviorism_CommandLine.txt",
+		"/Users/jyoshimi/Documents/Teaching/Cogs_202/Spring_2016/2016_Notes_Todos.txt",
+		"/Users/jyoshimi/Desktop/Cogs_202_alias",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/Week5_....txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/Week4_TuringStateMachines.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_190_PhilGameProgramming/190_todo_next_time.txt",
+		"/Users/jyoshimi/Desktop/NN_Journal_RR_1.txt",
+		"/Users/jyoshimi/Desktop/FSM_Notes.txt",
+		"/Users/jyoshimi/Desktop/KelloTalk_2016",
+		"/Users/jyoshimi/Documents/Research/KantHusserlMatrix/KantHusserlMatrixNotes.txt",
+		"/Users/jyoshimi/Desktop/McBridebio.txt",
+		"/Users/jyoshimi/Documents/TODO.txt",
+		"/Users/jyoshimi/Desktop/neuronprops/MethodHandles.java",
+		"/Users/jyoshimi/Desktop/neuronprops/MethodHandles2.java",
+		"/Users/jyoshimi/Desktop/neuronprops/NeuronDialog.txt",
+		"/Users/jyoshimi/Desktop/TimShea_Simbrain.txt",
+		"/Users/jyoshimi/Desktop/VoytekMeeting_2016.txt",
+		"/Users/jyoshimi/Documents/Research/CuringDisease/CD_Notes.txt",
+		"/Users/jyoshimi/Documents/Teaching/Cogs_202/Spring_2016/week2_jspsyche/test2.html",
+		"/Users/jyoshimi/Documents/Teaching/Cogs_202/Spring_2016/week2_jspsyche/test2.js",
+		"/Users/jyoshimi/Desktop/web_experiment/test1.html",
+		"/Users/jyoshimi/Desktop/MatrixNotes.txt",
+		"/Users/jyoshimi/Documents/defaultStuff.sublime-project",
+		"/Users/jyoshimi/Documents/Sites/jeffyoshimi.net/cv.html",
+		"/Users/jyoshimi/Documents/Sites/jeffyoshimi.net/index.html",
+		"/Users/jyoshimi/Documents/PhysicsScottUnclassified.txt",
+		"/Users/jyoshimi/Desktop/RungaKutta.txt",
+		"/Users/jyoshimi/Documents/AYALA",
+		"/Users/jyoshimi/Documents/Research/ConversationsOnMeaning/Fragments.txt",
+		"/Users/jyoshimi/Documents/Notes/scott/Encyclopedia_of_scott.txt",
+		"/Users/jyoshimi/Documents/Research/ConversationsOnMeaning/Bruce_Edits/Outline_Issues_1-4.txt",
+		"/Users/jyoshimi/gitstuff/simbrain/src/org/simbrain/assets/Materials/wall.j3m",
+		"/Users/jyoshimi/Documents/Research/CuringDisease/FoldIt_Reading_Notes.txt",
+		"/Users/jyoshimi/Documents/Research/CuringDisease/ETERNA_Reading_Notes.txt",
+		"/Users/jyoshimi/Desktop/GradApps_2015.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_110_CogSci/Phil_110_TODO.txt",
+		"/Users/jyoshimi/Desktop/Shea_12_16.txt",
+		"/Users/jyoshimi/Documents/Notes/math/ProbabilityStats.txt",
+		"/Users/jyoshimi/Desktop/ConnorBudget.txt",
+		"/Users/jyoshimi/Desktop/Quiz6.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_110_CogSci/Fall_15/Phil_110_TODO.txt alias",
+		"/Users/jyoshimi/Desktop/CurrentCases/AW_Transmittal.txt",
+		"/Users/jyoshimi/Documents/Misc/If_I_Die.txt",
+		"/Users/jyoshimi/Documents/Teaching/Phil_110_CogSci/Fall_15/ChatTranscripts/12-9-2015.txt",
+		"/Users/jyoshimi/Desktop/CurrentCases/SS_Transmittal.txt",
+		"/Users/jyoshimi/Desktop/TODO.txt",
+		"/Users/jyoshimi/Desktop/tempDuringBackup/ch1_CoinFlip_Demo_2.m",
+		"/Users/jyoshimi/Desktop/tempDuringBackup/coinFlip.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 102.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"chill",
+			"eating 1",
+			".speak",
+			"setmotion",
+			"botToTalkTo",
+			".speak",
+			"setmotion",
+			".extra",
+			".extraText",
+			".emotion",
+			"set up",
+			"case",
+			"imagePath",
+			"image_id",
+			"imagePath",
+			".stop",
+			"currentMotion",
+			"getMovementMode",
+			"energyS",
+			"gotcru",
+			"zele",
+			"powerwalking",
+			"powera",
+			"powerwalk",
+			"base",
+			"baselin",
+			"<<<",
+			">>>",
+			"setMotion",
+			"highFive",
+			"setMotion",
+			"rey.hunger",
+			".currentmotion",
+			"motion",
+			".emotion",
+			".currentmotion",
+			"jeff",
+			".update",
+			"add",
+			"setmotion",
+			"em",
+			".emotions",
+			"markov",
+			".emotions",
+			"Chill",
+			"Apathetic",
+			"]\n",
+			"Enthusiastic",
+			"fanout",
+			" @memberOf",
+			"memberOf",
+			"function",
+			"generic",
+			".hunger",
+			"hunger",
+			"pursuitcomplete",
+			"production",
+			"pursuitCompleted",
+			"motions",
+			"eat",
+			".chomp",
+			".play",
+			"chomp",
+			"eat",
+			"setMotion",
+			"move",
+			"tomove",
+			"highfive",
+			"setmotion",
+			"String",
+			"priority",
+			"priorityLevel",
+			"prototype",
+			"jeff.hunger",
+			".eat",
+			"this.sprite",
+			"objectsOverlap",
+			"colli",
+			"[type]",
+			"addFood",
+			"timer",
+			"body",
+			"this",
+			"imageName",
+			"collisionCheck",
+			"food",
+			"isEdib",
+			"eat",
+			"3000",
+			"rand",
+			"getRandom",
+			"console.log",
+			"speed",
+			"botWhoSpokeToMe",
+			"botWhoHighFivedMe",
+			"speech",
+			"jeff",
+			"speechText",
+			"/**",
+			"speechText",
+			"wrapBitmapText",
+			"speech",
+			"edges",
+			"lastSeen",
+			"lastSaw",
+			"wrapBitmapText",
+			"bitmapText",
+			"wrapBitmapText",
+			".still",
+			"speed",
+			"object",
+			"getBot",
+			"pursu",
+			"700",
+			"pursue",
+			"collision",
+			"pursue",
+			"pursuitmo",
+			"currentlyPursuing",
+			"yes!",
+			"nothing",
+			"Nothing",
+			"pursue",
+			"object",
+			"currentlyPursuing",
+			"pursue",
+			"speak",
+			"speech"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "js/botPlayground.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6787,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2322,
+								2322
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1056.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/bot.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11998,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9870,
+								9870
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5841.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/motions.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4149,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3634,
+								3634
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1578.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/utils.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6419,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4328,
+								4328
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 193.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/bots/dylan/dylan.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4525,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								837,
+								837
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 444.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "bot.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"dyla",
+				"js/bots/dylan/dylan.js"
+			],
+			[
+				"duy",
+				"js/bots/duyen/duyen.js"
+			],
+			[
+				"rey",
+				"js/bots/rey/rey.js"
+			],
+			[
+				"dyl",
+				"js/bots/dylan/dylan.js"
+			],
+			[
+				"dani",
+				"js/bots/Daniel/Daniel.js"
+			],
+			[
+				"mari",
+				"js/bots/Maria/Maria.js"
+			],
+			[
+				"troi",
+				"js/bots/troi/troi.js"
+			],
+			[
+				"fau",
+				"js/bots/faust/faust.js"
+			],
+			[
+				"ut",
+				"js/utils.js"
+			],
+			[
+				"dylan",
+				"js/bots/dylan/dylan.js"
+			],
+			[
+				"motion",
+				"js/motions.js"
+			],
+			[
+				"botpl",
+				"js/botPlayground.js"
+			],
+			[
+				"boty",
+				"botPlayground.html"
+			],
+			[
+				"sha",
+				"js/bots/sharAI/sharAI.js"
+			],
+			[
+				"re",
+				"js/bots/rey/rey.js"
+			],
+			[
+				"dan",
+				"js/bots/Daniel/Daniel.js"
+			],
+			[
+				"maria",
+				"js/bots/Maria/Maria.js"
+			],
+			[
+				"bot",
+				"js/bot.js"
+			],
+			[
+				"jeff",
+				"js/bots/jeff/jeff.js"
+			],
+			[
+				"faus",
+				"js/bots/faust/faust.js"
+			],
+			[
+				"mot",
+				"js/motions.js"
+			],
+			[
+				"ya",
+				"js/bots/yang/yang.js"
+			],
+			[
+				"ent",
+				"js/entity.js"
+			],
+			[
+				"spee",
+				"js/speechBubble.js"
+			],
+			[
+				"sp",
+				"js/speechBubble.js"
+			],
+			[
+				"spe",
+				"js/speechBubble.js"
+			],
+			[
+				".html",
+				"botPlayground.html"
+			],
+			[
+				"jef",
+				"js/bots/jeff/jeff.js"
+			],
+			[
+				"botp",
+				"js/botPlayground.js"
+			],
+			[
+				"pha",
+				"js/phaser.min.js"
+			],
+			[
+				"shar",
+				"js/bots/sharAI/sharAI.js"
+			],
+			[
+				"yan",
+				"js/bots/yang/yang.js"
+			],
+			[
+				"mo",
+				"js/motions.js"
+			],
+			[
+				"en",
+				"js/entity.js"
+			],
+			[
+				".htm",
+				"botPlayground.html"
+			],
+			[
+				"yang",
+				"js/bots/yang/yang.js"
+			],
+			[
+				"duye",
+				"bots/duyen/duyen.js"
+			],
+			[
+				"bot.j",
+				"bots/bot.js"
+			],
+			[
+				"fragme",
+				"Research/ConversationsOnMeaning/Fragments.txt"
+			],
+			[
+				"encyc",
+				"Notes/scott/Encyclopedia_of_scott.txt"
+			],
+			[
+				"ency",
+				"Notes/scott/Encyclopedia_of_scott.txt"
+			],
+			[
+				"cd_no",
+				"Research/CuringDisease/CD_Notes.txt"
+			],
+			[
+				"probab",
+				"Notes/math/ProbabilityStats.txt"
+			],
+			[
+				"cogs101todos",
+				"Teaching/Phil_110_CogSci/Fall_15/Phil_110_TODO.txt alias"
+			],
+			[
+				"cv.h",
+				"Sites/jeffyoshimi.net/cv.html"
+			],
+			[
+				"todo",
+				"TODO.txt"
+			],
+			[
+				"phil110todo",
+				"Documents/Teaching/Phil_110_CogSci/Phil_110_TODO.txt"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 50.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
