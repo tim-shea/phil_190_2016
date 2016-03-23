@@ -134,7 +134,7 @@ yang.init_plus = function() { //object related initialization
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
     yang.collided_obj = {};
-    yang.fun_.makeProductions
+    yang.fun_.makeProductions();
     //berry
     yang.berry = new yang.node_.id_prime_focus.berry_game_obj(); //see node
     //additional possiblity
