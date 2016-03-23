@@ -136,7 +136,6 @@ function create() {
     entities.push(new Entity(1200, 1200, 'Cherry Blossom Tree'));
     entities.push(new Entity(25, 2700, 'Eastern Castle'));
     entities.push(new Entity(10, 2930, 'Treasure'));
-    entities.push(new Entity(2500, 2500, 'Philoberry'));
     entities.push(new Entity(2700, 2700, 'Treehouse'));
     entities.push(new Entity(2700, 2800, 'DeerCrossingSign'));
     entities.push(new Entity(50, 300, 'grassyrock'));

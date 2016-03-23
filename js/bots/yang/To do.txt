@@ -3,3 +3,7 @@
 3. add another object
 4. the philoberry spawn design
 5. eating action
+6. reactions filling
+7. add audio
+
+node_modules\.bin\jsdoc C:\Users\louis\Desktop\Phil190\projectexperiment\js\bots\yang\yang.js

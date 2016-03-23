@@ -351,12 +351,18 @@ Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
 };
 
 /**
- * Yang's action - reaction
+ * caress with antler
+ * @param {Bot} target bot
+ * @param {String} message
  */
 Bot.prototype.antler_caress = function(botTocaress, message) {
     // console.log(botTocaress.name + message);
 };
-
+/**
+ * Override to react when caressed
+ * @param {Bot} target bot
+ * @param {String} message
+ */
 Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
     // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
 };
