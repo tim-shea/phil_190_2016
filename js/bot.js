@@ -442,5 +442,12 @@ Bot.prototype.ignore = function (annoyingBot) {
  * @param  {Bot} botWhoIgnoredToMe who ignored me
  */
 Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
+    this.body.speed = 0;
+    this.body.speed = 0;
+    this.body.speed = 0;
+    this.body.speed = 0; 
+    this.body.speed = 0;
+
+    this.pursue(botWhoIgnoredMe, 350);
 
 }

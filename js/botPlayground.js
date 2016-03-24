@@ -89,6 +89,8 @@ function preload() {
     game.load.image('steak', 'assets/steak.gif');
     game.load.image('pink_candy', 'assests/pink_candy.png');
     game.load.image('Cream_Cake', 'assets/Cream_Cake.png');
+    game.load.image('Spicy_Poffin', 'assets/Spicy_Poffin.png');
+
 
 }
 

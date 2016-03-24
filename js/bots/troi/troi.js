@@ -6,7 +6,9 @@ var troi = new Bot(0, 3000, 'troi', 'js/bots/troi/umbreon_2.0.png');
  */
 
 
-// (Override) Initialize Bot
+///////////////////////////////
+// (Override) Initialize Bot //
+///////////////////////////////
 troi.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
@@ -16,25 +18,110 @@ troi.init = function() {
     troi.STAMINA_MAX = 20000,
         troi.STAMINA_MIN = 0;
 
-    this.attackList = ("Shadow Ball", "Dark Pulse", "Payback", "Toxic", "Moonlight", "Agility");
-    /*
-        troi.I1 = 0.20; //random encounter with "antagonist"
-        troi.I2 = 0.30; //Probability of "being alone"
-        troi.I3 = 0.15; //Probability of finding food
-        troi.I4 = 0.02; //Probability of finding treasure
-        troi.I5 = 0.01; //Probabilty triggering a trap
-        */
+    troi.attackList = ["Shadow Ball", "Dark Pulse", "Payback", "Toxic", "Moonlight", "Agility"];
+    troi.inventory = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    troi.rand = 0; //variable for random event if multiple can occur
 
-    // Initialize Timed Updates
+    //////////////////////////////
+    // Initialize Timed Updates //
+    //////////////////////////////
     game.time.events.loop(Phaser.Timer.SECOND * 10, troi.update10Sec, this); //main loop (1/sec) for status
     game.time.events.loop(Phaser.Timer.SECOND * .1, troi.updateTenthSec, this); //loops (10/sec) for updating the stamina
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, troi.update_1_30_sec, this); //loops every 2 minutes to update for hunger
+
+    this.makeProductions();
+
+    this.home.x = 25;
+    this.home.y = 2700;
 }
 troi.motionMode = Motions.walking;
+troi.extraText = "";
 
 
+
+/////////////////
+// Productions //
+/////////////////
+troi.makeProductions = function() {
+    treasureHunting_Production = new Production("Treasure hunting",
+        Production.priority.Medium,
+        function() {
+            return (
+                troi.hunger.amount < 300 &&
+                troi.stamina > 12000 &&
+                (troi.emotion.current === "neutral" ||
+                    troi.emotion === "happy" ||
+                    troi.emotion.current === "euphoric")
+                /* && (world.time > sunrise && world.time < sunset) */
+            );
+        },
+        function() {
+            troi.body.speed = 150; //&&
+            troi.treasure;
+        });
+    homeward_Production = new Production("To Home",
+        Production.priority.High,
+        function() {
+            return (!troi.home &&
+                troi.stamina > 100 &&
+                troi.hunger < 400
+            );
+        },
+        function() {
+            troi.home;
+            troi.body.speed = 100;
+        });
+
+    nap_Production = new Production("Naptime",
+        Production.priority.Low,
+        function() {
+            return (
+                (troi.stamina > 0 && troi.stamina < 500) &&
+                (troi.hunger > 200 && troi.hunger < 400) &&
+                troi.emotion.current === "neutral"
+            );
+        },
+        function() {
+            troi.resting;
+            troi.extraText = "Naptime";
+        });
+    eating_Production = new Production("Eating",
+        Production.priority.High,
+        function() {
+            return (
+                troi.hunger > 400
+            );
+        },
+        function() {
+            troi.extraText = "Foooooooooooooood.";
+            troi.motionMode = Motions.walking;
+
+        });
+    tinkering_Production = new Production("Tinkering",
+        Production.priority.Medium,
+        function() {
+            return (
+                (troi.emotion.current === "euphoric" || troi.emotion.current === "happy") &&
+                (troi.stamina > 3000 && troi.stamina < 15000) &&
+                troi.hunger < 200
+            );
+        },
+        function() {
+
+            for (i = 0; i < troi.inventory.length; i++) {
+                if (Math.random > .5) {
+                    troi.inventory[i] += 1;
+                };
+            };
+
+
+        });
+
+    this.productions = [treasureHunting_Production, homeward_Production, nap_Production,
+        eating_Production, tinkering_Production
+    ];
+
+}
 
 ///////////////////
 // Emotion Modes //
@@ -73,7 +160,7 @@ troi.setMotion = function() {
             if (Math.random() <= .20) {
                 if (Math.random() <= .10) { //Probability of being startled
                     if (Math.random() > .20) { //Probability of running away
-                        console.log('Run, Run Away!');
+                      //  console.log('Run, Run Away!');
                         return Motions.running;
                     } else { //Probably of freezing in fear
                         return troi.resting;
@@ -109,7 +196,9 @@ troi.setMotion = function() {
 
 }
 
-
+//////////////////////
+// Personal motions //
+//////////////////////
 
 
 troi.resting = {
@@ -125,7 +214,7 @@ troi.resting = {
     update: function() {
         // Standing still
         troi.body.speed = 0;
-        troi.stamina += 20; //energy recharging while walking
+        troi.stamina += 200; //energy recharging while walking
     }
 }
 
@@ -156,10 +245,26 @@ troi.recovering = {
 }
 
 
+//////////
+// MISC //
+//////////
+troi.treasure = {
+    description: "treasure",
+    x : 10,
+    y : 2930
+}
+
+troi.home = {
+    description: "home",
+    x : 25,
+    y : 2700
+}
 
 
 
-// Hunger 
+/////////////
+// Hunger  //
+/////////////
 
 troi.hunger = {
     amount: 0,
@@ -199,7 +304,9 @@ troi.hunger = {
     }
 }
 
-//Id state - entertainment/amusment
+///////////////////////////////////////
+// Id state - entertainment/amusment //
+///////////////////////////////////////
 troi.amuse = {
     time: 500,
     play: function(play_time) {
@@ -238,37 +345,34 @@ troi.amuse = {
 }
 
 
-// Current States
-//troi.emotion = troi.neutral;
-
-
-
-// (Override) Populate status field
+///////////////////
+// status update //
+///////////////////
 troi.getStatus = function() {
-    var statusString = troi.emotion.name;
+    var statusString = troi.emotion.current;
     statusString += "\n-------";
-    statusString += "\nMotion mode: " + troi.motionMode.description + "\nEmotion mode: " + troi.emotion.name;
+    statusString += "\nMotion mode: " + troi.motionMode.description + "\nEmotion mode: " + troi.emotion.current;
     statusString += "\nStamina : " + troi.stamina + "\n" + troi.hunger.toString() + "\n" + troi.amuse.toString();
     return statusString;
 }
 
-// (Override) Main update.  On my machine this is called about 43 times per second
+/////////////////////////////////////////////////////////////////////////////////////
+// (Override) Main update.  On my machine this is called about 43 times per second //
+/////////////////////////////////////////////////////////////////////////////////////
 troi.update = function() {
     if (troi.atBoundary() === true) {
         troi.incrementAngle(45);
     }
-    /*if (troi.motionMode) {
-        troi.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.        
-    }
-    */
     this.basicUpdate();
 
 
     troi.genericUpdate();
 };
 
-// Called every tenth of a second
-//updates stamina
+////////////////////////////////////
+// Called every tenth of a second //
+// updates stamina                //
+////////////////////////////////////
 troi.updateTenthSec = function() {
     if (troi.stamina <= 0) {
         troi.motionMode = troi.resting;
@@ -283,24 +387,16 @@ troi.updateTenthSec = function() {
 }
 
 
-// Called every second
-//updates status
+/////////////////////////
+// Called every second //
+//updates status       //
+/////////////////////////
 troi.update10Sec = function() {
-    /*if (troi.emotion) {
-         if (Math.random() < troi.emotion.transitionProbability) {
-             troi.emotion = troi.emotion.transition();
-         }
-     }
-     if (troi.emotion && troi.motionMode) {
-         troi.motionMode = troi.emotion.getMotionMode();
-     }
-     //console.log(troi.motionMode.description);
-     //console.log(troi.emotion.name);
-     */
 
     troi.setMotion();
     troi.amuse.update();
     troi.hunger.update();
+    fireProductions(troi.productions);
 
 }
 troi.update_1_30_sec = function() {
@@ -332,7 +428,7 @@ troi.collision = function(object) {
  */
 troi.eatObject = function(objectToEat) {
     objectToEat.eat();
-    //troi.hunger.subtract(objectToEat.calories);
+    troi.hunger.subtract(objectToEat.calories);
     troi.hunger.eat(objectToEat.calories);
     troi.speak(objectToEat, "Yay, food. " + objectToEat.description + "!");
 }
@@ -356,5 +452,4 @@ troi.highFived = function(botWhoHighFivedMe) {
 troi.ignore = function(annoyingBot) {
     this.incrementAngle(180);
     this.body.speed = 250;
-    console.log(this.name + " ignored " + annoyingBot);
 }

@@ -142,6 +142,9 @@ function setUpFood() {
             case 14:
                 addFoodItem("Cream_Cake", "Cream cake", 5);
                 break;
+            case 15:
+                addFoodItem("Spicy_Poffin", "A very spicy pastry.", 70) ;
+                break;
             default:
                 break;
         }
