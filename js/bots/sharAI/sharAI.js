@@ -14,7 +14,7 @@ sharAI.motionText = "sharAI is getting ready";
 sharAI.isPursuing = false;
 sharAI.currentMotion = Motions.stop;
 sharAI.ear = "";
-sharAI.currentTarget;
+sharAI.currentTarget = jeff;
 
 /**
  * Initialize bot
@@ -51,13 +51,15 @@ sharAI.makeProductions = function() {
             if (sharAI.isPursuing == false) { 
                  do {
                      sharAI.currentTarget = sharAI.getRandomObject()
-                     if (currentTarget.isEdible == true) {
+                     if (sharAI.currentTarget.isEdible == true) {
                          sharAI.pursue(sharAI.currentTarget, 30);
                      }
-                } while (currentTarget.isEdible == false)
+                } while (sharAI.currentTarget.isEdible == false)
             }
         });
 
+    
+    
     // Populate production list
     this.productions = [huntingProduction];
 }
