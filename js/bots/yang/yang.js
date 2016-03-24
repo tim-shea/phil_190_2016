@@ -12,13 +12,18 @@ var yang = new Bot(2700, 2700, 'yang', 'js/bots/yang/yang.png');
 //objects that has its own basic variables, basic functions and objects  //
 //"_" marks objects                                                      //
 ///////////////////////////////////////////////////////////////////////////
-
 /**
  * combine all debug related stuff.
  * @memberOf yang
  * @type {Object}
  */
 yang.test_ = {};
+/**
+ * combine all debug productions related stuff.
+ * @memberOf yang.test_
+ * @type {Object}
+ */
+yang.test_.test_production = [];
 /**
  * combine all text related varandfun.
  * @memberOf yang
@@ -129,8 +134,8 @@ yang.init_plus = function() { //object related initialization
     yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
-    yang.test_.test_ongoing = false;
-    //yang.test_.test_ongoing = true;
+    //yang.test_.test_ongoing = false;
+    yang.test_.test_ongoing = true;
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
     yang.collided_obj = {};
@@ -191,10 +196,7 @@ yang.getStatus = function() {
         yang.text_.stateText =
             "Test Mode" + "\n" +
             yang.text_.testFeedBack + "\n" +
-            "Test node description: " + "\n" +
-            //yang[yang.test_.current_testnode.type].description + "\n" +
-            yang.test_.current_testnode.type + " node description:" + "\n" +
-            yang.test_.current_testnode.description + "\n" +
+            "Test node Type: " + yang.test_.current_testnode.type + "\n" +
             yang.text_.rotationText + "\n" +
             yang.text_.motionText + "\n" +
             "prime resources \t= " + yang.biomachine_.metaresources_prime + "\n" +
@@ -335,6 +337,7 @@ yang.collision = function(object) {//collision
     yang.biomachine_.metaresources_prime -= 0.1;
     fireProductions(yang.production_.inter_action);
     fireProductions(yang.production_.inter_reaction);
+    fireProductions(yang.test_.test_production);
 }
 /**
  * called by init_plus
@@ -344,16 +347,19 @@ yang.collision = function(object) {//collision
  */
 yang.fun_.makeProductions = function() {
     yang.production_.inter_action.push(
+        
+    );
+    yang.production_.inter_reaction.push(
+    );
+    yang.production_.direction.push(
+    );
+    yang.test_.test_production.push(
         new Production(
                 "feast",
                 Production.priority.High,
                 yang.production_.feast_upon.condition_cal,
                 yang.production_.feast_upon.act
         )
-    );
-    yang.production_.inter_reaction.push(
-    );
-    yang.production_.direction.push(
     );
 }
 /**
@@ -413,14 +419,24 @@ yang.MRGPRB4.add("annoyed", [
  */
 yang.production_.feast_upon = {};
 yang.production_.feast_upon.condition_cal = function () {
-    return ((yang.collided_obj instanceof Entity) &&
-        (yang.collided_obj.name.toLowerCase()).search("berry") &&
-        yang["mental_task_node"] == yang.node_.id_prime_focus);
+    yang.text_.testFeedBack = (yang.collided_obj instanceof Entity)
+        && (yang.collided_obj.name.toLowerCase()).search("berry") > 0
+        //&& yang["mental_task_node"] == yang.node_.id_prime_focus
+        && yang.test_.current_testnode == yang.node_.id_prime_focus
+    ;
+    return 
+    (yang.collided_obj instanceof Entity)
+        && (yang.collided_obj.name.toLowerCase()).search("berry") > 0
+        //&& yang["mental_task_node"] == yang.node_.id_prime_focus
+        && yang.test_.current_testnode == yang.node_.id_prime_focus
+    ;
 }
 yang.production_.feast_upon.act = function() {
+    yang.text_.testFeedBack = yang.collided_obj.name + 
+    + " " + yang.text_.testFeedBack + " ACT!";
     for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
         yang.node_.brake.brake();
-    }
+    } 
     yang.collided_obj.eat();//a function of food
 }
 
@@ -870,8 +886,9 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
+        yang.test_.current_testnode = yang.node_.id_prime_focus;
         /*
-        yang.test_.current_testnode = yang.def_node();
+        yang.test_.current_testnode = yang.def_node;
         yang.test_.current_testnode.init_fun();
         yang.test_.current_testnode.always_fun();
         yang.test_.current_testnode.current_fun();
