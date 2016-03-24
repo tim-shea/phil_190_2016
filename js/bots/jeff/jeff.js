@@ -1,14 +1,10 @@
 /**
  * Jeff's bot
- *
- * @namespace Jeff
- * @augments Bot
  */
 var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
 
 /**
  * State variables
- * @memberOf Jeff
  */
 jeff.currentlyPursuing = "Nothing";
 jeff.currentMotion = Motions.still;
@@ -17,7 +13,6 @@ jeff.extraText = "";
 /**
  * Initialize bot
  *
- * @memberOf Jeff
  * @override
  */
 jeff.init = function() {
@@ -37,7 +32,6 @@ jeff.init = function() {
 /**
  * Create the list of productions for this agent.
  *
- * @memberOf Jeff
  */
 jeff.makeProductions = function() {
     hungerProduction = new Production("eating",
@@ -54,7 +48,7 @@ jeff.makeProductions = function() {
     admireCar = new Production("admiring car",
         Production.priority.Low,
         function() {
-            let d = game.physics.arcade.distanceBetween(jeff.sprite, dylan.sprite);
+            let d = jeff.getDistanceTo(dylan);
             if ((d > 40) && (d < 400)) {
                 return true;
             };
@@ -69,7 +63,6 @@ jeff.makeProductions = function() {
 
 /**
  * Markov process controlling emotions
- * @memberOf Jeff
  */
 jeff.emotions = new MarkovProcess("Calm");
 jeff.emotions.add("Calm", [
@@ -91,7 +84,6 @@ jeff.emotions.add("Happy", [
 
 /**
  * Hunger Variable
- * @memberOf Jeff
  */
 jeff.hunger = new DecayVariable(0, 1, 0, 100);
 jeff.hunger.toString = function() {
@@ -111,29 +103,18 @@ jeff.hunger.toString = function() {
 /**
  * Populate the status field
  *
- * @memberOf Jeff
  * @override
  */
 jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
-    statusString += "\nMotion: " + jeff.currentMotion.description;
+    statusString += "\nMotion: " + (jeff.motionOverride ? "Override" :jeff.currentMotion.description);
     statusString += "\n" + jeff.hunger.toString();
     statusString += "\nExtra text:   " + jeff.extraText;
-    // statusString += "\nEntity collisions: " +
-    //     jeff.getOverlappingEntities().map(function(item) {
-    //         return item.name;
-    //     });
-    // statusString += "\nBot collisions: " +
-    //     jeff.getOverlappingBots().map(function(item) {
-    //         return item.name;
-    //     });
-    statusString += "\nMoving to: " + jeff.currentlyPursuing;
     return statusString;
 }
 
 /**
  * Set the current motion state.  Currently updated every second.
- * @memberOf Jeff
  */
 jeff.setMotion = function() {
 
@@ -158,11 +139,9 @@ jeff.setMotion = function() {
 /**
  * When a pursuit is completed reset the pursuit string.
  *
- * @memberOf Jeff
  * @override
  */
 jeff.pursuitCompleted = function() {
-    jeff.currentlyPursuing = "Nothing";
     this.currentMotion = Motions.still;
 }
 
@@ -173,23 +152,19 @@ jeff.pursuitCompleted = function() {
 /**
  * Main update called by the phaer game object (about 40 times / sec. on my machine).
  *
- * @memberOf Jeff
  * @override
  */
 jeff.update = function() {
-
-    // Apply current motion
     this.currentMotion.apply(jeff);
-    // "Superclass" update method
     jeff.genericUpdate();
 };
 
 
 /**
  * Called every second
- * @memberOf Jeff
  */
 jeff.update1Sec = function() {
+    // jeff.findFood(1000, Phaser.Easing.Bounce.Out);
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();
@@ -198,9 +173,9 @@ jeff.update1Sec = function() {
 
 /**
  * Called every ten seconds
- * @memberOf Jeff
  */
 jeff.updateTenSecs = function() {
+    // jeff.goto(Math.random()*500,1000, 2000);
     // Pursue a random entity
     if (Math.random() < .9) {
         // jeff.currentlyPursuing = this.pursueRandomObject(2000).name;
@@ -222,10 +197,14 @@ jeff.update2min = function() {
 /**
  * React to a collision.
  *
- * @memberOf Jeff
  * @override
  */
 jeff.collision = function(object) {
+
+    if (object instanceof Bot) {
+        // this.pursueForTime(object,10);
+    }
+
     // console.log("Object is edible: " + object.isEdible);
     if (object.isEdible) {
         jeff.eatObject(object);
@@ -233,9 +212,7 @@ jeff.collision = function(object) {
         jeff.speak(object, "Hello " + object.name);
     }
     // I'm a nice guy
-    if (object instanceof Bot) {
-        object.highFive();
-    }
+
 
     // jeff.flee(object);
     // jeff.pursue(object);
@@ -244,7 +221,6 @@ jeff.collision = function(object) {
 /**
  * Call this when eating something.  
  *
- * @memberOf Jeff
  * @param {Entity} objectToEat what to eat
  */
 jeff.eatObject = function(objectToEat) {
@@ -255,7 +231,6 @@ jeff.eatObject = function(objectToEat) {
 }
 
 /**
- * @memberOf Jeff
  * @override
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
@@ -265,7 +240,6 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
 /**
  * React when someone high fives me.
  *
- * @memberOf Jeff
  * @override
  */
 jeff.highFived = function(botWhoHighFivedMe) {

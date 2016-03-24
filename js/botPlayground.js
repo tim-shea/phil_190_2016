@@ -4,24 +4,26 @@
  * simple bots with their own distinctive personalities, AI, etc.
  *
  * @author  Jeff Yoshimi, ... [list your name here]
-*/
+ */
 
 //
-// Global Variables
+// Misc. global Variables
 // 
 var cursors;
 var cursorDown;
-var botGroup;
 var worldSizeX = 3000;
 var worldSizeY = 3000;
 
+// Phaser groups
+var botGroup, entityGroup;
 
 //
-// Arrays of bots
+// Arrays and dictionaries
 //
 var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey];
 var sprites = [];
 var entities = [];
+var foods = [];
 var currentBotIndex = defaultBotIndex;
 var sounds = {};
 
@@ -66,8 +68,6 @@ function preload() {
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
 
-
-
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
@@ -79,7 +79,7 @@ function preload() {
     game.load.image('food_fruit_veggies', 'assets/food_fruit_veggies.png');
     game.load.image('cupCake', 'assets/cupCake.png');
     game.load.image('diet_pepsi', 'assets/diet_pepsi.png');
-    game.load.image('jerry_can' , 'assets/jerry_can.png');
+    game.load.image('jerry_can', 'assets/jerry_can.png');
     game.load.image('Philoberry', 'assets/Philoberry.png');
     game.load.image('Cheri_berry', 'assets/Cheri_Berry.png');
     game.load.image('Enigma_berry', 'assets/Enigma_Berry.png');
@@ -90,7 +90,6 @@ function preload() {
     game.load.image('pink_candy', 'assests/pink_candy.png');
     game.load.image('Cream_Cake', 'assets/Cream_Cake.png');
     game.load.image('Spicy_Poffin', 'assets/Spicy_Poffin.png');
-
 
 }
 
@@ -107,6 +106,8 @@ function create() {
 
     // Add group for bots
     botGroup = game.add.group();
+    foodGroup = game.add.group();
+    entityGroup = game.add.group();
 
     // Set up sprites
     for (var i = 0; i < bots.length; i++) {
@@ -116,8 +117,10 @@ function create() {
         bots[i].body = newSprite.body;
         game.physics.enable(newSprite, Phaser.Physics.ARCADE);
         sprites.push(newSprite);
-        // newSprite.body.collideWorldBounds = true;
         bots[i].init();
+        // bots[i].body.mass = 10;
+        // bots[i].body.bounce.x = 5;
+        // bots[i].body.bounce.y = 5;
         bots[i].speechBubble = game.world.add(new SpeechBubble(game, bots[i].x, bots[i].y + 50, 256,
             "Loading " + bots[i].name));
         bots[i].speechBubble.visible = false;
@@ -145,6 +148,12 @@ function create() {
     entities.push(new Entity(1000, 1350, 'princessCastle'));
     entities.push(new Entity(600, 1200, 'carousel'));
 
+    // Make static entities immovable
+    entityGroup.forEach(function(entity) {
+        entity.body.immovable = true; 
+        entity.body.moves = false;}, 
+        this);
+    
     // Set up food items
     setUpFood();
 
@@ -212,6 +221,19 @@ function botSelect() {
     newIndex = e.selectedIndex;
     game.camera.follow(sprites[newIndex]);
     currentBotIndex = newIndex;
+}
+
+//
+// Find a location in the botplayground that is unoccupied by any static entity
+//
+function findEmptyLocation() {
+    while(true) {
+        let x = Math.random() * worldSizeX;
+        let y = Math.random() * worldSizeX;
+        if(game.physics.arcade.getObjectsAtLocation(x,y, entityGroup).length == 0) {
+            return [x,y];
+        }
+    }
 }
 
 //

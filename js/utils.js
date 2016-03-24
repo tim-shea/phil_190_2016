@@ -90,7 +90,6 @@ String.prototype.contains = function(it) {
     return this.indexOf(it) != -1;
 };
 
-
 /**
  * Add a food item to the game
  */
@@ -117,6 +116,7 @@ function setUpFood() {
                 addFoodItem("Philoberry", "Organic Philosopher's Stone", 5); 
                 break;
             case 6:
+                addFoodItem("Spicy_Poffin", "A very spicy pastry.", 70) ;
                 break;
             case 7:
                 addFoodItem("Cheri_berry", "Pokemon berry #01", 1);
@@ -142,9 +142,6 @@ function setUpFood() {
             case 14:
                 addFoodItem("Cream_Cake", "Cream cake", 5);
                 break;
-            case 15:
-                addFoodItem("Spicy_Poffin", "A very spicy pastry.", 70) ;
-                break;
             default:
                 break;
         }
@@ -160,10 +157,12 @@ function setUpFood() {
  */
 function addFoodItem(image_id, description, calories) {
     if (image_id != "") {
-        food = new Entity(Math.random() * worldSizeX, Math.random() * worldSizeY, image_id);
+        let [x,y] = findEmptyLocation();
+        food = new Entity(x,y, image_id);
         food.description = description;
         food.calories = calories;
         food.isEdible = true;
+        foods.push(food);
         food.eat = function() {
             // console.log("Eating " + this.description + " with " + this.calories + " calories");
             let tempSprite = this.sprite;

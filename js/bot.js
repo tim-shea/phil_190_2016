@@ -29,6 +29,9 @@ function Bot(x, y, name, path) {
     // Flag turned on during bot interactions to prevent infinite loops between bots.
     this.isInteracting = false;
 
+    // Override motion when in pursuit, etc.
+    this.motionOverride = false;
+    this.pursuit = null;
 };
 
 /**
@@ -51,6 +54,22 @@ Bot.prototype.init = function() {};
 Bot.prototype.update = function() {};
 
 /**
+ * Update the velocity and angle of the bot to update it's velocity.
+ *
+ * TODO: Possibly change name to something more descriptive.
+ * A basic default update style.
+ */
+Bot.prototype.basicUpdate = function() {
+    if (this.motionOverride) {
+        return;
+    }
+    game.physics.arcade.velocityFromRotation(
+        this.sprite.rotation,
+        this.sprite.body.speed,
+        this.sprite.body.velocity);
+};
+
+/**
  * Generic update method
  */
 Bot.prototype.genericUpdate = function() {
@@ -58,6 +77,10 @@ Bot.prototype.genericUpdate = function() {
     game.world.wrap(this.sprite);
     this.speechBubble.x = this.sprite.x + 50;
     this.speechBubble.y = this.sprite.y - 40;
+    game.physics.arcade.collide(this.sprite, entityGroup);
+    if((this.pursuit != null) && (!this.motionOverride))  {
+        this.pursue(this.pursuit, 1000);        
+    }
 };
 
 /**
@@ -79,7 +102,6 @@ Bot.prototype.atBoundary = function() {
     }
     return false;
 }
-
 
 /**
  * Returns a random number between floor and ceiling 
@@ -111,19 +133,28 @@ Bot.prototype.incrementAngle = function(amount) {
     this.sprite.body.rotation = this.sprite.body.rotation % 180;
 }
 
+/**
+ * Pursue the indicated object, for the indicated duration (in milliseconds), using a custom easing if desired
+ *
+ * Rough guideline on durations: 1000 = 1 second is fast, 100 is 1/10 second is super fast, 5000 = 5 seconds is slow
+ * 
+ * Easings listed here: http://phaser.io/docs/2.4.4/Phaser.Easing.html
+ */
+Bot.prototype.pursue = function(objectToPursue, duration, easing = Phaser.Easing.Exponential.InOut) {
+    this.motionOverride = true;
+    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
+    var pursuitTween = game.add.tween(this.sprite);
+    pursuitTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, easing);
+    pursuitTween.onComplete.add(this.pursuitCompleted);
+    pursuitTween.onComplete.add(function() { this.motionOverride = false; });
+    pursuitTween.start();
+}
+
 
 /**
- * Update the velocity and angle of the bot to update it's velocity.
- *
- * TODO: Possibly change name to something more descriptive.
- * A basic default update style.
+ * Called after a pursuit completes.  Override if any functionality is needed.
  */
-Bot.prototype.basicUpdate = function() {
-    game.physics.arcade.velocityFromRotation(
-        this.sprite.rotation,
-        this.sprite.body.speed,
-        this.sprite.body.velocity);
-};
+Bot.prototype.pursuitCompleted = function() {}
 
 /**
  * Helper function to determine if one sprite overlaps another.
@@ -134,31 +165,59 @@ Bot.prototype.basicUpdate = function() {
  */
 Bot.objectsOverlap = function(item1, item2) {
     if (item1 != item2) {
-        // if(item1.body.enable && item2.body.enable) {
-            return Phaser.Rectangle.intersects(item1.getBounds(), item2.getBounds());            
-        // }
+        return Phaser.Rectangle.intersects(item1.getBounds(), item2.getBounds());
     }
     return false;
 }
 
 /**
- * Pursue the indicated object.
- *
- * @param  {Object} the object to pursue
- * @param  {Number} duration of pursuit in milliseconds
+ * Returns the distance between this bot and a specified object. 
  */
-Bot.prototype.pursue = function(objectToPursue, duration) {
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
+Bot.prototype.getDistanceTo = function(otherObject) {
+    return game.physics.arcade.distanceBetween(this.sprite, otherObject.sprite);;
+}
+
+/**
+ * Pursue the specified object for the specified amount of time.
+ */
+Bot.prototype.pursueForTime = function(objectToPursue, time=4) {
+    if (!(this.pursuit === null)) {
+        return;
+    }
+    this.pursuit = objectToPursue;
+    console.log("Chasing " + objectToPursue.name);
+    timer = game.time.events.add(Phaser.Timer.SECOND * time,
+        function() {
+            console.log("Done");
+            this.pursuit = null;
+        },
+        this);
+}
+
+/**
+ * Go to the indicated location on screen, at the indicated speed
+ * (Duration in milliseconds it will take to get there.)
+ *
+ * Easings listed here: http://phaser.io/docs/2.4.4/Phaser.Easing.html
+ */
+Bot.prototype.goto = function(x, y, duration, easing = Phaser.Easing.Exponential.InOut) {
+    this.motionOverride = true;
     var pursuitTween = game.add.tween(this.sprite);
-    pursuitTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, Phaser.Easing.Exponential.InOut);
-    pursuitTween.onComplete.add(this.pursuitCompleted);
+    pursuitTween.to({ x: x, y: y }, duration, easing);
+    pursuitTween.onComplete.add(function() { this.motionOverride = false; });
     pursuitTween.start();
 }
 
 /**
- * Called after a pursuit completes.  Override if any functionality is needed.
+ * Go to some food item and take the indicated time to do it.
+ * Small values = fast; larger values = slow.
+ * TODO: Go to _nearest_ food
  */
-Bot.prototype.pursuitCompleted = function() {}
+Bot.prototype.findFood = function(duration, easing = Phaser.Easing.Exponential.InOut) {
+    let food = foods[game.rnd.integerInRange(0,foods.length)];
+    this.pursue(food, duration, easing);
+}
+
 
 /**
  * Turn away from the specified object and move with specified speed.
@@ -257,197 +316,4 @@ Bot.prototype.collisionCheck = function() {
  */
 Bot.prototype.collision = function(object) {
     console.log(this.name + " collided with " + object.name);
-}
-
-/**
- * Say something to the specified bot for 1 second.
- *
- * @param {Bot} botToTalkTo the bot to talk to
- * @param {String} whatToSay what was said
- */
-Bot.prototype.speak = function(botToTalkTo, whatToSay) {
-    this.speakTimed(botToTalkTo, whatToSay, 1);
-}
-
-/**
- * Say something to the specified bot for a specified amount of time in seconds.
- * @param {Bot} botToTalkTo the bot to talk to
- * @param {String} whatToSay what was said
- * @param  {Number} howLong how long to say it for
- */
-Bot.prototype.speakTimed = function(botToTalkTo, whatToSay, howLong) {
-    // Activate the speech Bubble
-    this.speechBubble.bitmapText.text = whatToSay;
-    // TODO speech bubble has extra left padding often.
-    // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
-    this.speechBubble.visible = true;
-    game.time.events.add(Phaser.Timer.SECOND * howLong, function() { 
-        this.speechBubble.visible = false; 
-        this.isInteracting = false;}, this);
-
-    // Call the listeners "hear" function
-    if (botToTalkTo instanceof Bot && this.isInteracting === false) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
-            this.isInteracting = true;
-            botToTalkTo.hear(this, whatToSay);
-        }
-    }
-}
-
-/**
- * Override to react when hearing something
- *
- * @param  {Bot} botWhoSpokeToMe who talked to me
- * @return {String} whatTheySaid what they said!
- */
-Bot.prototype.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    console.log(botWhoSpokeToMe.name + " said " + whatTheySaid);
-}
-
-/**
- * High five a specified bot
- *
- * @param {Bot} botToHighFive the bot to high five
- */
-Bot.prototype.highFive = function(botToHighFive) {
-    if (botToHighFive instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToHighFive.sprite) < 100) {
-            botToHighFive.highFived(this);
-        }
-    }
-}
-
-/**
- * Override to react when high fived
- *
- * @param  {Bot} botWhoSpokeToMe who talked to me
- */
-Bot.prototype.highFived = function(botWhoHighFivedMe) {
-    console.log(botWhoHighFivedMe.name + " high fived " + this.name);
-}
-
-/**
- * Bite a specified bot
- *
- * @param {Bot} botToAttack The bot to bite
- * @param {Number} damage Strength of the bite
- */
-Bot.prototype.bite = function(botToAttack, damage) {
-    if (botToAttack instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
-            botToAttack.gotAttacked(this, damage);
-        }
-    }
-};
-
-/**
- * Override to react when attacked
- *
- * @param {Bot} botWhoAttackedMe The bot that bit me
- * @param {Number} damage The amount of damage done
- */
-Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
-    // console.log(botWhoAttackedMe.name + "attacked me!");
-};
-
-/**
- * caress with antler
- * @param {Bot} target bot
- * @param {String} message
- */
-Bot.prototype.antler_caress = function(botTocaress, message) {
-    // console.log(botTocaress.name + message);
-};
-/**
- * Override to react when caressed
- * @param {Bot} target bot
- * @param {String} message
- */
-Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
-    // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
-};
-
-/**
- * Crush a bot at close proximity
- * @param  {Bot} botToCrush the bot being crushed
- * @param  {number} damage     damage of crushing, should be higher than biting?
- * 
- */
-Bot.prototype.crush = function(botToCrush, damage) {
-    if (botToCrush instanceof Bot) {
-        if(game.physics.arcade.distanceBetween(this.sprite, botToCrush.sprite) < 10) {
-            botToCrush.gotCrushed(this, damage);
-        }
-    }
-}
-
-Bot.prototype.gotCrushed = function(botToCrush) {
-    //console.log(botToCrush.name + " got crushed by dylan.");
-};
-
-/**
- * Bow down to bot
- * @param {Bot} botToBow the bot that is being bowed down to
- */
-Bot.prototype.bow = function(botToBow) {
-	if (botToBow instanceof Bot) {
-		if(game.physics.arcade.distanceBetween(this.sprite, botToBow.sprite) < 15) {
-            botToBow.gotBow(this);
-        }
-	}
-};
-/**
- * Override to react when bowed down to
- * 
- * @param {Bot} botWhoBowed bot who bowed down to me
- * 
- */
-Bot.prototype.gotBow = function(botWhoBowed) {
-	// console.log(botWhoBowed.name + "bowed down to " + this.name);
-};
-
-
-/**
- * Lick a specified bot
- *
- * @param {Bot} botToLick the bot to lick
- */
-Bot.prototype.lick = function(botTolick) {
-    if (botTolick instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botTolick.sprite) < 100) {
-            botTolick.gotLicked(this);
-        }
-    }
-};
-
-/**
- * Override to react when licked
- *
- * @param  {Bot} botWhoLickedToMe who licked me
- */
-Bot.prototype.gotLicked = function(botWhoLickedMe) {
-    // console.log(botWhoLickedMe.name + " licked " + this.name);
-};
-
-
-Bot.prototype.ignore = function (annoyingBot) {
-    this.incrementAngle(180);
-    this.body.speed = 250;
-    annoyingBot.gotIgnored(this);
-}
-
-/**
- * Override to react when ignored
- *
- * @param  {Bot} botWhoIgnoredToMe who ignored me
- */
-Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
-    this.body.speed = 0;
-    this.body.speed = 0;
-    this.body.speed = 0;
-    this.body.speed = 0; 
-    this.body.speed = 0;
-
-    this.pursue(botWhoIgnoredMe, 350);
-
 }

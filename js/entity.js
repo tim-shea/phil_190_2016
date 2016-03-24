@@ -6,7 +6,8 @@
 function Entity(x, y, name) {
     this.x = x;
     this.y = y;
-    this.sprite = game.add.sprite(x, y, name);
+    this.sprite = entityGroup.create(x, y, name);
+    game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     this.name = name; // Todo: replace with description separate from name
     this.isEdible = false;
 };
