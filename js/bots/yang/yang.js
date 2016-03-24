@@ -359,6 +359,12 @@ yang.fun_.makeProductions = function() {
                 Production.priority.High,
                 yang.production_.feast_upon.condition_cal,
                 yang.production_.feast_upon.act
+        ),
+        new Production(
+                "void",
+                Production.priority.Low,
+                yang.production_.void.condition_cal,
+                yang.production_.void.act
         )
     );
 }
@@ -412,6 +418,13 @@ yang.MRGPRB4.add("annoyed", [
 ////////////////////////////
 //Inter-action Production //
 ////////////////////////////
+yang.production_.void = {};
+yang.production_.void.condition_cal = function () {
+    return false; 
+};
+yang.production_.void.act = function () {
+    //does nothing
+};
 /**
  * eat
  * @memberOf yang.production
@@ -424,12 +437,10 @@ yang.production_.feast_upon.condition_cal = function () {
         //&& yang["mental_task_node"] == yang.node_.id_prime_focus
         && yang.test_.current_testnode == yang.node_.id_prime_focus
     ;
-    return 
-    (yang.collided_obj instanceof Entity)
+    return (yang.collided_obj instanceof Entity)
         && (yang.collided_obj.name.toLowerCase()).search("berry") > 0
         //&& yang["mental_task_node"] == yang.node_.id_prime_focus
-        && yang.test_.current_testnode == yang.node_.id_prime_focus
-    ;
+        && yang.test_.current_testnode == yang.node_.id_prime_focus;
 }
 yang.production_.feast_upon.act = function() {
     yang.text_.testFeedBack = yang.collided_obj.name + 
