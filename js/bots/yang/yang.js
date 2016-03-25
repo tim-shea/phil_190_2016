@@ -79,6 +79,12 @@ yang.production_ = {};
 yang.production_.inter_action = [];
 yang.production_.inter_reaction = [];
 /**
+ * remembered object and etc
+ * @memberOf yang
+ * @type {Object}
+ */
+yang.memory_ = {};
+/**
  * goal related directional adjustment
  * @memberOf yang.production_
  */
@@ -117,8 +123,10 @@ yang.init = function() {
     if (yang.test_.test_ongoing) {
         game.time.events.loop(Phaser.Timer.SECOND * 5, yang.test_.timed_test, yang);
     } else {
-        game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
+        game.time.events.loop(Phaser.Timer.SECOND * 1, yang.onesec_timedEvend, yang);
+        game.time.events.loop(Phaser.Timer.SECOND * 60, yang.onemin_timedEvend, yang);
     }
+    yang.fun_.makeProductions();
 };
 /**
  * initializor's helper
@@ -138,8 +146,17 @@ yang.init_plus = function() { //object related initialization
     yang.test_.test_ongoing = true;
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
-    yang.collided_obj = {};
-    yang.fun_.makeProductions();
+    yang.memory_.colliding_obj = {};//current collision
+    yang.memory_.last_collided_obj = {};//last collision
+    yang.memory_.uneaten_food = [];
+    yang.memory_.friendly_bots = [];
+    yang.memory_.unfriendly_bots = [];
+    yang.memory_.bene_bots = [];
+    //collision flags
+    yang.collision_flag = false;
+    yang.collision_bene_flag = false;
+    yang.collision_ouch_flag = false;
+    yang.collision_nice_flag = false;
     //berry
     yang.berry = new yang.node_.id_prime_focus.berry_game_obj(); //see node
     //additional possiblity
@@ -148,7 +165,6 @@ yang.init_plus = function() { //object related initialization
     //setup relevent entity
     //yang
     //yang.home = new Entity(2700, 2700, 'Deer Bush', game);
-
 };
 /**
  * initializor's helper
@@ -224,7 +240,8 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
         yang["mental_task_node"].always_fun();
         yang.fun_.AImotion_always_fun();
     }
-
+    //for zeleport
+    //TO DO redesign
     if (!yang.basicupdate_disable) {
         if (yang.unstable) {
             yang.body.speed = yang.temp_speed;
@@ -236,6 +253,12 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
             this.sprite.body.velocity);
     } else {
         yang.basicupdate_disable = false;
+    }
+    if (yang.isInteracting == false) {
+        yang.collision_flag = false;
+        yang.collision_bene_flag = false;
+        yang.collision_ouch_flag = false;
+        yang.collision_nice_flag = false;
     }
     yang.genericUpdate();//yang.collisionCheck() are included
 };
@@ -278,15 +301,14 @@ yang.pre_update = function() { // a reoccouring event...
     yang.text_.rotationText = "Rotation= " + Math.round(yang.body.rotation) +
         " Vs Angle(degree)= " + Math.round(yang.body.angle / Math.PI * 180);
     yang.text_.motionText = "Speed= " + yang.body.speed;
-    yang.control = (cursors.up.isDown || cursors.down.isDown ||
-        cursors.left.isDown || cursors.right.isDown);
+    yang.control = (cursors.up.isDown || cursors.down.isDown || cursors.left.isDown || cursors.right.isDown);
 };
 /**
  * game system manipulator
  * @function yang.pre_update
  * @memberOf yang
  */
-yang.timedEvend = function() {
+yang.onesec_timedEvend = function() {
     //use the following in init function
     //game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
     //console.log(game.time.totalElapsedSeconds());//save the line just in case
@@ -316,6 +338,25 @@ yang.timedEvend = function() {
     //clear interactive messages
     yang.text_.interactiveText = "";
 };
+
+yang.onemin_timedEvend = function () {
+    //empty most of memory
+    yang.memory_.friendly_bots = [yang.memory_.friendly_bots[yang.memory_.friendly_bots.length-1]];
+    yang.memory_.unfriendly_bots = [yang.memory_.unfriendly_bots[yang.memory_.unfriendly_bots.length-1]]; 
+}
+
+/**
+ * remembered object and etc
+ * @memberOf yang.fun_
+ */
+yang.fun_.distance_between_us = function (encounteredobject) {
+    if (typeof encounteredobject.sprite != "undefined"
+        && encounteredobject.sprite.x > 0
+        && encounteredobject.sprite.y > 0) {
+        return game.physics.arcade.distanceBetween(encounteredobject.sprite, yang.sprite); 
+    }
+    return undefined;
+}
 /**
  * collision
  * @param {Object}
@@ -323,22 +364,29 @@ yang.timedEvend = function() {
  * @Override
  */
 yang.collision = function(object) {//collision
-    yang.collided_obj = object;
-    /*
-    if ((object instanceof Bot) && yang.text_.interactiveText != "")
-    {
-        yang.speak(object, yang.text_.interactiveText);
-    }
-    */
+    yang.memory_.last_collided_obj = yang.memory_.colliding_obj;
+    yang.memory_.colliding_obj = object;
     for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
         yang.node_.brake.brake();
     }
-    yang.biomachine_.metaresources_secondary += 0.2;
-    yang.biomachine_.metaresources_prime -= 0.1;
-    fireProductions(yang.production_.inter_action);
-    fireProductions(yang.production_.inter_reaction);
-    fireProductions(yang.test_.test_production);
-}
+    yang.isInteracting = true;
+    if (yang.memory_.last_collided_obj != yang.memory_.colliding_obj
+        && yang.collision_flag == false ) {
+        yang.collision_flag == true;
+        yang.biomachine_.metaresources_secondary += 0.2;
+        yang.biomachine_.metaresources_prime -= 0.1;
+        if (yang.test_.test_ongoing) {
+            //fireProductions(yang.test_.test_production);
+        } else {
+            //fireProductions(yang.production_.inter_action);
+            //fireProductions(yang.production_.inter_reaction);
+        }
+        if (yang.text_.interactiveText != "")
+        {
+            yang.speak(object, yang.text_.interactiveText);
+        }
+    }
+};
 /**
  * called by init_plus
  * push actions and reactions into list
@@ -347,27 +395,76 @@ yang.collision = function(object) {//collision
  */
 yang.fun_.makeProductions = function() {
     yang.production_.inter_action.push(
-        
+        new Production(//example
+                yang.def_node.name,
+                yang.def_node.priority,
+                yang.def_node.condition,
+                yang.def_node.action
+        )
     );
     yang.production_.inter_reaction.push(
+        new Production(//example
+                yang.def_node.name,
+                yang.def_node.priority,
+                yang.def_node.condition,
+                yang.def_node.action
+        )
     );
     yang.production_.direction.push(
+        new Production(//example
+                yang.def_node.name,
+                yang.def_node.priority,
+                yang.def_node.condition,
+                yang.def_node.action
+        )
     );
     yang.test_.test_production.push(
         new Production(
-                "feast",
-                Production.priority.High,
-                yang.production_.feast_upon.condition_cal,
-                yang.production_.feast_upon.act
+                yang.node_.feast_upon.name,
+                yang.node_.feast_upon.priority,
+                yang.node_.feast_upon.condition,
+                yang.node_.feast_upon.action
+        ),
+        
+        new Production(
+                yang.node_.memorize_uneaten_food.name,
+                yang.node_.memorize_uneaten_food.priority,
+                yang.node_.memorize_uneaten_food.condition,
+                yang.node_.memorize_uneaten_food.action
+        ),
+
+        new Production(
+                yang.node_.memorize_friendly_bot.name,
+                yang.node_.memorize_friendly_bot.priority,
+                yang.node_.memorize_friendly_bot.condition,
+                yang.node_.memorize_friendly_bot.action
         ),
         new Production(
-                "void",
-                Production.priority.Low,
-                yang.production_.void.condition_cal,
-                yang.production_.void.act
+                yang.node_.memorize_unfriendly_bot.name,
+                yang.node_.memorize_unfriendly_bot.priority,
+                yang.node_.memorize_unfriendly_bot.condition,
+                yang.node_.memorize_unfriendly_bot.action
+        ),
+        new Production(
+                yang.node_.memorize_benefactor_bot.name,
+                yang.node_.memorize_benefactor_bot.priority,
+                yang.node_.memorize_benefactor_bot.condition,
+                yang.node_.memorize_benefactor_bot.action
+        ),
+        new Production(
+                yang.node_.recognization.name,
+                yang.node_.recognization.priority,
+                yang.node_.recognization.condition,
+                yang.node_.recognization.action
+        ),
+        new Production(//example
+                yang.def_node.name,
+                yang.def_node.priority,
+                yang.def_node.condition,
+                yang.def_node.action
         )
     );
-}
+};
 /**
  * Additional Helper functions - Wrapper
  * @function yang.fun_.AImotion_current_fun
@@ -416,46 +513,6 @@ yang.MRGPRB4.add("annoyed", [
     [.8, .2]
 ]);
 ////////////////////////////
-//Inter-action Production //
-////////////////////////////
-yang.production_.void = {};
-yang.production_.void.condition_cal = function () {
-    return false; 
-};
-yang.production_.void.act = function () {
-    //does nothing
-};
-/**
- * eat
- * @memberOf yang.production
- * @param {Object}
- */
-yang.production_.feast_upon = {};
-yang.production_.feast_upon.condition_cal = function () {
-    yang.text_.testFeedBack = (yang.collided_obj instanceof Entity)
-        && (yang.collided_obj.name.toLowerCase()).search("berry") > 0
-        //&& yang["mental_task_node"] == yang.node_.id_prime_focus
-        && yang.test_.current_testnode == yang.node_.id_prime_focus
-    ;
-    return (yang.collided_obj instanceof Entity)
-        && (yang.collided_obj.name.toLowerCase()).search("berry") > 0
-        //&& yang["mental_task_node"] == yang.node_.id_prime_focus
-        && yang.test_.current_testnode == yang.node_.id_prime_focus;
-}
-yang.production_.feast_upon.act = function() {
-    yang.text_.testFeedBack = yang.collided_obj.name + 
-    + " " + yang.text_.testFeedBack + " ACT!";
-    for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
-        yang.node_.brake.brake();
-    } 
-    yang.collided_obj.eat();//a function of food
-}
-
-//////////////////////////////
-//Inter-reaction Production //
-//////////////////////////////
-
-////////////////////////////
 //Inter-reaction Override //
 ////////////////////////////
 /**
@@ -474,7 +531,8 @@ yang.hear = function (botWhoSpokeToMe, whatTheySaid) {
  * @Override
  */
 yang.highFived = function(botWhoHighFivedMe) {
-    yang.speak (botWhoHighFivedMe, "Yoyoyo, let's party bruh.");
+    yang.biomachine_.metaresources_secondary += 10;
+    yang.collision_nice_flag = true;
 }
 /**
  * Override to bitten reaction 
@@ -484,8 +542,8 @@ yang.highFived = function(botWhoHighFivedMe) {
  * @param {Number} damage The amount of damage done
  */
 yang.gotBit = function(botWhoBitedMe, damage) {
-    //lose some resources
-    //console.log(botWhoBitedMe.name + "attacked me!");
+    yang.biomachine_.metaresources_prime -= damage * 5;
+    yang.collision_ouch_flag = true;
 };
 /**
  * Override to antler_caressed reaction 
@@ -497,6 +555,7 @@ yang.gotBit = function(botWhoBitedMe, damage) {
 yang.antler_caressed = function(botWhocaresedMe, message) {
     // whoelse would do this?
     // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
+    yang.collision_bene_flag = true;
 };
 /**
  * Override to gotCrushed reaction
@@ -506,11 +565,13 @@ yang.antler_caressed = function(botWhocaresedMe, message) {
  */
 yang.gotCrushed = function(botWhoCrushMe) {
     //lose significant amount of resources
+    yang.biomachine_.metaresources_prime -= 100;
+    yang.biomachine_.metaresources_secondary -= 100;
     //declare death
     //playmusic
     //reset bot
     //change mood
-    //console.log(botToCrush.name + " got crushed by dylan.");
+    yang.collision_ouch_flag = false;
 };
 /**
  * Override to react when bowed down to 
@@ -520,7 +581,8 @@ yang.gotCrushed = function(botWhoCrushMe) {
  */
 yang.gotBow = function(botWhoBowed) {
     //secondary resources++
-    //console.log(botWhoBowed.name + "bowed down to " + this.name);
+    yang.collision_bene_flag = true;
+    yang.collision_nice_flag = true;
 };
 /**
  * Override to react when got Licked
@@ -529,8 +591,12 @@ yang.gotBow = function(botWhoBowed) {
  * @param {Bot} botWhoBowed bot who bowed down to me
  */
 yang.gotLicked = function(botWhoLickedMe) {
-    //???
-    // console.log(botWhoLickedMe.name + " licked " + this.name);
+    yang.chaosmachine_.chance = Math.random();
+    if (yang.chaosmachine_.chance <= .50) {
+        yang.collision_ouch_flag = true;
+    } else if (yang.chaosmachine_.chance > .50) {
+        yang.collision_nice_flag = true;;
+    }
 };
 /**
  * Override to react when ignored
@@ -539,7 +605,12 @@ yang.gotLicked = function(botWhoLickedMe) {
  * @param  {Bot} botWhoIgnoredToMe who ignored me
  */
 yang.gotIgnored = function(botWhoIgnoredMe) {
-    //???
+    yang.chaosmachine_.chance = Math.random();
+    if (yang.chaosmachine_.chance <= .50) {
+        yang.collision_ouch_flag = true;
+    } else if (yang.chaosmachine_.chance > .50) {
+        yang.collision_nice_flag = true;;
+    }
 };
 ///////////////
 //Nodes Zone //
@@ -554,8 +625,15 @@ yang.gotIgnored = function(botWhoIgnoredMe) {
 yang.fun_.def_node_construct = function(node_type) { //arguement is string
     if (!new.target) throw "def_node_construct() must be called with new";
     //the methods are attempted to listed in an order of calling by game functions
+    this.name = "Blank"; //production name
     this.type = node_type; //used for switch
+    this.priority = Production.priority.Low; //for production
     this.description = "Default"; //used to write state text
+    this.condition = function () { //for production
+        return false; 
+    };
+    this.action = function () { //for production
+    };
     this.init_fun = function() { //only call once
     };
     this.current_fun = function() { //player control sensitive
@@ -580,6 +658,7 @@ yang.fun_.def_node_construct = function(node_type) { //arguement is string
 /**
  * default node has type "void", and does nothing
  * @memberOf yang
+ * @type {yang.fun_.def_node_construct}
  */
 yang.def_node = new yang.fun_.def_node_construct("void");
 ////////////////////////////////////////////////////
@@ -589,6 +668,7 @@ yang.def_node = new yang.fun_.def_node_construct("void");
 /**
  * stop
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.stop_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.stop_node.description = "Deer's body doesn't feel energitic.",
@@ -603,6 +683,7 @@ yang.node_.stop_node.current_fun = function() { //unrelated to control
 /**
  * slow
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.slow_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.slow_node.description = "Deer's body still has fuel.";
@@ -622,6 +703,7 @@ yang.node_.slow_node.always_fun = function() {
 /**
  * fast
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.fast_node = new yang.fun_.def_node_construct("speed_node");
 yang.node_.fast_node.description = "Deer's body feels lighter than usual.";
@@ -643,6 +725,7 @@ yang.node_.fast_node.always_fun = function() {
 /**
  * TO DO : Production Chain instead
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.lay = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.lay.description = "Deer lays down and eat grass. Tastes terrible!";
@@ -658,6 +741,7 @@ yang.node_.lay.always_fun = function() {
 /**
  * brake
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.brake = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.brake.description = "";
@@ -681,6 +765,7 @@ yang.node_.brake.always_fun = function() {
 /**
  * wander
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.wander = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.wander.description = "Deer wanders.";
@@ -697,6 +782,7 @@ yang.node_.wander.current_fun = function() { //control sensitive
 /**
  * gallop
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.gallop = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.gallop.description = "Deer is in motion.";
@@ -717,6 +803,7 @@ yang.node_.gallop.current_fun = function() { //control sensitive
 /**
  * leap
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.leap = new yang.fun_.def_node_construct("acceleration_node");
 yang.node_.leap.eap_loop = false;
@@ -768,6 +855,7 @@ yang.node_.leap.current_fun = function() { //control sensitive
  * TO DO : eat production
  * TO DO : new philoberry Sense
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.id_prime_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.id_prime_focus.berry_game_obj = function() {
@@ -792,7 +880,8 @@ yang.node_.id_prime_focus.always_fun = function() { //ignore control
             yang.berry.berry_coord[0],
             yang.berry.berry_coord[1]));
     yang.node_.id_prime_focus.description =
-        "Deer senses a philoberry grows at " +
+        //"Deer senses a philoberry grows at " +
+        "There are pies in the refrigerator. Deer's home is " +
         yang.berry.berry_distance +
         " pixels away.";
     if (yang.berry.berry_distance < 50) {
@@ -813,6 +902,7 @@ yang.node_.id_prime_focus.always_fun = function() { //ignore control
  * moody
  * uses primary resources to transform emptyness into inspiration
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */ 
 yang.node_.superego_brood_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.superego_brood_focus.description = "The life is in general disappointing, but Deer is still appreciating. What are holy and profane?";
@@ -833,6 +923,7 @@ yang.node_.superego_brood_focus.always_fun = function() { //control sensitive
  * drain
  * uses secondary resources for inspiration at high cost
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */ 
 yang.node_.superego_drain_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.superego_drain_focus.description = "The life has been fair, but a deer always desires better.";
@@ -854,12 +945,13 @@ yang.node_.superego_drain_focus.always_fun = function() { //control sensitive
  * void
  * gain secondary resources from pleasant social event
  * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
  */
 yang.node_.id_secondary_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.id_secondary_focus.description = "No one catches Deer~";
 yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
-    //tag game mechanism, currently disabled
-    if (false) {
+    if (typeof yang.memory_.friendly_bots.find(yang.memory_.colliding_obj) != "undefined") {
+    //TO DO : tag game mechanism
         yang.biomachine_.metaresources_secondary += yang.chaosmachine_.randomness;
     }
     //switch check
@@ -867,6 +959,122 @@ yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
         yang.node_.superego_brood_focus.switch_to_this_node();
     }
 };
+////////////////////////////
+//Inter-action Production //
+////////////////////////////
+/**
+ * eat
+ * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.feast_upon = new yang.fun_.def_node_construct("production_node");
+yang.node_.feast_upon.name = "fiesta";
+yang.node_.feast_upon.priority = Production.priority.High;
+yang.node_.feast_upon.condition = function () {
+    return (yang.memory_.colliding_obj instanceof Entity)
+        && ((yang.memory_.colliding_obj.name.toLowerCase()).search("berry") > 0
+        || (yang.memory_.colliding_obj.name.toLowerCase()).search("fruit") > 0)
+        && yang["mental_task_node"] == yang.node_.id_prime_focus;
+}
+yang.node_.feast_upon.action = function() {
+    for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
+        yang.node_.brake.brake();
+    } 
+    yang.biomachine_.metaresources_prime += yang.memory_.colliding_obj.calories * 10;
+    yang.memory_.colliding_obj.eat();//a function of food
+}
+/**
+ * memorize food if not hungry
+ * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.memorize_uneaten_food = new yang.fun_.def_node_construct("production_node");
+yang.node_.memorize_uneaten_food.name = "memorize_uneaten_food";
+yang.node_.memorize_uneaten_food.priority = Production.priority.High;
+yang.node_.memorize_uneaten_food.condition = function () {//I think problem is here
+    return (yang.memory_.colliding_obj instanceof Entity)
+        && ((yang.memory_.colliding_obj.name.toLowerCase()).search("berry") > 0
+        || (yang.memory_.colliding_obj.name.toLowerCase()).search("fruit") > 0)
+        && yang["mental_task_node"] != yang.node_.id_prime_focus
+        && typeof yang.memory_.uneaten_food.find(yang.memory_.colliding_obj) == "undefined";
+};
+yang.node_.memorize_uneaten_food.action = function () {
+    yang.memory_.uneaten_food.push(yang.memory_.colliding_obj);
+    yang.text_.interactiveText += "I'm not hungry. ";//not a hungry comment  
+};
+/**
+ * memorize bot if friendly
+ * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.memorize_friendly_bot = new yang.fun_.def_node_construct("production_node");
+yang.node_.memorize_friendly_bot.name = "add a New Friend to network";
+yang.node_.memorize_friendly_bot.priority = Production.priority.Medium;
+yang.node_.memorize_friendly_bot.condition = function () {
+    return (yang.memory_.colliding_obj instanceof Bot)
+        && yang["mental_task_node"] != yang.node_.id_secondary_focus
+        && yang.collision_nice_flag == true
+        && typeof yang.memory_.friendly_bots.find(yang.memory_.colliding_obj) == "undefined"
+        && typeof yang.memory_.unfriendly_bots.find(yang.memory_.colliding_obj) == "undefined";
+};
+yang.node_.memorize_friendly_bot.action = function () {
+    yang.memory_.friendly_bots.push(yang.memory_.colliding_obj);
+    yang.text_.interactiveText += "Good to meet you! ";//friendly comment 
+};
+/**
+ * memorize bot if unfriendly
+ * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.memorize_unfriendly_bot = new yang.fun_.def_node_construct("production_node");
+yang.node_.memorize_unfriendly_bot.name = "add a bot to blacklist";
+yang.node_.memorize_unfriendly_bot.priority = Production.priority.Low;
+yang.node_.memorize_unfriendly_bot.condition = function () {
+    return (yang.memory_.colliding_obj instanceof Bot)
+        && yang.collision_ouch_flag == true
+        && typeof yang.memory_.friendly_bots.find(yang.memory_.colliding_obj) == "undefined"
+        && typeof yang.memory_.unfriendly_bots.find(yang.memory_.colliding_obj) == "undefined";
+};
+yang.node_.memorize_unfriendly_bot.action = function () {
+    yang.memory_.unfriendly_bots.push(yang.memory_.colliding_obj);
+    yang.text_.interactiveText += "~~~Ughhh~~ ";//unfriendly comment 
+};
+/**
+ * memorize bot if it is a benefiting relationship
+ * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.memorize_benefactor_bot = new yang.fun_.def_node_construct("production_node");
+yang.node_.memorize_benefactor_bot.name = "add a bot to benefitlist";
+yang.node_.memorize_benefactor_bot.priority = Production.priority.High;
+yang.node_.memorize_benefactor_bot.condition = function () { 
+    return (yang.memory_.colliding_obj instanceof Bot)
+        && yang.collision_bene_flag == true
+        && typeof yang.memory_.bene_bots.find(yang.memory_.colliding_obj) == "undefined";
+};
+yang.node_.memorize_benefactor_bot.action = function () {
+    yang.memory_.bene_bots.push(yang.memory_.colliding_obj);
+    yang.text_.interactiveText += "Thanks. ";//unfriendly comment 
+};
+/**
+ * Say the Name
+ * @memberOf yang.node_
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.recognization = new yang.fun_.def_node_construct("production_node");
+yang.node_.recognization.name = "Say the name";
+yang.node_.recognization.priority = Production.priority.Low;
+yang.node_.recognization.condition = function () {
+    return typeof yang.memory_.colliding_obj.name != "undefined";
+};
+yang.node_.recognization.action = function () {
+    yang.text_.interactiveText += yang.memory_.colliding_obj.name + ". ";//unfriendly comment 
+};
+
+//////////////////////////////
+//Inter-reaction Production //
+//////////////////////////////
+
 //////////////
 //Test Zone //
 //////////////
@@ -919,7 +1127,6 @@ yang.test_.node_test = function() { // test with a permanate state
  */
 yang.test_.timed_test = function() {
 };
-
 /*
 Timed Rotation
 1.forward_dodge [high]
