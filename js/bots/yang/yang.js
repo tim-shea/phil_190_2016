@@ -297,6 +297,12 @@ yang.pre_update = function() { // a reoccouring event...
         " Vs Angle(degree)= " + Math.round(yang.body.angle / Math.PI * 180);
     yang.text_.motionText = "Speed= " + yang.body.speed;
     yang.control = (cursors.up.isDown || cursors.down.isDown || cursors.left.isDown || cursors.right.isDown);
+    yang.memory_.uneaten_food.sort(
+        function (a,b) { 
+            return yang.fun_.distance_between_us(a) > yang.fun_.distance_between_us(b);
+        }
+    );
+    
 };
 /**
  * game system manipulator
@@ -508,8 +514,10 @@ yang.MRGPRB4.add("annoyed", [
  * @Override
  */
 yang.hear = function (botWhoSpokeToMe, whatTheySaid) {
-     yang.text_.interactiveText = "mimic* " + botWhoSpokeToMe.name + ":" + whatTheySaid;
-}
+    if (botWhoSpokeToMe != yang) {
+        yang.text_.interactiveText = "mimic* " + botWhoSpokeToMe.name + ":" + whatTheySaid;
+    }   
+};
 /**
  * highFived
  * @memberOf yang
@@ -843,36 +851,42 @@ yang.node_.leap.current_fun = function() { //control sensitive
  */
 yang.node_.id_prime_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.id_prime_focus.berry_game_obj = function() {
-    //[x,y] initialized as starting location
-    // for now, philoberry entity is in botplayground.js with fixed location
+    this.home = [2700, 2700];
     this.berry_coord = [2700, 2700];
     this.berry_distance = 0; //calculate later
-    //TO DO - redesign
-    /*//berry spawn mechanic, currently disabled
-    this.create_new_berry = function () {
-        this.berry_coord[0] = Math.random() * 10000 % 860 + 70; // 70 - 930
-        this.berry_coord[1] = Math.random() * 10000 % 860 + 70; // 70 - 930
-    };*/
+};
+yang.node_.id_prime_focus.berry_game_obj_renew = function () {
+    if ( yang.berry.berry_coord[0] != yang.memory_.uneaten_food[0].sprite.x 
+        && yang.berry.berry_coord[1] != yang.memory_.uneaten_food[0].sprite.y) {
+        yang.berry.berry_coord[0] = yang.memory_.uneaten_food[0].sprite.x;
+        yang.berry.berry_coord[1] = yang.memory_.uneaten_food[0].sprite.y;
+        return true;//return true if some change were made
+    } else {
+        return false;
+    }
 };
 yang.node_.id_prime_focus.description = ""; //write by functions
-yang.node_.id_prime_focus.init_fun = function() { //only call once
-    //berry spawn mechanic, currently disabled
-    //game.add etcetc
-};
 yang.node_.id_prime_focus.always_fun = function() { //ignore control
+    //find food from memory
+    if (yang.memory_.uneaten_food.length > 0) {
+        if (yang.node_.id_prime_focus.berry_game_obj_renew()) {
+            yang.text_.interactiveText = "Someone just eat the food!~Quickly head to another one.";
+            yang.speak(yang, yang.text_.interactiveText);//speak to myself does nothing
+        } else {
+            yang.node_.id_prime_focus.description = "Deer recalls a fruit or berry grew at ";
+        }
+    } else {//otherwise eat at home.
+        this.berry_coord = [2700, 2700];
+        yang.node_.id_prime_focus.description = "There are pies in the refrigerator. Deer's home is ";
+    }
     yang.berry.berry_distance = Math.round(
         game.physics.arcade.distanceToXY(yang.sprite,
             yang.berry.berry_coord[0],
-            yang.berry.berry_coord[1]));
-    yang.node_.id_prime_focus.description =
-        //"Deer senses a philoberry grows at " +
-        "There are pies in the refrigerator. Deer's home is " +
-        yang.berry.berry_distance +
-        " pixels away.";
-    if (yang.berry.berry_distance < 50) {
-        //eat berry and grow a new one
-        yang.biomachine_.metaresources_prime += 200;
-        //berry spawn mechanic, currently disabled
+            yang.berry.berry_coord[1])
+        );
+    yang.node_.id_prime_focus.description += yang.berry.berry_distance + " pixels away.";
+    if (this.berry_coord = [2700, 2700] && yang.berry.berry_distance < 50) {
+        yang.biomachine_.metaresources_prime += 200;//eat at home
     }
     //switch check
     if (yang.biomachine_.metaresources_prime >= 50) { //belly filled
