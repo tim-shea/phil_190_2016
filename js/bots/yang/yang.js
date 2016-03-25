@@ -142,8 +142,7 @@ yang.init_plus = function() { //object related initialization
     yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
-    //yang.test_.test_ongoing = false;
-    yang.test_.test_ongoing = true;
+    yang.test_.test_ongoing = false;
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
     yang.memory_.colliding_obj = {};//current collision
@@ -160,11 +159,8 @@ yang.init_plus = function() { //object related initialization
     //berry
     yang.berry = new yang.node_.id_prime_focus.berry_game_obj(); //see node
     //additional possiblity
-    //yang.basespeed = 0;
-    //yang.acceleration = 0;
-    //setup relevent entity
-    //yang
-    //yang.home = new Entity(2700, 2700, 'Deer Bush', game);
+    //basespeed
+    //acceleration
 };
 /**
  * initializor's helper
@@ -182,7 +178,6 @@ yang.init_state = function() {
     //basic mind states of two spirits
     yang.mindmachine_.inspiration = 0; // accumulate through contact event
     yang.mindmachine_.emptyness = 0; // accumulate through time
-    //--------------------------------------------------------
     //state machines that uses nodes
     //mental nodes
     if (yang.test_.test_ongoing) {
@@ -309,9 +304,6 @@ yang.pre_update = function() { // a reoccouring event...
  * @memberOf yang
  */
 yang.onesec_timedEvend = function() {
-    //use the following in init function
-    //game.time.events.loop(Phaser.Timer.SECOND * 1, yang.timedEvend, yang);
-    //console.log(game.time.totalElapsedSeconds());//save the line just in case
     //randomness
     yang.chaosmachine_.randomness += Math.round((Math.random() * 10));
     yang.chaosmachine_.randomness = Math.min(200, yang.chaosmachine_.randomness);
@@ -334,7 +326,7 @@ yang.onesec_timedEvend = function() {
     yang.mindmachine_.inspiration = Math.max(0, yang.mindmachine_.inspiration);
     //speical markov chain update
     yang.MRGPRB4.update();
-    //Motions.zeleport.apply(yang);//TODO : redesign
+    //TODO : redesign//Motions.zeleport.apply(yang)
     //clear interactive messages
     yang.text_.interactiveText = "";
 };
@@ -358,6 +350,13 @@ yang.fun_.distance_between_us = function (encounteredobject) {
     return undefined;
 }
 /**
+ * condition of find
+ * @memberOf yang.fun_
+ */
+yang.fun_.find_colliding_obj = function (object_in_array) {
+     return object_in_array == yang.memory_.colliding_obj;
+}
+/**
  * collision
  * @param {Object}
  * @memberOf yang
@@ -376,10 +375,10 @@ yang.collision = function(object) {//collision
         yang.biomachine_.metaresources_secondary += 0.2;
         yang.biomachine_.metaresources_prime -= 0.1;
         if (yang.test_.test_ongoing) {
-            //fireProductions(yang.test_.test_production);
+            fireProductions(yang.test_.test_production);
         } else {
-            //fireProductions(yang.production_.inter_action);
-            //fireProductions(yang.production_.inter_reaction);
+            fireProductions(yang.production_.inter_action);
+            fireProductions(yang.production_.inter_reaction);
         }
         if (yang.text_.interactiveText != "")
         {
@@ -395,44 +394,18 @@ yang.collision = function(object) {//collision
  */
 yang.fun_.makeProductions = function() {
     yang.production_.inter_action.push(
-        new Production(//example
-                yang.def_node.name,
-                yang.def_node.priority,
-                yang.def_node.condition,
-                yang.def_node.action
-        )
-    );
-    yang.production_.inter_reaction.push(
-        new Production(//example
-                yang.def_node.name,
-                yang.def_node.priority,
-                yang.def_node.condition,
-                yang.def_node.action
-        )
-    );
-    yang.production_.direction.push(
-        new Production(//example
-                yang.def_node.name,
-                yang.def_node.priority,
-                yang.def_node.condition,
-                yang.def_node.action
-        )
-    );
-    yang.test_.test_production.push(
         new Production(
                 yang.node_.feast_upon.name,
                 yang.node_.feast_upon.priority,
                 yang.node_.feast_upon.condition,
                 yang.node_.feast_upon.action
         ),
-        
         new Production(
                 yang.node_.memorize_uneaten_food.name,
                 yang.node_.memorize_uneaten_food.priority,
                 yang.node_.memorize_uneaten_food.condition,
                 yang.node_.memorize_uneaten_food.action
         ),
-
         new Production(
                 yang.node_.memorize_friendly_bot.name,
                 yang.node_.memorize_friendly_bot.priority,
@@ -456,13 +429,25 @@ yang.fun_.makeProductions = function() {
                 yang.node_.recognization.priority,
                 yang.node_.recognization.condition,
                 yang.node_.recognization.action
-        ),
+        )
+    );
+    yang.production_.inter_reaction.push(
         new Production(//example
                 yang.def_node.name,
                 yang.def_node.priority,
                 yang.def_node.condition,
                 yang.def_node.action
         )
+    );
+    yang.production_.direction.push(
+        new Production(//example
+                yang.def_node.name,
+                yang.def_node.priority,
+                yang.def_node.condition,
+                yang.def_node.action
+        )
+    );
+    yang.test_.test_production.push(
     );
 };
 /**
@@ -554,7 +539,6 @@ yang.gotBit = function(botWhoBitedMe, damage) {
  */
 yang.antler_caressed = function(botWhocaresedMe, message) {
     // whoelse would do this?
-    // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
     yang.collision_bene_flag = true;
 };
 /**
@@ -863,6 +847,7 @@ yang.node_.id_prime_focus.berry_game_obj = function() {
     // for now, philoberry entity is in botplayground.js with fixed location
     this.berry_coord = [2700, 2700];
     this.berry_distance = 0; //calculate later
+    //TO DO - redesign
     /*//berry spawn mechanic, currently disabled
     this.create_new_berry = function () {
         this.berry_coord[0] = Math.random() * 10000 % 860 + 70; // 70 - 930
@@ -950,7 +935,7 @@ yang.node_.superego_drain_focus.always_fun = function() { //control sensitive
 yang.node_.id_secondary_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.id_secondary_focus.description = "No one catches Deer~";
 yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
-    if (typeof yang.memory_.friendly_bots.find(yang.memory_.colliding_obj) != "undefined") {
+    if (typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) != "undefined") {
     //TO DO : tag game mechanism
         yang.biomachine_.metaresources_secondary += yang.chaosmachine_.randomness;
     }
@@ -996,7 +981,7 @@ yang.node_.memorize_uneaten_food.condition = function () {//I think problem is h
         && ((yang.memory_.colliding_obj.name.toLowerCase()).search("berry") > 0
         || (yang.memory_.colliding_obj.name.toLowerCase()).search("fruit") > 0)
         && yang["mental_task_node"] != yang.node_.id_prime_focus
-        && typeof yang.memory_.uneaten_food.find(yang.memory_.colliding_obj) == "undefined";
+        && typeof yang.memory_.uneaten_food.find(yang.fun_.find_colliding_obj) == "undefined";
 };
 yang.node_.memorize_uneaten_food.action = function () {
     yang.memory_.uneaten_food.push(yang.memory_.colliding_obj);
@@ -1014,8 +999,8 @@ yang.node_.memorize_friendly_bot.condition = function () {
     return (yang.memory_.colliding_obj instanceof Bot)
         && yang["mental_task_node"] != yang.node_.id_secondary_focus
         && yang.collision_nice_flag == true
-        && typeof yang.memory_.friendly_bots.find(yang.memory_.colliding_obj) == "undefined"
-        && typeof yang.memory_.unfriendly_bots.find(yang.memory_.colliding_obj) == "undefined";
+        && typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) == "undefined"
+        && typeof yang.memory_.unfriendly_bots.find(yang.fun_.find_colliding_obj) == "undefined";
 };
 yang.node_.memorize_friendly_bot.action = function () {
     yang.memory_.friendly_bots.push(yang.memory_.colliding_obj);
@@ -1032,8 +1017,8 @@ yang.node_.memorize_unfriendly_bot.priority = Production.priority.Low;
 yang.node_.memorize_unfriendly_bot.condition = function () {
     return (yang.memory_.colliding_obj instanceof Bot)
         && yang.collision_ouch_flag == true
-        && typeof yang.memory_.friendly_bots.find(yang.memory_.colliding_obj) == "undefined"
-        && typeof yang.memory_.unfriendly_bots.find(yang.memory_.colliding_obj) == "undefined";
+        && typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) == "undefined"
+        && typeof yang.memory_.unfriendly_bots.find(yang.fun_.find_colliding_obj) == "undefined";
 };
 yang.node_.memorize_unfriendly_bot.action = function () {
     yang.memory_.unfriendly_bots.push(yang.memory_.colliding_obj);
@@ -1050,7 +1035,7 @@ yang.node_.memorize_benefactor_bot.priority = Production.priority.High;
 yang.node_.memorize_benefactor_bot.condition = function () { 
     return (yang.memory_.colliding_obj instanceof Bot)
         && yang.collision_bene_flag == true
-        && typeof yang.memory_.bene_bots.find(yang.memory_.colliding_obj) == "undefined";
+        && typeof yang.memory_.bene_bots.find(yang.fun_.find_colliding_obj) == "undefined";
 };
 yang.node_.memorize_benefactor_bot.action = function () {
     yang.memory_.bene_bots.push(yang.memory_.colliding_obj);
@@ -1106,19 +1091,9 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.inspiration = 0;
         //test node
         yang.test_.current_testnode = yang.node_.id_prime_focus;
-        /*
-        yang.test_.current_testnode = yang.def_node;
-        yang.test_.current_testnode.init_fun();
-        yang.test_.current_testnode.always_fun();
-        yang.test_.current_testnode.current_fun();
-        yang.test_.current_testnode.switch_to_this_node();
-        */   
-        
+        //call function of the tested node here
         yang.test_.ini++;
     }
-
-    //fixed node test
-    //
 };
 /**
  * Test - timeevent
@@ -1127,107 +1102,3 @@ yang.test_.node_test = function() { // test with a permanate state
  */
 yang.test_.timed_test = function() {
 };
-/*
-Timed Rotation
-1.forward_dodge [high]
-[collision_in_1_sec] ­ > [forward_doge]
-2.head_home [low]
-[sleepy] ­ > [head_home]
-7.visit_friend [low]
-[nothing_to_do] ­ > [visit_friend_home]
-
-
-5.curious [low]
-[frequency_of_nonhostile_encounter] ­ > [follow]
-
-
-collision
-8.debate [low]
-[friend_is_near && both_stop] ­ > [debate]
-9.spar [low]
-[friend_is_near && has_martial_art] ­ > [spar]
-12.inspection [low]
-[collision] ­ > [look_at_obstacle]
-
-
-3.wary [medium]
-[dangerous_obj_is_near] ­ > [stare_at_obj]
-4.relax_mood [low]
-[well_fed] ­ > [lower_awareness_range]
-
-
-Others:
-6.dream [medium]
-[many_unsatisfied_instinct] ­ > [dream]
-10.interven [high]
-[weak_friend_is_near && danger_is_near] ­ > [block_between_friend_and_foe]
-11.environment_preservation [low]
-[nothing_is_going_on] ­ > [grow_berries_trees]
-*/
-
-
-// ------Back Yard---------------------------------------------------
-//useful notes
-//yang.body.rotation + " Vs " + yang.body.angle / Math.PI * 180
-//usefulfunctions
-//distance = 
-//game.physics.arcade.distanceToXY(yang.sprite, jeff.sprite.x, jeff.sprite.y)
-//.distanceBetween(jeff.sprite, yang.sprite)
-//
-//movement =
-//yang.body.rotation = game.physics.arcade.moveToObject(yang.sprite, jeff.sprite, 500, 1);
-//
-// add objects=
-// this.sprite = game.add.sprite(x, y, name);
-
-
-
-/*overrideable basic functions of prototype bot
-/*nothing yet overwrite prototype 
-yang.getBasicStats = function() {};
-
-// Helper function to update angle
-//override bot increment angle
-yang.incrementAngle = function(amount) {
-    this.body.rotation += amount;
-    this.body.rotation = this.body.rotation % 180;
-}
-//
-*/
-
-//other edits
-/* 
-botplayground.html
-<script src="bots/yang/yang.js"></script>
-<option value="yang">Yang</option>
-
-/*under preload function
-game.load.image('oakTree', 'assets/oakTree.png');
-
-/*under create function
-var troll_garden
-var philoberry_bush
-var predator
-var troll
-
-botplayground.js
-var bots = [jeff, mouse, yang];
-*/
-
-/*Yang's action - reaction
-Bot.prototype.antler_caress = function(botTocaress, message) {
-    console.log(botTocaress.name + message);
-};
-
-Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
-    console.log(botWhocaresedMe.name + "attacked me!");
-};
-*/
-
-
-
-
-
-/*extra resources
-http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
-*/

@@ -4,3 +4,109 @@
 9. death and reset
 
 node_modules\.bin\jsdoc C:\Users\louis\Desktop\Phil190\projectexperiment\js\bots\yang\yang.js
+
+/*
+Timed Rotation
+1.forward_dodge [high]
+[collision_in_1_sec] ­ > [forward_doge]
+2.head_home [low]
+[sleepy] ­ > [head_home]
+7.visit_friend [low]
+[nothing_to_do] ­ > [visit_friend_home]
+
+
+5.curious [low]
+[frequency_of_nonhostile_encounter] ­ > [follow]
+
+
+collision
+8.debate [low]
+[friend_is_near && both_stop] ­ > [debate]
+9.spar [low]
+[friend_is_near && has_martial_art] ­ > [spar]
+12.inspection [low]
+[collision] ­ > [look_at_obstacle]
+
+
+3.wary [medium]
+[dangerous_obj_is_near] ­ > [stare_at_obj]
+4.relax_mood [low]
+[well_fed] ­ > [lower_awareness_range]
+
+
+Others:
+6.dream [medium]
+[many_unsatisfied_instinct] ­ > [dream]
+10.interven [high]
+[weak_friend_is_near && danger_is_near] ­ > [block_between_friend_and_foe]
+11.environment_preservation [low]
+[nothing_is_going_on] ­ > [grow_berries_trees]
+*/
+
+
+// ------Back Yard---------------------------------------------------
+//useful notes
+//yang.body.rotation + " Vs " + yang.body.angle / Math.PI * 180
+//usefulfunctions
+//distance = 
+//game.physics.arcade.distanceToXY(yang.sprite, jeff.sprite.x, jeff.sprite.y)
+//.distanceBetween(jeff.sprite, yang.sprite)
+//
+//movement =
+//yang.body.rotation = game.physics.arcade.moveToObject(yang.sprite, jeff.sprite, 500, 1);
+//
+// add objects=
+// this.sprite = game.add.sprite(x, y, name);
+
+//console.log(game.time.totalElapsedSeconds());//save the line just in case
+
+
+/*overrideable basic functions of prototype bot
+/*nothing yet overwrite prototype 
+yang.getBasicStats = function() {};
+
+// Helper function to update angle
+//override bot increment angle
+yang.incrementAngle = function(amount) {
+    this.body.rotation += amount;
+    this.body.rotation = this.body.rotation % 180;
+}
+//
+*/
+
+//other edits
+/* 
+botplayground.html
+<script src="bots/yang/yang.js"></script>
+<option value="yang">Yang</option>
+
+/*under preload function
+game.load.image('oakTree', 'assets/oakTree.png');
+
+/*under create function
+var troll_garden
+var philoberry_bush
+var predator
+var troll
+
+botplayground.js
+var bots = [jeff, mouse, yang];
+*/
+
+/*Yang's action - reaction
+Bot.prototype.antler_caress = function(botTocaress, message) {
+    console.log(botTocaress.name + message);
+};
+
+Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
+    console.log(botWhocaresedMe.name + "attacked me!");
+};
+*/
+
+
+
+
+
+/*extra resources
+http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html
+*/
