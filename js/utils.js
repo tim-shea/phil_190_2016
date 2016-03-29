@@ -157,8 +157,8 @@ function setUpFood() {
  */
 function addFoodItem(image_id, description, calories) {
     if (image_id != "") {
-        let [x,y] = findEmptyLocation();
-        food = new Entity(x,y, image_id);
+        let location = findEmptyLocation();
+        food = new Entity(location[0],location[1], image_id);
         food.description = description;
         food.calories = calories;
         food.isEdible = true;
