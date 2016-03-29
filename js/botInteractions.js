@@ -1,36 +1,38 @@
 /**
- * Say something to the specified bot for 1 second.
- *
- * @param {Bot} botToTalkTo the bot to talk to
- * @param {String} whatToSay what was said
- */
-Bot.prototype.speak = function(botToTalkTo, whatToSay) {
-    this.speakTimed(botToTalkTo, whatToSay, 1);
-}
-
-/**
  * Say something to the specified bot for a specified amount of time in seconds.
  * @param {Bot} botToTalkTo the bot to talk to
  * @param {String} whatToSay what was said
- * @param  {Number} howLong how long to say it for
+ * @param  {Number} howLong how long to say it for in milliseconds
  */
-Bot.prototype.speakTimed = function(botToTalkTo, whatToSay, howLong) {
-    // Activate the speech Bubble
-    this.speechBubble.bitmapText.text = whatToSay;
-    // TODO speech bubble has extra left padding often.
-    // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
-    this.speechBubble.visible = true;
-    game.time.events.add(Phaser.Timer.SECOND * howLong, function() { 
-        this.speechBubble.visible = false; 
-        this.isInteracting = false;}, this);
-
+Bot.prototype.speak = function(botToTalkTo, whatToSay, howLong = 2000) {
     // Call the listeners "hear" function
     if (botToTalkTo instanceof Bot && this.isInteracting === false) {
+        this.makeSpeechBubble(whatToSay, howLong);
         if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
             this.isInteracting = true;
             botToTalkTo.hear(this, whatToSay);
         }
     }
+}
+
+/**
+ * Make a speech bubble
+ * @param  {String} text what to say
+ * @param  {Number} howLong  how long to say it in milliseconds.
+ */
+Bot.prototype.makeSpeechBubble = function(text, howLong = 1000) {
+    if(this.isInteracting) {
+        return;
+    }
+    // Activate the speech Bubble
+    this.speechBubble.bitmapText.text = text;
+    // TODO speech bubble has extra left padding often.
+    // SpeechBubble.wrapBitmapText(this.speechBubble.bitmapText, 200);
+    this.speechBubble.visible = true;
+    game.time.events.add(howLong, function() { 
+        this.speechBubble.visible = false; 
+        this.isInteracting = false;}, this);
+
 }
 
 /**
@@ -74,7 +76,7 @@ Bot.prototype.highFived = function(botWhoHighFivedMe) {
 Bot.prototype.bite = function(botToAttack, damage) {
     if (botToAttack instanceof Bot) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
-            botToAttack.gotAttacked(this, damage);
+            botToAttack.gotBit(this, damage);
         }
     }
 };
@@ -86,7 +88,7 @@ Bot.prototype.bite = function(botToAttack, damage) {
  * @param {Number} damage The amount of damage done
  */
 Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
-    // console.log(botWhoAttackedMe.name + "attacked me!");
+    console.log(botWhoAttackedMe.name + "attacked me!");
 };
 
 /**
@@ -185,3 +187,10 @@ Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
     this.body.speed = 0;
     this.pursue(botWhoIgnoredMe, 350);
 }
+
+/**
+ * Override to react when someone tries to eat you!
+ */
+Bot.prototype.eat = function() {
+    console.log("Someone tried to eat " + this.name);
+};

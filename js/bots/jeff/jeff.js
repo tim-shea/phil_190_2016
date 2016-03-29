@@ -1,14 +1,13 @@
 /**
  * Jeff's bot
  */
-var jeff = new Bot(540, 520, 'jeff', 'js/bots/jeff/person.png');
+var jeff = new Bot(570, 570, 'jeff', 'js/bots/jeff/person.png');
 
 /**
  * State variables
  */
 jeff.currentlyPursuing = "Nothing";
 jeff.currentMotion = Motions.still;
-jeff.extraText = "";
 
 /**
  * Initialize bot
@@ -18,7 +17,7 @@ jeff.extraText = "";
 jeff.init = function() {
     this.body = this.sprite.body; // Todo:  a way to do this at a higher level?
     this.body.rotation = 100; // Initial Angle
-    this.body.speed = 100; // Initial Speed
+    this.body.speed = 0; // Initial Speed
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, jeff.update1Sec, this);
@@ -27,6 +26,29 @@ jeff.init = function() {
 
     // Make productions
     this.makeProductions();
+
+    // Initialize edibility function
+    jeff.canEat = function(object) {
+        if (object.name == "jerry_can") {
+            return false;
+        } else {
+            return object.isEdible;
+        }
+    }
+
+    // Initialize utility function
+    jeff.utilityFunction = function(object) {
+        if (object instanceof Bot) {
+            return 10;
+        } else if (object.name == "jerry_can") {
+            return -10;
+        } else if (object.isEdible) {
+            return object.calories;
+        } else {
+            return 1;
+        }
+    }
+
 }
 
 /**
@@ -34,19 +56,18 @@ jeff.init = function() {
  *
  */
 jeff.makeProductions = function() {
-    hungerProduction = new Production("eating",
+    foodSeeking = new Production("find food when hungry",
         Production.priority.High,
         function() {
-            return (
-                jeff.hunger.value > 50 &&
-                jeff.emotions.current === "Angry");
+            return (jeff.hunger.value > 50);
         },
         function() {
-            jeff.currentMotion = Motions.tantrum;
-            jeff.extraText = "I need food!";
+            // jeff.currentMotion = Motions.tantrum;
+            jeff.findFood();
+            jeff.makeSpeechBubble("Ok I'm hunting!", 400);
         });
     admireCar = new Production("admiring car",
-        Production.priority.Low,
+        Production.priority.Medium,
         function() {
             let d = jeff.getDistanceTo(dylan);
             if ((d > 40) && (d < 400)) {
@@ -54,10 +75,60 @@ jeff.makeProductions = function() {
             };
             return false;
         },
-        function() { jeff.speakTimed(dylan, "Nice car!", 5); });
-
+        function() { jeff.speak(dylan, "Nice car!", 5000); });
+    fight = new Production("pick a fight when grumpy",
+        Production.priority.Low,
+        function() {
+            return (jeff.emotions.current === "Angry");
+        },
+        function() { 
+            if(Math.random() > .8) {
+                return;
+            }
+            jeff.makeSpeechBubble("Attack!", 2000);
+            jeff.attackNearbyBots(); });
+    irritable = new Production("irritable when hungry",
+        Production.priority.Medium,
+        function() {
+            return (jeff.hunger.value > 40);
+        },
+        function() {
+            if(Math.random() > .8) {
+                return;
+            }
+            jeff.emotions.current = "Angry";
+            jeff.makeSpeechBubble("Need food!", 1000);
+        });
+    chatty = new Production("talk to people when bored",
+        Production.priority.Medium,
+        function() {
+            return (jeff.emotions.current === "Calm" || jeff.emotions.current == "Sad");
+        },
+        function() {
+            if(Math.random() > .8) {
+                return;
+            }
+            var nearbyBots = jeff.getNearbyBots(800);
+            if (nearbyBots.length > 0) {
+                jeff.pursue(nearbyBots[0], 500);
+                jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
+            }
+        });
+    findNewFriends = new Production("talk to random people when happy",
+        Production.priority.Medium,
+        function() {
+            return (jeff.emotions.current === "Happy");
+        },
+        function() {
+            if(Math.random() > .8) {
+                return;
+            }
+            var randBot = jeff.getRandomBot();
+            jeff.pursue(randBot, 700);
+            jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
+        });
     // Populate production list
-    this.productions = [hungerProduction, admireCar];
+    this.productions = [foodSeeking, admireCar, fight, irritable, chatty, findNewFriends];
 }
 
 
@@ -75,7 +146,7 @@ jeff.emotions.add("Sad", [
 ]);
 jeff.emotions.add("Angry", [
     ["Angry", "Calm"],
-    [.5, .5]
+    [.7, .3]
 ]);
 jeff.emotions.add("Happy", [
     ["Happy", "Calm"],
@@ -107,9 +178,8 @@ jeff.hunger.toString = function() {
  */
 jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
-    statusString += "\nMotion: " + (jeff.motionOverride ? "Override" :jeff.currentMotion.description);
+    statusString += "\nMotion: " + (jeff.motionOverride ? "Override" : jeff.currentMotion.description);
     statusString += "\n" + jeff.hunger.toString();
-    statusString += "\nExtra text:   " + jeff.extraText;
     return statusString;
 }
 
@@ -136,21 +206,12 @@ jeff.setMotion = function() {
     }
 }
 
-/**
- * When a pursuit is completed reset the pursuit string.
- *
- * @override
- */
-jeff.pursuitCompleted = function() {
-    this.currentMotion = Motions.still;
-}
-
 //////////////////////
 // Update Functions //
 //////////////////////
 
 /**
- * Main update called by the phaer game object (about 40 times / sec. on my machine).
+ * Main update called by the phaser game object (about 40 times / sec. on my machine).
  *
  * @override
  */
@@ -159,12 +220,10 @@ jeff.update = function() {
     jeff.genericUpdate();
 };
 
-
 /**
  * Called every second
  */
 jeff.update1Sec = function() {
-    // jeff.findFood(1000, Phaser.Easing.Bounce.Out);
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();
@@ -174,13 +233,7 @@ jeff.update1Sec = function() {
 /**
  * Called every ten seconds
  */
-jeff.updateTenSecs = function() {
-    // jeff.goto(Math.random()*500,1000, 2000);
-    // Pursue a random entity
-    if (Math.random() < .9) {
-        // jeff.currentlyPursuing = this.pursueRandomObject(2000).name;
-    }
-}
+jeff.updateTenSecs = function() {}
 
 /**
  *  Called every two minutes
@@ -200,22 +253,15 @@ jeff.update2min = function() {
  * @override
  */
 jeff.collision = function(object) {
-
-    if (object instanceof Bot) {
-        // this.pursueForTime(object,10);
-    }
-
-    // console.log("Object is edible: " + object.isEdible);
-    if (object.isEdible) {
+    if (jeff.canEat(object)) {
         jeff.eatObject(object);
     } else {
-        jeff.speak(object, "Hello " + object.name);
+        if (object instanceof Bot) {
+            // jeff.speak(object, "Hello " + object.name);
+        } else {
+            jeff.moveAwayFrom(object);
+        }
     }
-    // I'm a nice guy
-
-
-    // jeff.flee(object);
-    // jeff.pursue(object);
 }
 
 /**
@@ -234,7 +280,7 @@ jeff.eatObject = function(objectToEat) {
  * @override
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
+    // jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); 
 }
 
 /**

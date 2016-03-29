@@ -31,7 +31,9 @@ function Bot(x, y, name, path) {
 
     // Override motion when in pursuit, etc.
     this.motionOverride = false;
-    this.pursuit = null;
+    
+    // A reference to the current tween so that multiple tweens are not initiated at once
+    this.currentTween = null;
 };
 
 /**
@@ -78,9 +80,6 @@ Bot.prototype.genericUpdate = function() {
     this.speechBubble.x = this.sprite.x + 50;
     this.speechBubble.y = this.sprite.y - 40;
     game.physics.arcade.collide(this.sprite, entityGroup);
-    if((this.pursuit != null) && (!this.motionOverride))  {
-        this.pursue(this.pursuit, 1000);        
-    }
 };
 
 /**
@@ -134,27 +133,108 @@ Bot.prototype.incrementAngle = function(amount) {
 }
 
 /**
+ * Face towards the indicated object
+ */
+Bot.prototype.orientTowards = function(objectToFace, minInterEvent = Phaser.Timer.SECOND * .5, multiplier=1) {
+    if (!objectToFace || cursorDown || this.currentTween != null) {
+        return;
+    }
+    this.currentTween = {}; // Using currentTween as flag.
+    this.sprite.rotation = multiplier * game.physics.arcade.angleBetween(this.sprite, objectToFace.sprite);
+    timer = game.time.events.add(minInterEvent, function() { this.currentTween = null; }, this);
+
+}
+
+/**
+ * Face away from the indicated object
+ */
+Bot.prototype.faceAwayFrom = function(objectToFaceAwayFrom, minInterEvent = Phaser.Timer.SECOND * .5) {
+    this.orientTowards(objectToFaceAwayFrom, minInterEvent, -Math.PI);
+    // TODO: Not quite right.
+}
+
+/**
  * Pursue the indicated object, for the indicated duration (in milliseconds), using a custom easing if desired
  *
  * Rough guideline on durations: 1000 = 1 second is fast, 100 is 1/10 second is super fast, 5000 = 5 seconds is slow
  * 
  * Easings listed here: http://phaser.io/docs/2.4.4/Phaser.Easing.html
  */
-Bot.prototype.pursue = function(objectToPursue, duration, easing = Phaser.Easing.Exponential.InOut) {
+Bot.prototype.pursue = function(objectToPursue, duration = 500, easing = Phaser.Easing.Exponential.In) {
+    if (!objectToPursue || cursorDown || this.currentTween != null || this.motionOverride) {
+        return;
+    }
     this.motionOverride = true;
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
-    var pursuitTween = game.add.tween(this.sprite);
-    pursuitTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, easing);
-    pursuitTween.onComplete.add(this.pursuitCompleted);
-    pursuitTween.onComplete.add(function() { this.motionOverride = false; });
-    pursuitTween.start();
+    // game.physics.arcade.accelerateToObject(this, objectToPursue);
+    this.orientTowards(objectToPursue);
+    this.currentTween = game.add.tween(this.sprite);
+    this.currentTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, easing);
+    this.currentTween.onComplete.add(function() { 
+        this.currentTween = null;
+        this.motionOverride = false; }, this);
+    this.currentTween.start();
 }
 
+/**
+ * Run away from an object.  Todo: Improve!
+ * 
+ * @param  {Bot} object the thing to move away from
+ */
+Bot.prototype.moveAwayFrom = function(object) {
+    if (!object) {
+        return;
+    }
+    this.faceAwayFrom(object);
+    this.body.speed = 1500;
+    this.basicUpdate();
+}
 
 /**
- * Called after a pursuit completes.  Override if any functionality is needed.
+ * Attack the specified bot, currently just by moving twice towards it
+ * @param  {Bot} objectToAttack the object to attack
+ * @param  {Number} numAttacks how many times to "attack". 
  */
-Bot.prototype.pursuitCompleted = function() {}
+Bot.prototype.attackMotion = function(objectToAttack, numAttacks = 2) {
+    if (!objectToAttack || cursorDown || this.currentTween != null || this.motionOverride) {
+        return;
+    }
+    this.motionOverride = true;
+    this.orientTowards(objectToAttack);
+    this.currentTween = game.add.tween(this.sprite);
+    this.currentTween.to({ x: objectToAttack.sprite.x, y: objectToAttack.sprite.y },
+        200, Phaser.Easing.Linear.None, false, 0, numAttacks-1, true);
+    // currentTween.onUpdateCallback(function() {theBot.faceTowards(objectToAttack);}); // works
+    this.currentTween.onComplete.add(function() { 
+        this.currentTween = null; 
+        this.motionOverride = false;}, this);
+    this.currentTween.start();
+
+    // Chaining tween test
+    // var backUpTween = game.add.tween(this.sprite);
+    // backUpTween.to({ x: 800, y: 800 },
+    //     200, Phaser.Easing.Linear.None, true, 0, true);
+    // backUpTween.onComplete.add(function() { console.log("Done2");
+    //     this.currentTween = null; this.motionOverride = false; }, this);
+    // currentTween.chain(backUpTween);
+
+}
+
+/**
+ * Go to the indicated location on screen, at the indicated speed
+ * (Duration in milliseconds it will take to get there.)
+ *
+ * Easings listed here: http://phaser.io/docs/2.4.4/Phaser.Easing.html
+ */
+Bot.prototype.goto = function(x, y, duration, easing = Phaser.Easing.Exponential.InOut) {
+    if (cursorDown || this.currentTween != null || this.motionOverride) {
+        return;
+    }
+    this.motionOverride = true;
+    this.currentTween = game.add.tween(this.sprite);
+    this.currentTween.to({ x: x, y: y }, duration, easing);
+    this.currentTween.onComplete.add(function() { this.motionOverride = false; this.currentTween = null}, this);
+    this.currentTween.start();
+}
 
 /**
  * Helper function to determine if one sprite overlaps another.
@@ -178,64 +258,52 @@ Bot.prototype.getDistanceTo = function(otherObject) {
 }
 
 /**
- * Pursue the specified object for the specified amount of time.
- */
-Bot.prototype.pursueForTime = function(objectToPursue, time=4) {
-    if (!(this.pursuit === null)) {
-        return;
-    }
-    this.pursuit = objectToPursue;
-    console.log("Chasing " + objectToPursue.name);
-    timer = game.time.events.add(Phaser.Timer.SECOND * time,
-        function() {
-            console.log("Done");
-            this.pursuit = null;
-        },
-        this);
-}
-
-/**
- * Go to the indicated location on screen, at the indicated speed
- * (Duration in milliseconds it will take to get there.)
+ * Returns an array of objects in a specified radius of this one, ordered by distance.
  *
- * Easings listed here: http://phaser.io/docs/2.4.4/Phaser.Easing.html
+ * To get nearest object: getNearbyObjects[0]
  */
-Bot.prototype.goto = function(x, y, duration, easing = Phaser.Easing.Exponential.InOut) {
-    this.motionOverride = true;
-    var pursuitTween = game.add.tween(this.sprite);
-    pursuitTween.to({ x: x, y: y }, duration, easing);
-    pursuitTween.onComplete.add(function() { this.motionOverride = false; });
-    pursuitTween.start();
+Bot.prototype.getNearbyObjects = function(radius = 250) {
+    var centerPoint = new Phaser.Point(50, 50);
+    var triggerDistance = 100;
+    var nearbyObjects = [];
+    var theBot = this.sprite;
+    bots.forEach(function(bot) {
+        let distance = Phaser.Math.distance(bot.sprite.x, bot.sprite.y, theBot.x, theBot.y);
+        if (distance <= radius) {
+            if (bot.sprite != theBot) {
+                bot.temp_distance = distance;
+                nearbyObjects.push(bot);
+            }
+        }
+    });
+    entities.forEach(function(entity) {
+        let distance = Phaser.Math.distance(entity.sprite.x, entity.sprite.y, theBot.x, theBot.y);
+        if (distance <= radius) {
+            entity.temp_distance = distance;
+            nearbyObjects.push(entity);
+        }
+    });    
+    nearbyObjects = nearbyObjects.sort(
+        function(a,b) {return (a.temp_distance < b.temp_distance);});
+    // nearbyObjects.forEach(function(entity) {
+    //     console.log(entity.name + "," + entity.temp_distance);
+    // });   
+    return nearbyObjects;
 }
 
 /**
- * Go to some food item and take the indicated time to do it.
- * Small values = fast; larger values = slow.
- * TODO: Go to _nearest_ food
- */
-Bot.prototype.findFood = function(duration, easing = Phaser.Easing.Exponential.InOut) {
-    let food = foods[game.rnd.integerInRange(0,foods.length)];
-    this.pursue(food, duration, easing);
-}
-
-
-/**
- * Turn away from the specified object and move with specified speed.
+ * Returns an array of objects in a specified radius of this one, ordered by distance.
  *
- * TODO: Not a very effective flight algorithm yet.  Improve.
- * 
- * @param  {Bot} object object to run front
- * @param  {Number} speed speed to run with
+ * To get nearest object: getNearbyObjects[0]
  */
-Bot.prototype.flee = function(object, speed) {
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, object.sprite) * -1;
-    this.sprite.speed = speed;
+Bot.prototype.getNearbyBots = function(radius = 250) {
+    return this.getNearbyObjects(radius).filter(function(object) {return object instanceof Bot;});
 }
 
 /**
  * Returns a random object (bot or static entity)
  *
- * @return {Bot} the random entity
+ * @return {Object} the random entity
  */
 Bot.prototype.getRandomObject = function() {
     let allObjects = entities.concat(bots);
@@ -244,16 +312,12 @@ Bot.prototype.getRandomObject = function() {
 }
 
 /**
- * Pursue a random bot or entity.
- * 
- * Todo: prevent movement to self
- * 
- * @param {Number} speed in pixels/sec
+ * Returns a random bot
+ *
+ * @return {Bot} the bot entity
  */
-Bot.prototype.pursueRandomObject = function(speed) {
-    let chosenEntity = this.getRandomObject();
-    this.pursue(chosenEntity, speed);
-    return chosenEntity;
+Bot.prototype.getRandomBot = function() {
+    return bots[game.rnd.integerInRange(0, bots.length - 1)];
 }
 
 /**
@@ -316,4 +380,25 @@ Bot.prototype.collisionCheck = function() {
  */
 Bot.prototype.collision = function(object) {
     console.log(this.name + " collided with " + object.name);
+}
+
+/**
+ * Pursue food in the indicated radius
+ */
+Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(object) {return object.isEdible;}) {
+    var nearbyFoods = this.getNearbyObjects(radius).filter(function(object) {return edibilityFunction(object);});
+    if(nearbyFoods.length > 0) {
+        this.pursue(nearbyFoods[0]);
+    }
+}
+
+/**
+ * Attack bots in the indicated radius
+ */
+Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction = function(object) {return object.isEdible;}) {
+    var nearbyBots = this.getNearbyBots(radius);
+    if(nearbyBots.length > 0) {
+        this.attackMotion(nearbyBots[0]);
+        this.bite(nearbyBots[0], 100);
+    }
 }

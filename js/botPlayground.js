@@ -87,7 +87,7 @@ function preload() {
     game.load.image('Passo_berry', 'assets/Passo_Berry.png');
     game.load.image('Devil_Fruit_rubber', 'assets/gomu_gomu_no_mi.png');
     game.load.image('steak', 'assets/steak.gif');
-    game.load.image('pink_candy', 'assests/pink_candy.png');
+    game.load.image('pink_candy', 'assets/pink_candy.png');
     game.load.image('Cream_Cake', 'assets/Cream_Cake.png');
     game.load.image('Spicy_Poffin', 'assets/Spicy_Poffin.png');
 
@@ -147,15 +147,15 @@ function create() {
     entities.push(new Entity(-100, -100, 'cave', game));
     entities.push(new Entity(1000, 1350, 'princessCastle'));
     entities.push(new Entity(600, 1200, 'carousel'));
+    
+    // Set up food items
+    setUpFood();
 
     // Make static entities immovable
     entityGroup.forEach(function(entity) {
         entity.body.immovable = true; 
         entity.body.moves = false;}, 
         this);
-    
-    // Set up food items
-    setUpFood();
 
     // Set up global sounds
     sounds.chomp = game.add.audio('chomp');

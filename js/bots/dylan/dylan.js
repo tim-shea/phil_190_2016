@@ -54,7 +54,7 @@ dylan.makeProductions = function() {
                 //     return false;
                 // }
         },
-        function() { dylan.speakTimed(this.sprite, "What's your story?", 10); });
+        function() { dylan.speak(this.sprite, "What's your story?", 10); });
 
     revengeProduction = new Production("seeking revenge",
         Production.priority.Medium,

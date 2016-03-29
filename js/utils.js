@@ -119,16 +119,16 @@ function setUpFood() {
                 addFoodItem("Spicy_Poffin", "A very spicy pastry.", 70) ;
                 break;
             case 7:
-                addFoodItem("Cheri_berry", "Pokemon berry #01", 1);
+                addFoodItem("Cheri_berry", "Pokemon berry #01", 20);
                 break;
             case 8:
-                addFoodItem("Enigma_berry", "Pokemon berry #60", 1);
+                addFoodItem("Enigma_berry", "Pokemon berry #60", 20);
                 break;
             case 9:
-                addFoodItem("Hondew_berry", "Pokemon berry #24", 1);
+                addFoodItem("Hondew_berry", "Pokemon berry #24", 20);
                 break;
             case 10:
-                addFoodItem("Passo_berry", "Pokemon berry #37", 1);
+                addFoodItem("Passo_berry", "Pokemon berry #37", 20);
                 break;  
             case 11:
                 addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -10);
@@ -137,10 +137,10 @@ function setUpFood() {
                 addFoodItem("steak", "Fresh meat", 10);
                 break;  
             case 13:
-                addFoodItem("pink_candy", "Yummy candy", 5);
+                addFoodItem("pink_candy", "Yummy candy", 50);
                 break;
             case 14:
-                addFoodItem("Cream_Cake", "Cream cake", 5);
+                addFoodItem("Cream_Cake", "Cream cake", 150);
                 break;
             default:
                 break;
