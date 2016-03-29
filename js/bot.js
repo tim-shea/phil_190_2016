@@ -139,7 +139,7 @@ Bot.prototype.incrementAngle = function(amount) {
 /**
  * Face towards the indicated object
  */
-Bot.prototype.orientTowards = function(objectToFace, minInterEvent = Phaser.Timer.SECOND * .5, multiplier = 1) {
+Bot.prototype.orientTowards = function(objectToFace, minInterEvent = 5000, multiplier = 1) {
     if (!objectToFace || cursorDown || this.currentTween != null) {
         return;
     }
