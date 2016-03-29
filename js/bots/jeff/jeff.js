@@ -43,6 +43,7 @@ jeff.init = function() {
         } else if (object.name == "jerry_can") {
             return -70;
         } else if (object.isEdible) {
+            // TODO: Introduce a function that scales calories to utilities 
             return object.calories;
         } else {
             return 1;
@@ -53,19 +54,30 @@ jeff.init = function() {
 
 /**
  * Create the list of productions for this agent.
- *
  */
 jeff.makeProductions = function() {
-    foodSeeking = new Production("find food when hungry",
-        Production.priority.High,
-        function() {
-            return (jeff.hunger.value > 50);
-        },
-        function() {
-            // jeff.currentMotion = Motions.tantrum;
-            jeff.findFood();
-            jeff.makeSpeechBubble("Ok I'm hunting!", 400);
-        });
+
+    foodSeeking = new Production("find food when hungry");
+    foodSeeking.priority = Production.priority.High;
+    foodSeeking.condition = function() {
+        return (jeff.hunger.value > 50);
+    }
+    foodSeeking.action = function() {
+        // jeff.currentMotion = Motions.tantrum;
+        jeff.findFood();
+        jeff.makeSpeechBubble("Ok I'm hunting!", 400);
+    }
+
+    // foodSeeking = new Production("find food when hungry",
+    //     Production.priority.High,
+    //     function() {
+    //         return (jeff.hunger.value > 50);
+    //     },
+    //     function() {
+    //         // jeff.currentMotion = Motions.tantrum;
+    //         jeff.findFood();
+    //         jeff.makeSpeechBubble("Ok I'm hunting!", 400);
+    //     });
     
     admireCar = new Production("admiring car",
         Production.priority.Medium,
@@ -250,7 +262,8 @@ jeff.update1Sec = function() {
 /**
  * Called every ten seconds
  */
-jeff.updateTenSecs = function() {}
+jeff.updateTenSecs = function() {
+}
 
 /**
  *  Called every two minutes

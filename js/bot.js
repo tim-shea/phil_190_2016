@@ -13,6 +13,8 @@ function Bot(x, y, name, path) {
     this.y = y;
     this.name = name;
     this.imagePath = path;
+    this.home_x = x;
+    this.home_y = y;
 
     // Parent sprite.  Generally speaking, the body (see below) should be
     //   modified, not this.   But sometimes the reference is useful.
@@ -232,7 +234,7 @@ Bot.prototype.attackMotion = function(objectToAttack, numAttacks = 2) {
  *
  * Easings listed here: http://phaser.io/docs/2.4.4/Phaser.Easing.html
  */
-Bot.prototype.goto = function(x, y, duration, easing = Phaser.Easing.Exponential.InOut) {
+Bot.prototype.goto = function(x, y, duration = 1000, easing = Phaser.Easing.Exponential.InOut) {
     if (cursorDown || this.currentTween != null || this.motionOverride) {
         return;
     }
@@ -242,6 +244,15 @@ Bot.prototype.goto = function(x, y, duration, easing = Phaser.Easing.Exponential
     this.currentTween.onComplete.add(function() { this.motionOverride = false;
         this.currentTween = null }, this);
     this.currentTween.start();
+}
+
+/**
+ * Go to your specified home location.
+ * @param  {Number} duration how long to take in milliseconds to get home
+ * @param  {Easing} easing  the easing to use (see above)
+ */
+Bot.prototype.goHome = function(duration = 1000, easing = Phaser.Easing.Exponential.InOut) {
+    this.goto(this.home_x, this.home_y, duration, easing);
 }
 
 /**
