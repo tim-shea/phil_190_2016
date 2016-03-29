@@ -11,10 +11,9 @@ var sharAI = new Bot(2950, 75, 'sharAI', 'js/bots/sharAI/sharAI.png');
  * @memberOf sharAI
  */
 sharAI.motionText = "sharAI is getting ready";
-sharAI.isPursuing = false;
 sharAI.currentMotion = Motions.stop;
 sharAI.ear = "";
-sharAI.currentTarget = jeff;
+sharAI.inedibles = ["cupCake", "diet_pepsi", "jerry_can", "Spicy_Poffin", "Devil_Fruit_rubber", "pink_candy", "Cream_Cake"];
 
 /**
  * Initialize bot
@@ -36,32 +35,41 @@ sharAI.init = function() {
 }
 
 /**
+ * Initialize edibility function
+ * 
+ * @param  {object} object object to check
+ * @return {boolean}        is this object edible?
+ */
+sharAI.canEat = function(object) {
+    for (i = 0; i < sharAI.inedibles; i++) {
+        if (object.name == sharAI.inedibles[i]) {
+            return false;
+        }
+
+        return object.isEdible;
+    }
+}
+
+/**
  * Create the list of productions for this agent.
  *
  * @memberOf sharAI
  */
 sharAI.makeProductions = function() {
-    huntingProduction = new Production("eating",
+    getFood = new Production("hunting",
         10,
         function() {
             return (
                 sharAI.hunger.value > 50);
         },
         function() {
-            if (sharAI.isPursuing == false) { 
-                 do {
-                     sharAI.currentTarget = sharAI.getRandomObject()
-                     if (sharAI.currentTarget.isEdible == true) {
-                         sharAI.pursue(sharAI.currentTarget, 30);
-                     }
-                } while (sharAI.currentTarget.isEdible == false)
-            }
+            sharAI.findFood(100, sharAI.canEat);
         });
 
-    
-    
+
+
     // Populate production list
-    this.productions = [huntingProduction];
+    this.productions = [getFood];
 }
 
 /**
@@ -270,25 +278,19 @@ sharAI.incrementDecayVariables = function() {
     if (sharAI.currentMotion == Motions.still) {
         sharAI.exhaustion.decrement();
         sharAI.boredom.increment();
-    }
-    else if (sharAI.currentMotion == Motions.stop) {
+    } else if (sharAI.currentMotion == Motions.stop) {
         sharAI.exhaustion.decrement();
-    }
-    else if (sharAI.currentMotion == Motions.spazzing) {
+    } else if (sharAI.currentMotion == Motions.spazzing) {
         sharAI.exhaustion.add(3);
         sharAI.boredom.decrement();
-    }
-    else if (sharAI.currentMotion == Motions.walking) {
+    } else if (sharAI.currentMotion == Motions.walking) {
         sharAI.exhaustion.increment();
         sharAI.boredom.increment();
-    }
-    else if (sharAI.currentMotion == Motions.running) {
+    } else if (sharAI.currentMotion == Motions.running) {
         sharAI.exhaustion.add(2);
-    }
-    else if (sharAI.currentMotion == Motions.tantrum) {
+    } else if (sharAI.currentMotion == Motions.tantrum) {
         sharAI.exhaustion.add(3);
-    }
-    else if (sharAI.currentMotion == Motions.dancing) {
+    } else if (sharAI.currentMotion == Motions.dancing) {
         sharAI.exhaustion.increment(2);
         sharAI.boredom.decrement();
     }
@@ -307,32 +309,6 @@ sharAI.regenerateHealth = function() {
     if (sharAI.hunger.value < 50 && sharAI.lethargy.value < 50 && sharAI.exhaustion.value < 50) {
         sharAI.health.increment();
     }
-}
-
-/**
- * Override of Bot.pursue
- *
- * @memberOf sharAI
- * @override
- */
-sharAI.pursue = function(objectToPursue, duration) {
-    this.sprite.rotation = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
-    var pursuitTween = game.add.tween(this.sprite);
-    pursuitTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, Phaser.Easing.Exponential.InOut);
-    pursuitTween.onComplete.add(this.pursuitCompleted);
-    pursuitTween.start();
-    this.isPursuing = true;
-}
-
-/**
- * When a pursuit is completed reset the pursuit string.
- *
- * @memberOf sharAI
- * @override
- */
-sharAI.pursuitCompleted = function() {
-    sharAI.isPursuing = false;
-    this.currentMotion = Motions.stop;
 }
 
 //////////////////////
@@ -385,11 +361,13 @@ sharAI.updateFiveSecs = function() {
  * @override
  */
 sharAI.collision = function(object) {
-    if (object.isEdible) {
+    if (object.canEat) {
         sharAI.eatObject(object);
     } else if (object instanceof Bot) {
         sharAI.speak(object, "How you doin\', " + object.name + "?");
         object.highFive();
+    } else if (object.name != "web") {
+        sharAI.moveAwayFrom(object);
     }
 }
 

@@ -127,7 +127,9 @@ function create() {
     // Set up static entities.  Give it an x and y coordinate.  
     //      The third argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
-    entities.push(new Entity(2755, 0, 'web'));
+    
+    // web has been seperated from entities so that bots can walk over it
+    game.add.sprite(2755, 0, 'web');
     entities.push(new Entity(400, 400, 'oakTree'));
     entities.push(new Entity(1000, 2000, 'oakTree'));
     entities.push(new Entity(2900, 130, 'cocoon'));
@@ -145,14 +147,15 @@ function create() {
     entities.push(new Entity(-100, -100, 'cave', game));
     entities.push(new Entity(1000, 1350, 'princessCastle'));
     entities.push(new Entity(600, 1200, 'carousel'));
-    
+
     // Set up food items
     setUpFood();
 
     // Make static entities immovable
     entityGroup.forEach(function(entity) {
-        entity.body.immovable = true; 
-        entity.body.moves = false;}, 
+            entity.body.immovable = true;
+            entity.body.moves = false;
+        },
         this);
 
     // Set up global sounds
@@ -225,11 +228,11 @@ function botSelect() {
 // Find a location in the botplayground that is unoccupied by any static entity
 //
 function findEmptyLocation() {
-    while(true) {
+    while (true) {
         let x = Math.random() * worldSizeX;
         let y = Math.random() * worldSizeX;
-        if(game.physics.arcade.getObjectsAtLocation(x,y, entityGroup).length == 0) {
-            return [x,y];
+        if (game.physics.arcade.getObjectsAtLocation(x, y, entityGroup).length == 0) {
+            return [x, y];
         }
     }
 }

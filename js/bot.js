@@ -79,9 +79,9 @@ Bot.prototype.basicUpdate = function() {
 Bot.prototype.genericUpdate = function() {
     this.collisionCheck();
     game.world.wrap(this.sprite);
-    if(this.speechBubble) {
+    if (this.speechBubble) {
         this.speechBubble.x = this.sprite.x + 50;
-        this.speechBubble.y = this.sprite.y - 40;        
+        this.speechBubble.y = this.sprite.y - 40;
     }
     game.physics.arcade.collide(this.sprite, entityGroup);
 };
@@ -241,8 +241,10 @@ Bot.prototype.goto = function(x, y, duration = 1000, easing = Phaser.Easing.Expo
     this.motionOverride = true;
     this.currentTween = game.add.tween(this.sprite);
     this.currentTween.to({ x: x, y: y }, duration, easing);
-    this.currentTween.onComplete.add(function() { this.motionOverride = false;
-        this.currentTween = null }, this);
+    this.currentTween.onComplete.add(function() {
+        this.motionOverride = false;
+        this.currentTween = null
+    }, this);
     this.currentTween.start();
 }
 
@@ -304,7 +306,8 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
     });
     nearbyObjects = nearbyObjects.sort(
         function(a, b) {
-            return (a.temp_distance < b.temp_distance); });
+            return (a.temp_distance < b.temp_distance);
+        });
     // nearbyObjects.forEach(function(entity) {
     //     console.log(entity.name + "," + entity.temp_distance);
     // });   
@@ -318,7 +321,8 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
  */
 Bot.prototype.getNearbyBots = function(radius = 250) {
     return this.getNearbyObjects(radius).filter(function(object) {
-        return object instanceof Bot; });
+        return object instanceof Bot;
+    });
 }
 
 /**
@@ -407,9 +411,11 @@ Bot.prototype.collision = function(object) {
  * Pursue food in the indicated radius
  */
 Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(object) {
-    return object.isEdible; }) {
+    return object.isEdible;
+}) {
     var nearbyFoods = this.getNearbyObjects(radius).filter(function(object) {
-        return edibilityFunction(object); });
+        return edibilityFunction(object);
+    });
     if (nearbyFoods.length > 0) {
         this.pursue(nearbyFoods[0]);
     }
@@ -419,7 +425,8 @@ Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(obj
  * Attack bots in the indicated radius
  */
 Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction = function(object) {
-    return object.isEdible; }) {
+    return object.isEdible;
+}) {
     var nearbyBots = this.getNearbyBots(radius);
     if (nearbyBots.length > 0) {
         this.attackMotion(nearbyBots[0]);
@@ -457,12 +464,31 @@ Bot.prototype.makeSpeechBubble = function(text, howLong = 1000) {
     }
     // Activate the speech Bubble
     this.currentSpeech = text;
-    this.speechBubble = game.world.add(new SpeechBubble(game, this.x+50, this.y - 40, 256,
-            text));
+    this.speechBubble = game.world.add(new SpeechBubble(game, this.x + 50, this.y - 40, 256,
+        text));
     game.time.events.add(howLong, function() {
         this.speechBubble.visible = false;
         this.speechBubble = null;
         this.currentSpeech = null;
     }, this);
 
+}
+
+/**
+ * Checks if an object is part of a group
+ * 
+ * @param  {object}  object The object to check
+ * @param  {Group}  group  The group to check the object against
+ * @return {Boolean}        Is the object part of this group?
+ */
+Bot.prototype.isChild = function(object, group) {
+    if (group instanceof Group) {
+        for (i = 0; i < group.children.length; i++) {
+            if (group.children[i] = object) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
