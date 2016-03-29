@@ -121,9 +121,7 @@ function create() {
         // bots[i].body.mass = 10;
         // bots[i].body.bounce.x = 5;
         // bots[i].body.bounce.y = 5;
-        bots[i].speechBubble = game.world.add(new SpeechBubble(game, bots[i].x, bots[i].y + 50, 256,
-            "Loading " + bots[i].name));
-        bots[i].speechBubble.visible = false;
+        bots[i].speechBubble;
     }
 
     // Set up static entities.  Give it an x and y coordinate.  

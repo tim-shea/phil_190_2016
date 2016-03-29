@@ -26,14 +26,14 @@ function Bot(x, y, name, path) {
     // Eating each other is not yet supported.
     this.isEdible = false;
 
-    // Flag turned on during bot interactions to prevent infinite loops between bots.
-    this.isInteracting = false;
-
     // Override motion when in pursuit, etc.
     this.motionOverride = false;
-    
+
     // A reference to the current tween so that multiple tweens are not initiated at once
     this.currentTween = null;
+
+    // A reference to the current speech item
+    this.currentSpeech = null;
 };
 
 /**
@@ -77,8 +77,10 @@ Bot.prototype.basicUpdate = function() {
 Bot.prototype.genericUpdate = function() {
     this.collisionCheck();
     game.world.wrap(this.sprite);
-    this.speechBubble.x = this.sprite.x + 50;
-    this.speechBubble.y = this.sprite.y - 40;
+    if(this.speechBubble) {
+        this.speechBubble.x = this.sprite.x + 50;
+        this.speechBubble.y = this.sprite.y - 40;        
+    }
     game.physics.arcade.collide(this.sprite, entityGroup);
 };
 
@@ -135,7 +137,7 @@ Bot.prototype.incrementAngle = function(amount) {
 /**
  * Face towards the indicated object
  */
-Bot.prototype.orientTowards = function(objectToFace, minInterEvent = Phaser.Timer.SECOND * .5, multiplier=1) {
+Bot.prototype.orientTowards = function(objectToFace, minInterEvent = Phaser.Timer.SECOND * .5, multiplier = 1) {
     if (!objectToFace || cursorDown || this.currentTween != null) {
         return;
     }
@@ -165,13 +167,17 @@ Bot.prototype.pursue = function(objectToPursue, duration = 500, easing = Phaser.
         return;
     }
     this.motionOverride = true;
-    // game.physics.arcade.accelerateToObject(this, objectToPursue);
-    this.orientTowards(objectToPursue);
     this.currentTween = game.add.tween(this.sprite);
-    this.currentTween.to({ x: objectToPursue.sprite.x, y: objectToPursue.sprite.y }, duration, easing);
-    this.currentTween.onComplete.add(function() { 
+    let rad = game.physics.arcade.angleBetween(this.sprite, objectToPursue.sprite);
+    let new_x = objectToPursue.sprite.x - Math.cos(rad) * 100;
+    let new_y = objectToPursue.sprite.y - Math.sin(rad) * 100;
+    this.sprite.rotation = rad;
+
+    this.currentTween.to({ x: new_x, y: new_y }, duration, easing);
+    this.currentTween.onComplete.add(function() {
         this.currentTween = null;
-        this.motionOverride = false; }, this);
+        this.motionOverride = false;
+    }, this);
     this.currentTween.start();
 }
 
@@ -181,7 +187,7 @@ Bot.prototype.pursue = function(objectToPursue, duration = 500, easing = Phaser.
  * @param  {Bot} object the thing to move away from
  */
 Bot.prototype.moveAwayFrom = function(object) {
-    if (!object) {
+    if (!object || cursorDown) {
         return;
     }
     this.faceAwayFrom(object);
@@ -202,11 +208,12 @@ Bot.prototype.attackMotion = function(objectToAttack, numAttacks = 2) {
     this.orientTowards(objectToAttack);
     this.currentTween = game.add.tween(this.sprite);
     this.currentTween.to({ x: objectToAttack.sprite.x, y: objectToAttack.sprite.y },
-        200, Phaser.Easing.Linear.None, false, 0, numAttacks-1, true);
+        200, Phaser.Easing.Linear.None, false, 0, numAttacks - 1, true);
     // currentTween.onUpdateCallback(function() {theBot.faceTowards(objectToAttack);}); // works
-    this.currentTween.onComplete.add(function() { 
-        this.currentTween = null; 
-        this.motionOverride = false;}, this);
+    this.currentTween.onComplete.add(function() {
+        this.currentTween = null;
+        this.motionOverride = false;
+    }, this);
     this.currentTween.start();
 
     // Chaining tween test
@@ -232,7 +239,8 @@ Bot.prototype.goto = function(x, y, duration, easing = Phaser.Easing.Exponential
     this.motionOverride = true;
     this.currentTween = game.add.tween(this.sprite);
     this.currentTween.to({ x: x, y: y }, duration, easing);
-    this.currentTween.onComplete.add(function() { this.motionOverride = false; this.currentTween = null}, this);
+    this.currentTween.onComplete.add(function() { this.motionOverride = false;
+        this.currentTween = null }, this);
     this.currentTween.start();
 }
 
@@ -282,9 +290,10 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
             entity.temp_distance = distance;
             nearbyObjects.push(entity);
         }
-    });    
+    });
     nearbyObjects = nearbyObjects.sort(
-        function(a,b) {return (a.temp_distance < b.temp_distance);});
+        function(a, b) {
+            return (a.temp_distance < b.temp_distance); });
     // nearbyObjects.forEach(function(entity) {
     //     console.log(entity.name + "," + entity.temp_distance);
     // });   
@@ -297,7 +306,8 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
  * To get nearest object: getNearbyObjects[0]
  */
 Bot.prototype.getNearbyBots = function(radius = 250) {
-    return this.getNearbyObjects(radius).filter(function(object) {return object instanceof Bot;});
+    return this.getNearbyObjects(radius).filter(function(object) {
+        return object instanceof Bot; });
 }
 
 /**
@@ -385,9 +395,11 @@ Bot.prototype.collision = function(object) {
 /**
  * Pursue food in the indicated radius
  */
-Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(object) {return object.isEdible;}) {
-    var nearbyFoods = this.getNearbyObjects(radius).filter(function(object) {return edibilityFunction(object);});
-    if(nearbyFoods.length > 0) {
+Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(object) {
+    return object.isEdible; }) {
+    var nearbyFoods = this.getNearbyObjects(radius).filter(function(object) {
+        return edibilityFunction(object); });
+    if (nearbyFoods.length > 0) {
         this.pursue(nearbyFoods[0]);
     }
 }
@@ -395,10 +407,51 @@ Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(obj
 /**
  * Attack bots in the indicated radius
  */
-Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction = function(object) {return object.isEdible;}) {
+Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction = function(object) {
+    return object.isEdible; }) {
     var nearbyBots = this.getNearbyBots(radius);
-    if(nearbyBots.length > 0) {
+    if (nearbyBots.length > 0) {
         this.attackMotion(nearbyBots[0]);
         this.bite(nearbyBots[0], 100);
     }
+}
+
+/**
+ * Say something to the specified bot for a specified amount of time in seconds.
+ * @param {Bot} botToTalkTo the bot to talk to
+ * @param {String} whatToSay what was said
+ * @param  {Number} howLong how long to say it for in milliseconds
+ */
+Bot.prototype.speak = function(botToTalkTo, whatToSay, howLong = 2000) {
+    if (this.currentSpeech != null || !(botToTalkTo instanceof Bot)) {
+        return;
+    }
+
+    // Call the listeners "hear" function
+    this.makeSpeechBubble(whatToSay, howLong);
+    if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
+        botToTalkTo.hear(this, whatToSay);
+    }
+}
+
+/**
+ * Make a speech bubble but don't "talk" to someone.
+ *
+ * @param  {String} text what to say
+ * @param  {Number} howLong  how long to say it in milliseconds.
+ */
+Bot.prototype.makeSpeechBubble = function(text, howLong = 1000) {
+    if (this.currentSpeech != null) {
+        return;
+    }
+    // Activate the speech Bubble
+    this.currentSpeech = text;
+    this.speechBubble = game.world.add(new SpeechBubble(game, this.x+50, this.y - 40, 256,
+            text));
+    game.time.events.add(howLong, function() {
+        this.speechBubble.visible = false;
+        this.speechBubble = null;
+        this.currentSpeech = null;
+    }, this);
+
 }

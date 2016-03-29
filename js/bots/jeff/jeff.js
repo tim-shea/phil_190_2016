@@ -70,67 +70,62 @@ jeff.makeProductions = function() {
         Production.priority.Medium,
         function() {
             let d = jeff.getDistanceTo(dylan);
-            if ((d > 40) && (d < 400)) {
+            if ((d > 100) && (d < 300)) {
                 return true;
             };
             return false;
         },
-        function() { jeff.speak(dylan, "Nice car!", 5000); });
+        function() { 
+            jeff.speak(dylan, "Nice car!", 2000);
+            jeff.orientTowards(dylan);
+        });
     fight = new Production("pick a fight when grumpy",
         Production.priority.Low,
         function() {
             return (jeff.emotions.current === "Angry");
         },
         function() { 
-            if(Math.random() > .8) {
-                return;
-            }
             jeff.makeSpeechBubble("Attack!", 2000);
             jeff.attackNearbyBots(); });
+    fight.randomFactor = .7;
     irritable = new Production("irritable when hungry",
         Production.priority.Medium,
         function() {
             return (jeff.hunger.value > 40);
         },
         function() {
-            if(Math.random() > .8) {
-                return;
-            }
             jeff.emotions.current = "Angry";
             jeff.makeSpeechBubble("Need food!", 1000);
         });
+    irritable.randomFactor = .9;
     chatty = new Production("talk to people when bored",
         Production.priority.Medium,
         function() {
             return (jeff.emotions.current === "Calm" || jeff.emotions.current == "Sad");
         },
         function() {
-            if(Math.random() > .8) {
-                return;
-            }
             var nearbyBots = jeff.getNearbyBots(800);
             if (nearbyBots.length > 0) {
                 jeff.pursue(nearbyBots[0], 500);
                 jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
             }
         });
+    chatty.randomFactor = .9;
     findNewFriends = new Production("talk to random people when happy",
         Production.priority.Medium,
         function() {
             return (jeff.emotions.current === "Happy");
         },
         function() {
-            if(Math.random() > .8) {
-                return;
-            }
             var randBot = jeff.getRandomBot();
             jeff.pursue(randBot, 700);
             jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
         });
+    findNewFriends.randomFactor = .9;
+
     // Populate production list
     this.productions = [foodSeeking, admireCar, fight, irritable, chatty, findNewFriends];
 }
-
 
 /**
  * Markov process controlling emotions
@@ -253,15 +248,16 @@ jeff.update2min = function() {
  * @override
  */
 jeff.collision = function(object) {
+    jeff.moveAwayFrom(object);
     if (jeff.canEat(object)) {
         jeff.eatObject(object);
-    } else {
-        if (object instanceof Bot) {
-            // jeff.speak(object, "Hello " + object.name);
-        } else {
-            jeff.moveAwayFrom(object);
-        }
     }
+    //     if (object instanceof Bot) {
+    //         // jeff.speak(object, "Hello " + object.name);
+    //     } else {
+    //         jeff.moveAwayFrom(object);
+    //     }
+    // }
 }
 
 /**
