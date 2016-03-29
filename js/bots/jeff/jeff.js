@@ -41,7 +41,7 @@ jeff.init = function() {
         if (object instanceof Bot) {
             return 10;
         } else if (object.name == "jerry_can") {
-            return -10;
+            return -70;
         } else if (object.isEdible) {
             return object.calories;
         } else {
@@ -66,6 +66,7 @@ jeff.makeProductions = function() {
             jeff.findFood();
             jeff.makeSpeechBubble("Ok I'm hunting!", 400);
         });
+    
     admireCar = new Production("admiring car",
         Production.priority.Medium,
         function() {
@@ -79,6 +80,7 @@ jeff.makeProductions = function() {
             jeff.speak(dylan, "Nice car!", 2000);
             jeff.orientTowards(dylan);
         });
+    
     fight = new Production("pick a fight when grumpy",
         Production.priority.Low,
         function() {
@@ -87,7 +89,8 @@ jeff.makeProductions = function() {
         function() { 
             jeff.makeSpeechBubble("Attack!", 2000);
             jeff.attackNearbyBots(); });
-    fight.randomFactor = .7;
+    fight.probNotFiring = .7;
+    
     irritable = new Production("irritable when hungry",
         Production.priority.Medium,
         function() {
@@ -97,7 +100,8 @@ jeff.makeProductions = function() {
             jeff.emotions.current = "Angry";
             jeff.makeSpeechBubble("Need food!", 1000);
         });
-    irritable.randomFactor = .9;
+    irritable.probNotFiring = .5;
+    
     chatty = new Production("talk to people when bored",
         Production.priority.Medium,
         function() {
@@ -110,8 +114,26 @@ jeff.makeProductions = function() {
                 jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
             }
         });
-    chatty.randomFactor = .9;
-    findNewFriends = new Production("talk to random people when happy",
+    chatty.probNotFiring = .8;
+    
+    commentOnGoodStuff = new Production("Comment on high utility items",
+        Production.priority.High,
+        function() {
+            var nearbyObjects = jeff.getNearbyObjects(800);
+            if (nearbyObjects.length > 0) {
+                if(jeff.utilityFunction(nearbyObjects[0]) > 30) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
+        function() {
+            jeff.makeSpeechBubble("Something good around here...!");
+        });
+    commentOnGoodStuff.probNotFiring = .9;
+    
+    findNewFriends = new Production("Talk to random people when happy",
         Production.priority.Medium,
         function() {
             return (jeff.emotions.current === "Happy");
@@ -121,10 +143,10 @@ jeff.makeProductions = function() {
             jeff.pursue(randBot, 700);
             jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
         });
-    findNewFriends.randomFactor = .9;
+    findNewFriends.probNotFiring = .8;
 
     // Populate production list
-    this.productions = [foodSeeking, admireCar, fight, irritable, chatty, findNewFriends];
+    this.productions = [foodSeeking, admireCar, fight, irritable, chatty, findNewFriends, commentOnGoodStuff];
 }
 
 /**

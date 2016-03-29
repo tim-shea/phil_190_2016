@@ -196,7 +196,9 @@ function Production(name, priorityLevel, condition, action) {
     this.priorityLevel = priorityLevel;
     this.condition = condition;
     this.action = action;
-    this.randomFactor = 0; // A probability of _not_ firing the action even if condition is met  
+    // A probability of _not_ firing the action even if condition is met  
+    // 0 is it always fires; 1 is it never fires; .2 is it fires with 20 percent chance.
+    this.probNotFiring = 0; 
 
 };
 Production.priority = {};
@@ -216,7 +218,7 @@ function fireProductions(productions) {
     activeProductions = activeProductions.sort(
         function(a,b) {return (a.priorityLevel < b.priorityLevel);});
     if(activeProductions.length > 0) {
-        if(Math.random() < activeProductions[0].randomFactor) {
+        if(Math.random() < activeProductions[0].probNotFiring) {
             return;
         }
         activeProductions[0].action();
