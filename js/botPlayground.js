@@ -127,7 +127,7 @@ function create() {
     // Set up static entities.  Give it an x and y coordinate.  
     //      The third argument (e.g. 'oakTree') must match the name used
     //      above in the pre-load function 
-    
+
     // web has been seperated from entities so that bots can walk over it
     game.add.sprite(2755, 0, 'web');
     entities.push(new Entity(400, 400, 'oakTree'));
@@ -242,4 +242,13 @@ function findEmptyLocation() {
 //
 function render() {
     // game.debug.text('Bots: ' + bots.length, 32, 32);
+
+    // Uncomment the next 6 lines to see bounding boxes
+    // bots.forEach(function(bot) {
+    //     game.debug.body(bot);
+    // });
+    // entities.forEach(function(entity) {
+    //     game.debug.body(entity.sprite);
+    // });
+
 }

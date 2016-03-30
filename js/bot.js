@@ -266,7 +266,8 @@ Bot.prototype.goHome = function(duration = 1000, easing = Phaser.Easing.Exponent
  */
 Bot.objectsOverlap = function(item1, item2) {
     if (item1 != item2) {
-        return Phaser.Rectangle.intersects(item1.getBounds(), item2.getBounds());
+        // Add a border around first object so that overlap is detected even when "nearby"
+        return Phaser.Rectangle.intersects( Phaser.Rectangle.inflate(item1.getBounds(), 10,10), item2.getBounds());
     }
     return false;
 }
