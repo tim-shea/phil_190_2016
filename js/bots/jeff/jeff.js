@@ -61,100 +61,90 @@ jeff.makeProductions = function() {
     foodSeeking.priority = Production.priority.High;
     foodSeeking.condition = function() {
         return (jeff.hunger.value > 50);
-    }
+    };
     foodSeeking.action = function() {
         // jeff.currentMotion = Motions.tantrum;
         jeff.findFood();
         jeff.makeSpeechBubble("Ok I'm hunting!", 400);
-    }
+    };
 
-    // foodSeeking = new Production("find food when hungry",
-    //     Production.priority.High,
-    //     function() {
-    //         return (jeff.hunger.value > 50);
-    //     },
-    //     function() {
-    //         // jeff.currentMotion = Motions.tantrum;
-    //         jeff.findFood();
-    //         jeff.makeSpeechBubble("Ok I'm hunting!", 400);
-    //     });
-    
-    admireCar = new Production("admiring car",
-        Production.priority.Medium,
-        function() {
-            let d = jeff.getDistanceTo(dylan);
-            if ((d > 100) && (d < 300)) {
-                return true;
-            };
-            return false;
-        },
-        function() { 
-            jeff.speak(dylan, "Nice car!", 2000);
-            jeff.orientTowards(dylan);
-        });
-    
-    fight = new Production("pick a fight when grumpy",
-        Production.priority.Low,
-        function() {
-            return (jeff.emotions.current === "Angry");
-        },
-        function() { 
-            jeff.makeSpeechBubble("Attack!", 2000);
-            jeff.attackNearbyBots(); });
+    admireCar = new Production("admiring car");
+    admireCar.priority = Production.priority.Medium;
+    admireCar.condition = function() {
+        let d = jeff.getDistanceTo(dylan);
+        if ((d > 100) && (d < 300)) {
+            return true;
+        };
+        return false;
+    };
+    admireCar.action = function() {
+        jeff.speak(dylan, "Nice car!", 2000);
+        jeff.orientTowards(dylan);
+    };
+
+    fight = new Production("pick a fight when grumpy");
+    fight.priority = Production.priority.Low;
+    fight.condition = function() {
+        return (jeff.emotions.current === "Angry");
+    };
+    fight.action = function() {
+        jeff.makeSpeechBubble("Attack!", 2000);
+        jeff.attackNearbyBots();
+    };
     fight.probNotFiring = .7;
-    
-    irritable = new Production("irritable when hungry",
-        Production.priority.Medium,
-        function() {
-            return (jeff.hunger.value > 40);
-        },
-        function() {
-            jeff.emotions.current = "Angry";
-            jeff.makeSpeechBubble("Need food!", 1000);
-        });
+
+    irritable = new Production("irritable when hungry");
+    irritable.priority = Production.priority.Medium;
+    irritable.condition = function() {
+        return (jeff.hunger.value > 40);
+    };
+    irritable.action = function() {
+        jeff.emotions.current = "Angry";
+        jeff.makeSpeechBubble("Need food!", 1000);
+    };
     irritable.probNotFiring = .5;
-    
-    chatty = new Production("talk to people when bored",
-        Production.priority.Medium,
-        function() {
-            return (jeff.emotions.current === "Calm" || jeff.emotions.current == "Sad");
-        },
-        function() {
-            var nearbyBots = jeff.getNearbyBots(800);
-            if (nearbyBots.length > 0) {
-                jeff.pursue(nearbyBots[0], 500);
-                jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
-            }
-        });
+
+    chatty = new Production("talk to people when bored");
+    chatty.priority = Production.priority.Medium;
+    chatty.condition = function() {
+        return (jeff.emotions.current === "Calm" || jeff.emotions.current == "Sad");
+    };
+    chatty.action = function() {
+        var nearbyBots = jeff.getNearbyBots(800);
+        if (nearbyBots.length > 0) {
+            jeff.pursue(nearbyBots[0], 500);
+            jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
+        }
+    };
     chatty.probNotFiring = .8;
-    
-    commentOnGoodStuff = new Production("Comment on high utility items",
-        Production.priority.High,
-        function() {
-            var nearbyObjects = jeff.getNearbyObjects(800);
-            if (nearbyObjects.length > 0) {
-                if(jeff.utilityFunction(nearbyObjects[0]) > 30) {
-                    return true;
-                } else {
-                    return false;
-                }
+
+    commentOnGoodStuff = new Production("Comment on high utility items");
+    commentOnGoodStuff.priority = Production.priority.High;
+    commentOnGoodStuff.condition = function() {
+        var nearbyObjects = jeff.getNearbyObjects(800);
+        if (nearbyObjects.length > 0) {
+            if (jeff.utilityFunction(nearbyObjects[0]) > 30) {
+                return true;
+            } else {
+                return false;
             }
-        },
-        function() {
-            jeff.makeSpeechBubble("Something good around here...!");
-        });
+        }
+    };
+    commentOnGoodStuff.action = function() {
+        jeff.makeSpeechBubble("Something good around here...!");
+    };
     commentOnGoodStuff.probNotFiring = .9;
-    
-    findNewFriends = new Production("Talk to random people when happy",
-        Production.priority.Medium,
-        function() {
-            return (jeff.emotions.current === "Happy");
-        },
-        function() {
-            var randBot = jeff.getRandomBot();
-            jeff.pursue(randBot, 700);
-            jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
-        });
+
+    findNewFriends = new Production("Talk to random people when happy");
+    findNewFriends.priority = Production.priority.Low;
+    findNewFriends.condition = function() {
+        return (jeff.emotions.current === "Happy");
+    };
+    findNewFriends.action = function() {
+        var randBot = jeff.getRandomBot();
+        jeff.pursue(randBot, 700);
+        jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
+    };
     findNewFriends.probNotFiring = .8;
 
     // Populate production list
@@ -262,8 +252,7 @@ jeff.update1Sec = function() {
 /**
  * Called every ten seconds
  */
-jeff.updateTenSecs = function() {
-}
+jeff.updateTenSecs = function() {}
 
 /**
  *  Called every two minutes
