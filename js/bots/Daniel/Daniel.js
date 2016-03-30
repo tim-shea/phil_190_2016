@@ -3,11 +3,33 @@ var Daniel = new Bot(240, 220, 'Daniel', 'js/bots/Daniel/espeon.png');
 Daniel.init = function() {
     this.body = this.sprite.body;
     this.body.angle = 100; // Initial Angle
-    this.body.speed = -70; // Initial Speed
+    this.body.speed = 70; // Initial Speed
 
     //Initialized timed events
     game.time.events.loop(Phaser.Timer.SECOND * 1, Daniel.updateOneSecond, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60, Daniel.updateMin, this);
+}
+
+Daniel.isEdible = function(object) {
+	if (object.name == "jerry_can") {
+		return false;
+	} else {
+		return object.isEdible;
+	}
+}
+
+Daniel.utilityFunction = function(object) {
+	if (object instanceof Bot) {
+		return 30;
+	} else if (object.name == "jerry_can") {
+		return -90;
+	} else if (object.name == "steak") {
+		return -40;
+	} else if (object.isEdible) {
+		return object.calories;
+	} else {
+		return 0;
+	}
 }
 
 //
@@ -49,7 +71,7 @@ Daniel.fear = {
 //
 Daniel.hunger = {
     amount: 0,
-    eat: function(food_amount) {
+    eatIt: function(food_amount) {
         this.amount -= food_amount;
         this.amount = Math.max(0, this.amount);
     },
@@ -87,7 +109,7 @@ Daniel.hunger = {
 Daniel.baseline = {
     description: "Walking pace",
     update: function() {
-        Daniel.body.speed = -70;
+        Daniel.body.speed = 70;
         if (Math.random() < .3) {
             Daniel.incrementAngle(Daniel.getRandom(-5, 5));
         }
@@ -96,7 +118,7 @@ Daniel.baseline = {
 Daniel.powerwalking = {
     description: "A little faster now",
     update: function() {
-        Daniel.body.speed = -100;
+        Daniel.body.speed = 100;
         if (Math.random() < .5) {
             Daniel.incrementAngle(Daniel.getRandom(-10, 10));
         }
@@ -105,7 +127,7 @@ Daniel.powerwalking = {
 Daniel.sonic = {
     description: "GOTTA GO FAST GOTTA GO FAST GOTTA GO FAST",
     update: function() {
-        Daniel.body.speed = -500;
+        Daniel.body.speed = 500;
     }
 }
 Daniel.exhaustion = {
@@ -190,10 +212,7 @@ Daniel.getStatus = function() {
 }
 
 Daniel.update = function() {
-    if (Daniel.atBoundary() === true) {
-        Daniel.incrementAngle(45);
-    }
-    Daniel.motionMode.update(); // Todo: IncrementAngle does not work when called from timed functions.  Not sure why not.
+    Daniel.motionMode.update();
     this.basicUpdate();
 };
 
@@ -206,8 +225,20 @@ Daniel.updateOneSecond = function() {
     Daniel.motionMode = Daniel.emotion.getMotionMode();
 }
 
-//feeds every minute
 Daniel.updateMin = function() {
-    Daniel.hunger.eat(75);
+    Daniel.hunger.eatIt(75);
     Daniel.fear.reassure(100);
+}
+
+Daniel.collision = function(object) {
+    Daniel.moveAwayFrom(object);
+    if (Daniel.isEdible(object)) {
+        Daniel.eatObject(object);
+    }
+}
+
+Daniel.eatObject = function(objectToEat) {
+    objectToEat.eat();
+    Daniel.hunger.eatIt(objectToEat.calories);
+    Daniel.speak(objectToEat, "Delicious " + objectToEat.description + "!");
 }

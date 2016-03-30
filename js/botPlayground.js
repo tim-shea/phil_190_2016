@@ -67,6 +67,7 @@ function preload() {
     game.load.image('cave', 'assets/cave.png');
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
+    game.load.image('shield', 'assets/bubble.png'); 
 
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
