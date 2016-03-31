@@ -236,6 +236,7 @@ duyen.updateTenthSec = function() {
 // Called every second
 duyen.update1Sec = function() {
     duyen.speechText = "";
+    duyen.updateNetwork();
     //duyen.findFood(duyen.edibility);
     // <<<<<<< HEAD
     //     duyen.hunger.increment();
@@ -268,6 +269,11 @@ duyen.collision = function(object) {
     duyen.speak(object, "Hello " + object.name);
     // duyen.flee(object);
     // duyen.pursue(object);
+    duyen.addMemory("Saw " + object.name);
+    duyen.moveAwayFrom(object);
+    if (duyen.isEdible(object) && (duyen.hunger.value > 60)) {
+        duyen.eatObject(object);
+    }
 }
 
 
@@ -294,7 +300,9 @@ duyen.highFived = function(botWhoHighFivedMe) {
 
 
 duyen.eatObject = function(objectToEat) {
+    duyen.addMemory("Ate" + objectToEat.name);
     objectToEat.eat();
     duyen.hunger.subtract(objectToEat.calories);
     duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
+    sound.chomp.play();
 }
