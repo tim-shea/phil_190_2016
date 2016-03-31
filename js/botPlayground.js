@@ -75,7 +75,7 @@ function preload() {
     game.load.audio('chomp', 'assets/chwl.wav');
     game.load.audio('drink', 'assets/drinkSound.mp3');
     // game.load.audio('wilhelm', 'assets/Wilhelm_Scream.wav')
-    // game.load.audio('snooze', 'assets/snooze.mp3');
+    game.load.audio('snooze', 'assets/snooze.mp3');
     // game.load.audio('crash', 'assets/crash.mp3');
     game.load.audio('attack 1', 'assets/attacksound1.mp3');
     game.load.audio('collision', 'assets/collision_noise.mp3');
@@ -177,6 +177,7 @@ function create() {
     // Set up global sounds
     sounds.coockiecatinstrumental = game.add.audio('cookiecat');
     sounds.chomp = game.add.audio('chomp');
+    sounds.snooze = game.add.audio('snooze')
     // sounds.collision_noise3 = game.add.audio('collision 3');
     // sounds.collision_noise4 = game.add.audio('collision 4');
     // sounds.collision_noise5 = game.add.audio('collision 5');

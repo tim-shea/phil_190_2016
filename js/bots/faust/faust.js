@@ -59,20 +59,21 @@ faust.makeProductions = function() {
             return (faust.hunger.value > 60);
         },
         function() {
-        	// faust.findFood(); <-- fix
-            faust.makeSpeechBubble("I have a craving only steak can satisfy");
+        	faust.findFood(500, faust.eatsFood);
+            faust.makeSpeechBubble("I have a craving only hands can satisfy");
         }
     );
     sleepingProduction = new Production("no motion when energy is slow i.e. sleeping",
         Production.priority.High,
         function() {
             return (
-                faust.hunger.value < 20
+                faust.hunger.value < 20 && faust.emotions.current === "Calm"
             );
         },
         function() {
             faust.currentMotion = Motions.still;
             faust.makeSpeechBubble("So...tired...Zzzz");
+            sounds.snooze.play();
         }
     );
     singingProduction = new Production("singing",
@@ -114,7 +115,7 @@ faust.makeProductions = function() {
     	},
     	function() {
     		faust.pursue(randBot),
-    		faust.makeSpeechBubble("Let's play");
+    		faust.makeSpeechBubble("Let's play!");
     	}
     );
 
@@ -175,14 +176,6 @@ faust.getStatus = function() {
     var statusString = "Emotion: " + faust.emotions.current;
     statusString += "\nMotion: " + faust.currentMotion.description;
     statusString += "\n" + faust.hunger.toString();
-    // statusString += "\nEntity collisions: " +
-    //     faust.getOverlappingEntities().map(function(item) {
-    //         return item.name;
-    //     });
-    // statusString += "\nBot collisions: " +
-    //     faust.getOverlappingBots().map(function(item) {
-    //         return item.name;
-    //     });
     statusString += "\nMoving to: " + faust.currentlyPursuing;
     return statusString;
 }
@@ -193,7 +186,6 @@ faust.getStatus = function() {
 faust.setMotion = function() {
 
     // Default markov chain movement patterns
-    // TODO: Add conditions that involve hunger, etc.
     if (faust.emotions.current === "Sad") {
         faust.currentMotion = Motions.moping;
     } else if (faust.emotions.current === "Happy") {
@@ -247,6 +239,7 @@ faust.update = function() {
  * Called every second
  */
 faust.update1Sec = function() {
+	faust.updateNetwork();
     faust.hunger.increment();
     faust.emotions.update();
     faust.setMotion();
@@ -258,10 +251,7 @@ faust.update1Sec = function() {
  * Called every ten seconds
  */
 faust.updateTenSecs = function() {
-    // Pursue a random entity
-    if (Math.random() < .9) {
-        // faust.currentlyPursuing = this.pursueRandomObject(2000).name;
-    }
+	//
 }
 
 /**
@@ -283,18 +273,10 @@ faust.update2min = function() {
  */
 faust.collision = function(object) {
 	faust.moveAwayFrom(object);
-    // console.log("Object is edible: " + object.isEdible);
-    if (object.isEdible) {
-        faust.eatObject(object);
-    } else {
-        faust.speak(object, "Hello " + object.name);
+	faust.addMemory("Saw " + object.name);
+    if (faust.eatsFood(object) && (faust.hunger.value > 60)) {
+    	faust.eatObject(object);
     }
-    if (object instanceof Bot) {
-        object.highFive();
-    }
-
-    // faust.flee(object);
-    // faust.pursue(object);
 }
 
 /**
@@ -306,6 +288,7 @@ faust.eatObject = function(objectToEat) {
     objectToEat.eat();
     faust.hunger.subtract(objectToEat.calories);
     faust.speak(objectToEat, "Yummy " + objectToEat.description + "!");
+
 }
 
 /**
