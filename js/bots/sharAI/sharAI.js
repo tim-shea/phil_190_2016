@@ -416,7 +416,7 @@ sharAI.updateFiveSecs = function() {
  */
 sharAI.collision = function(object) {
 	sharAI.addMemory("Saw " + object.name);
-    if (object.canEat) {
+    if (sharAI.canEat(object)) {
         sharAI.eatObject(object);
     } else if (object instanceof Bot) {
         sharAI.speak(object, "How you doin\', " + object.name + "?");
@@ -433,7 +433,7 @@ sharAI.collision = function(object) {
  * @param {Entity} objectToEat what to eat
  */
 sharAI.eatObject = function(objectToEat) {
-	jeff.addMemory("Ate " + objectToEat.name);
+	sharAI.addMemory("Ate " + objectToEat.name);
     objectToEat.eat();
     sharAI.hunger.subtract(objectToEat.calories);
     sharAI.speak(objectToEat, "Om nom nom");
