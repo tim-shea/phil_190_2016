@@ -16,28 +16,28 @@ rey.init = function() {
 
 }
 
-    // Initialize edibility function
-    rey.canEat = function(object) {
-        if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
-            return false;
-        } else {
-            return object.isEdible;
-        }
+// Initialize edibility function
+rey.canEat = function(object) {
+    if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
+        return false;
+    } else {
+        return object.isEdible;
     }
+}
 
-    // Initialize utility function
-    rey.utilityFunction = function(object) {
-        if (object instanceof Bot) {
-            return 10;
-        } else if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
-            return -70;
-        } else if (object.isEdible) {
-            // TODO: Introduce a function that scales calories to utilities 
-            return object.calories;
-        } else {
-            return 1;
-        }
+// Initialize utility function
+rey.utilityFunction = function(object) {
+    if (object instanceof Bot) {
+        return 10;
+    } else if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
+        return -70;
+    } else if (object.isEdible) {
+        // TODO: Introduce a function that scales calories to utilities 
+        return object.calories;
+    } else {
+        return 1;
     }
+}
 
 rey.makeProductions = function() {
     eatingProduction1 = new Production("eating",
@@ -45,7 +45,9 @@ rey.makeProductions = function() {
         function() {
             return (rey.hunger.value > 10 && rey.hunger.value < 20);
         },
-        function() { console.log("Yum!"); });
+        function() {
+            rey.makeSpeechBubble = "Yum!";
+        });
 
     fleeingProduction = new Production("fleeing",
         Production.priority.High,
@@ -53,7 +55,8 @@ rey.makeProductions = function() {
             return (rey.emotions.current == "Not in the mood");
         },
         function() {
-            console.log("Get away from meee!");
+            rey.moveAwayFrom(nearbyBots[0], 500);
+            rey.makeSpeechBubble = "Get away from meee!";
         });
 
     dancingProduction = new Production("dancing",
@@ -62,7 +65,7 @@ rey.makeProductions = function() {
             return (rey.currentMotion == Motions.dancing);
         },
         function() {
-            console.log("Someone come dance with me pls!");
+            rey.makeSpeechBubble = "Someone come dance with me pls!";
         });
 
     lookingforfoodProduction = new Production("scavaging",
@@ -71,7 +74,7 @@ rey.makeProductions = function() {
             return (rey.hunger.value > 30 && rey.emotions.current !== "Sleepy");
         },
         function() {
-            console.log("I need to find me some food..");
+            rey.makeSpeechBubble = "I need to find me some food..";
         });
 
     playingProduction = new Production("playing",
@@ -80,7 +83,8 @@ rey.makeProductions = function() {
             return (rey.emotions.current == "Hyper");
         },
         function() {
-            console.log("Play with me!!");
+            rey.pursue(nearbyBots[0], 1000);
+            rey.makeSpeechBubble("Play with me!!");
         });
     sleepingProduction = new Production("sleeping",
         Production.priority.Low,
@@ -88,12 +92,13 @@ rey.makeProductions = function() {
             return (rey.emotions.current == "Sleepy" && rey.hunger.value > 40);
         },
         function() {
-            console.log("I'm about to take a nap..");
+            rey.currentMotion = Motions.still;
+            rey.makeSpeechBubble = "I'm about to take a nap..";
         });
 
-//five new productions
+    //five new productions
 
-   attack = new Production("fighting");
+    attack = new Production("fighting"); ///this production still needs some work 
     fight.priority = Production.priority.High;
     fight.condition = function() {
         return (rey.emotions.current == "Not in the mood");
@@ -117,21 +122,30 @@ rey.makeProductions = function() {
             rey.getNearbyObjects;
         });
 
-goHome = new Production("need to rest at home",
+    goHome = new Production("need to rest at home",
         Production.priority.High,
         function() {
             return (
-                rey.emotions.current === "Sleepy");
+                rey.emotions.current == "Sleepy");
         },
         function() {
             rey.currentMotion = Motions.sonicSpeed;
             rey.productionText = "goood night";
-            rey.orientTowards = "stray dog";
+            rey.orientTowards = "stray";
         });
 
+    avoidance = new Production("please leave me alone for now",
+        Production.priority.Medium,
+        function() {
+            return (
+                rey.emotions.current == "Not in the mood" || rey.emotions.current == "Sleepy")
+        },
+        function() {
+            rey.orientTowards(sharAI);
+            rey.makeSpeechBubble = "No one will get close to me if I am close to sharAI";
+        });
 
-
-    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood];
+    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood, goHome, avoidance];
 }
 
 
