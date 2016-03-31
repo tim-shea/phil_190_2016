@@ -139,6 +139,7 @@ function setUpFood() {
                 break;  
             case 13:
                 addFoodItem("pink_candy", "Yummy candy", 5);
+                //a tiny piece of candy barely has any calories
                 break;
             case 14:
                 addFoodItem("Cream_Cake", "Ice Cream cake", 1,860);

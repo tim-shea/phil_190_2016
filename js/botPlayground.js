@@ -74,8 +74,13 @@ function preload() {
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
     game.load.audio('attack 1', 'assets/attacksound1.mp3');
+<<<<<<< HEAD
     game.load.audio('snooze', 'assets/snooze.mp3');
     game.load.audio('crash', 'assets/crash.mp3');
+=======
+    game.load.audio('collision', 'assets/collision_noise.mp3');
+    game.load.audio('collision 2', 'assets/collision_noise2.wav');
+>>>>>>> origin/master
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
@@ -135,7 +140,7 @@ function create() {
 
     // web has been seperated from entities so that bots can walk over it
     game.add.sprite(2755, 0, 'web');
-    entities.push(new Entity(400, 600, 'oakTree'));
+    entities.push(new Entity(400, 400, 'oakTree'));
     entities.push(new Entity(1000, 2000, 'oakTree'));
     entities.push(new Entity(2900, 130, 'cocoon'));
     entities.push(new Entity(600, 2198, 'singlerock'));
@@ -148,8 +153,8 @@ function create() {
     entities.push(new Entity(10, 2930, 'Treasure'));
     entities.push(new Entity(2700, 2700, 'Treehouse'));
     entities.push(new Entity(2700, 2800, 'DeerCrossingSign'));
-    entities.push(new Entity(80, 300, 'grassyrock'));
-    entities.push(new Entity(-80, -100, 'cave', game));
+    entities.push(new Entity(50, 300, 'grassyrock'));
+    entities.push(new Entity(-100, -100, 'cave', game));
     entities.push(new Entity(1000, 1350, 'princessCastle'));
     entities.push(new Entity(600, 1200, 'carousel'));
 
