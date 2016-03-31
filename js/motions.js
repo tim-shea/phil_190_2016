@@ -16,7 +16,7 @@ Motions.stop = {
         if (Math.random() < .5) {
             botToMove.incrementAngle(10 * Math.random() - 5);
         }
-        botToMove.speed = 0;
+        botToMove.body.speed = 0;
         botToMove.basicUpdate();
     }
 }

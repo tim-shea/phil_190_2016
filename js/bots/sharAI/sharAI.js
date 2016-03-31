@@ -80,6 +80,18 @@ sharAI.makeProductions = function() {
     }
     getFood.action = function() {
         sharAI.findFood(100, sharAI.canEat);
+        sharAI.motionText = "sharAI is looking for their next meal";
+    }
+
+    sleep = new Production("sleeping");
+    sleep.priority = 10;
+    sleep.condition = function() {
+        return (sharAI.lethargy.value > 75);
+    }
+    sleep.action = function() {
+        sharAI.currentMotion = Motions.still;
+        sharAI.motionText = "sharAI is sleeping";
+        sharAI.makeSpeechBubble("Zzz...");
     }
 
     returnHome = new Production("going home");
@@ -88,11 +100,21 @@ sharAI.makeProductions = function() {
         return (sharAI.energyLevel == "Anxious" || sharAI.health.value < 25);
     }
     returnHome.action = function() {
+        sharAI.orientTowards(web);
         sharAI.goHome();
     }
 
+    curse = new Production("cursing");
+    curse.priority = 0;
+    curse.condition = function() {
+        return (sharAI.mood == "Angry");
+    }
+    curse.action = function() {
+        sharAI.makeSpeechBubble("\*\@\$\#!");
+    }
+
     // Populate production list
-    this.productions = [getFood];
+    this.productions = [getFood, sleep, returnHome, curse];
 }
 
 /**
@@ -301,26 +323,32 @@ sharAI.incrementDecayVariables = function() {
     if (sharAI.currentMotion == Motions.still) {
         sharAI.exhaustion.decrement();
         sharAI.boredom.increment();
+        sharAI.lethargy.decrement();
     } else if (sharAI.currentMotion == Motions.stop) {
         sharAI.exhaustion.decrement();
+        sharAI.lethargy.increment();
     } else if (sharAI.currentMotion == Motions.spazzing) {
         sharAI.exhaustion.add(3);
         sharAI.boredom.decrement();
+        sharAI.lethargy.increment();
     } else if (sharAI.currentMotion == Motions.walking) {
         sharAI.exhaustion.increment();
         sharAI.boredom.increment();
+        sharAI.lethargy.increment();
     } else if (sharAI.currentMotion == Motions.running) {
         sharAI.exhaustion.add(2);
+        sharAI.lethargy.increment();
     } else if (sharAI.currentMotion == Motions.tantrum) {
         sharAI.exhaustion.add(3);
+        sharAI.lethargy.increment();
     } else if (sharAI.currentMotion == Motions.dancing) {
         sharAI.exhaustion.increment(2);
         sharAI.boredom.decrement();
+        sharAI.lethargy.increment();
     }
     // Motions.moping doesn't have additional increments or decrements that isn't shared by all movement types
-    // Always increment hunger and lethargy no matter what motion state sharAI's in
+    // Always increment hunger no matter what motion state sharAI's in
     sharAI.hunger.increment();
-    sharAI.lethargy.increment();
 }
 
 /**
@@ -359,9 +387,6 @@ sharAI.update = function() {
  */
 sharAI.updatePerSec = function() {
     sharAI.incrementDecayVariables();
-    sharAI.energyLevel.update();
-    sharAI.mood.update();
-    sharAI.setMotion();
     fireProductions(sharAI.productions);
 }
 
@@ -371,6 +396,9 @@ sharAI.updatePerSec = function() {
  */
 sharAI.updateFiveSecs = function() {
     sharAI.regenerateHealth();
+    sharAI.energyLevel.update();
+    sharAI.mood.update();
+    sharAI.setMotion();
 }
 
 ///////////////////////////
