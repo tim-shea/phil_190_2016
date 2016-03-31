@@ -104,17 +104,34 @@ rey.makeProductions = function() {
     };
     fight.probNotFiring = .5;
 
-    foodSeeking = new Production("Run and find food!");
-    foodSeeking.priority = Production.priority.High;
-    foodSeeking.condition = function() {
-        return (rey.hunger.value > 30);
-    };
-    foodSeeking.action = function() {
-        // rey.currentMotion = Motions.tantrum;
-        rey.findFood();
-            };
+    seekFood = new Production("starving",
+        Production.priority.High,
+        function() {
+            return (
+                rey.hunger.value > 10);
+        },
+        function() {
+            rey.currentMotion = Motions.moping;
+            rey.productionText = "Please feed me";
+            rey.getRandomObject;
+            rey.getNearbyObjects;
+        });
 
-    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, foodSeeking];
+goHome = new Production("need to rest at home",
+        Production.priority.High,
+        function() {
+            return (
+                rey.emotions.current === "Sleepy");
+        },
+        function() {
+            rey.currentMotion = Motions.sonicSpeed;
+            rey.productionText = "goood night";
+            rey.orientTowards = "stray dog";
+        });
+
+
+
+    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood];
 }
 
 
@@ -224,7 +241,7 @@ rey.eatObject = function(objectToEat) {
 
 
 rey.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    rey.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name);
+    rey.speak(botWhoSpokeToMe, "How are you doing " + botWhoSpokeToMe.name);
 }
 
 
