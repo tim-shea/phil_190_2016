@@ -23,7 +23,7 @@ duyen.init = function() {
     // Setting up edibility function
 
     duyen.isEdible = function(object) {
-        if (object.name == "jerry_can") {
+        if (object.name == "jerry_can" || object.name == "Spice_Poffin" || object.name == "Devil_Fruit_rubber") {
             return false;
         } else {
             return object.isEdible;
@@ -107,8 +107,57 @@ duyen.makeProductions = function() {
         function() {
             duyen.currentMotion = Motions.dancing;
         });
-}
 
+    // New productions
+    goHome = new Production("back to base",
+        Production.priority.Medium,
+        function() {
+            return (
+                duyen.emotions.current === "mad");
+        },
+        function() {
+            duyen.currentMotion = Motions.floating;
+            duyen.productionText = "Peace out!";
+            duyen.orientTowards = pinkTree;
+        });
+    pursueFriend = new Production("make new friend",
+        Production.priority.Low,
+        function () {
+            return (
+                duyen.emotions.current === "happy" &&
+                duyen.energy.value > 50);
+        },
+        function() {
+            duyen.currentMotion = Motions.dancing;
+            duyen.productionText = "Wow! You're cool!";
+            duyen.getRandomBot;
+        });
+    findFood = new Production("find food",
+        Production.priority.High,
+        function() {
+            return (
+                duyen.emotions.current === "mad" &&
+                duyen.hunger.value > 60);
+        },
+        function() {
+            duyen.currentMotion = Motions.flying;
+            duyen.productionText = "I need food!";
+            duyen.getRandomObject;
+            duyen.getNearbyObjects;
+        });
+    defendResources = new Production("sleeping",
+        Production.priority.Medium,
+        function() {
+            return (
+                duyen.emotions.current === "mad" &&
+                duyen.energy.value > 80);
+        },
+        function() {
+            duyen.attackMotion;
+            duyen.ProductionText = "Back off!";
+            duyen.attackNearbyBots;
+        });
+}
 
 
 // Hunger 
@@ -186,16 +235,16 @@ duyen.updateTenthSec = function() {
 duyen.update1Sec = function() {
     duyen.speechText = "";
     //duyen.findFood(duyen.edibility);
-// <<<<<<< HEAD
-//     duyen.hunger.increment();
-// =======
-// duyen.hunger.update();
-// duyen.hygiene.update();
-//     // if (Math.random() < duyen.emotion.transitionProbability) {
-//     //     duyen.emotion = duyen.emotion.transition();
-//     // }
-//     // duyen.motionMode = duyen.emotion.getMotionMode();
-// >>>>>>> origin/master
+    // <<<<<<< HEAD
+    //     duyen.hunger.increment();
+    // =======
+    // duyen.hunger.update();
+    // duyen.hygiene.update();
+    //     // if (Math.random() < duyen.emotion.transitionProbability) {
+    //     //     duyen.emotion = duyen.emotion.transition();
+    //     // }
+    //     // duyen.motionMode = duyen.emotion.getMotionMode();
+    // >>>>>>> origin/master
 }
 
 // Called every two minutes
@@ -247,5 +296,3 @@ duyen.eatObject = function(objectToEat) {
     duyen.hunger.subtract(objectToEat.calories);
     duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
 }
-
-
