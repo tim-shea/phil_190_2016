@@ -91,7 +91,30 @@ rey.makeProductions = function() {
             console.log("I'm about to take a nap..");
         });
 
-    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction];
+//five new productions
+
+   attack = new Production("fighting");
+    fight.priority = Production.priority.High;
+    fight.condition = function() {
+        return (rey.emotions.current == "Not in the mood");
+    };
+    fight.action = function() {
+        rey.makeSpeechBubble("I don't want to deal with you right nowww!!", 2000);
+        rey.attackNearbyBots();
+    };
+    fight.probNotFiring = .5;
+
+    foodSeeking = new Production("Run and find food!");
+    foodSeeking.priority = Production.priority.High;
+    foodSeeking.condition = function() {
+        return (rey.hunger.value > 30);
+    };
+    foodSeeking.action = function() {
+        // rey.currentMotion = Motions.tantrum;
+        rey.findFood();
+            };
+
+    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, foodSeeking];
 }
 
 

@@ -75,6 +75,7 @@ function preload() {
     game.load.audio('chomp', 'assets/chwl.wav');
     game.load.audio('attack 1', 'assets/attacksound1.mp3');
     game.load.audio('snooze', 'assets/snooze.mp3');
+    game.load.audio('crash', 'assets/crash.mp3');
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
