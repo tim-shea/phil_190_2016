@@ -12,6 +12,34 @@ rey.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, rey.update2min, this);
 
+    this.makeProductions();
+
+}
+
+    // Initialize edibility function
+    rey.canEat = function(object) {
+        if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
+            return false;
+        } else {
+            return object.isEdible;
+        }
+    }
+
+    // Initialize utility function
+    rey.utilityFunction = function(object) {
+        if (object instanceof Bot) {
+            return 10;
+        } else if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
+            return -70;
+        } else if (object.isEdible) {
+            // TODO: Introduce a function that scales calories to utilities 
+            return object.calories;
+        } else {
+            return 1;
+        }
+    }
+
+rey.makeProductions = function() {
     eatingProduction1 = new Production("eating",
         Production.priority.High,
         function() {
@@ -154,6 +182,7 @@ rey.update2min = function() {}
 
 
 rey.collision = function(object) {
+    rey.moveAwayFrom(object);
     if (object.isEdible) {
         rey.eatObject(object);
     } else {

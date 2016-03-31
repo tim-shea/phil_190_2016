@@ -141,7 +141,8 @@ function setUpFood() {
                 addFoodItem("pink_candy", "Yummy candy", 5);
                 break;
             case 14:
-                addFoodItem("Cream_Cake", "Cream cake", 150);
+                addFoodItem("Cream_Cake", "Ice Cream cake", 1,860);
+                //There is about 310 calories per slice of ice cream cake, so assuming there is roughly six slices, there would be 1,860 calories in the whole cake
                 break;
             default:
                 break;
