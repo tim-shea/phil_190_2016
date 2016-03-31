@@ -238,6 +238,7 @@ rey.update = function() {
 
 
 rey.update1Sec = function() {
+    rey.updateNetwork();
     rey.hunger.increment();
     rey.emotions.update();
     rey.setMotion();
@@ -245,21 +246,21 @@ rey.update1Sec = function() {
 }
 
 
+
 rey.update2min = function() {}
 
 
 rey.collision = function(object) {
+    rey.addMemory("Saw " + object.name);
     rey.moveAwayFrom(object);
-    if (object.isEdible) {
+    if (rey.canEat(object)  && (rey.hunger.value > 40)) {
         rey.eatObject(object);
-    } else {
-        rey.speak(object, "What's up " + object.name + "!");
-    }
 
 }
 
 
 rey.eatObject = function(objectToEat) {
+    rey.addMemory("Ate " + objectToEat.name);
     objectToEat.eat();
     rey.hunger.subtract(objectToEat.calories);
     rey.speak(objectToEat, "Yum my favorite " + objectToEat.description + "!");
@@ -274,4 +275,5 @@ rey.hear = function(botWhoSpokeToMe, whatTheySaid) {
 
 rey.highFived = function(botWhoHighFivedMe) {
     rey.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
+}
 }
