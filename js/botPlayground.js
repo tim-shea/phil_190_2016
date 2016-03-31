@@ -71,18 +71,23 @@ function preload() {
     game.load.image('pow', 'assets/pow.png');
 
     // Load sounds
+    game.load.audio('cookiecat', 'assets/coockiecatinstrumental.m4a');
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
-    game.load.audio('attack 1', 'assets/attacksound1.mp3');
     game.load.audio('drink', 'assets/drinkSound.mp3');
     game.load.audio('wilhelm', 'assets/Wilhelm_Scream.wav')
-
     game.load.audio('snooze', 'assets/snooze.mp3');
     game.load.audio('crash', 'assets/crash.mp3');
-
+    game.load.audio('attack 1', 'assets/attacksound1.mp3');
     game.load.audio('collision', 'assets/collision_noise.mp3');
     game.load.audio('collision 2', 'assets/collision_noise2.wav');
-
+    game.load.audio('collision 3', 'assets/collision_noise3.m4a');
+    game.load.audio('collision 4', 'assets/collision_noise4.m4a');
+    game.load.audio('collision 5', 'assets/collision_noise5.m4a');
+    game.load.audio('beepbeep 00', 'assets/BeepBeep_roadrunner.m4a');
+    game.load.audio('puuuu 00', 'assets/puuuu_00.m4a');
+    game.load.audio('quote_batrider 00', 'assets/quote_batrider.m4a');
+    game.load.audio('sleep 00', 'assets/sleep_00.m4a');
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
@@ -171,7 +176,18 @@ function create() {
         this);
 
     // Set up global sounds
+    sounds.coockiecatinstrumental = game.add.audio('cookiecat');
+    sounds.coockiecatinstrumental.loop = true;
+    sounds.coockiecatinstrumental.is_playing = false;
     sounds.chomp = game.add.audio('chomp');
+
+    sounds.collision_noise3 = game.add.audio('collision 3');
+    sounds.collision_noise4 = game.add.audio('collision 4');
+    sounds.collision_noise5 = game.add.audio('collision 5');
+    sounds.beepbeep_00 = game.add.audio('beepbeep 00');
+    sounds.puuuu_00 = game.add.audio('puuuu 00');
+    sounds.quote_batrider_00 = game.add.audio('quote_batrider 00');
+    sounds.sleep_00 = game.add.audio('sleep 00');
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);
@@ -253,6 +269,10 @@ function findEmptyLocation() {
 // Can be used to render text to the canvas
 //
 function render() {
+    if (sounds.coockiecatinstrumental.is_playing == false) {//test m4a
+        sounds.coockiecatinstrumental.play();
+        sounds.coockiecatinstrumental.is_playing = true;
+    }
     // game.debug.text('Bots: ' + bots.length, 32, 32);
 
     // Uncomment the next 6 lines to see bounding boxes
