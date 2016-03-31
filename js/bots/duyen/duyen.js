@@ -19,6 +19,32 @@ duyen.init = function() {
 
     // Make productions
     this.makeProductions();
+
+    // Setting up edibility function
+
+    duyen.isEdible = function(object) {
+        if (object.name == "jerry_can") {
+            return false;
+        } else {
+            return object.isEdible;
+        }
+    }
+
+    // Setting up utility function
+    duyen.utilityFunction = function(object) {
+        if (object instanceof Bot) {
+            return 10;
+        } else if (object.name == "jerry_can") {
+            return -80;
+        } else if (object.name == "Spice_Poffin") {
+            return -30;
+        } else if (object.isEdible) {
+            return object.calories;
+        } else {
+            return 0;
+        }
+    }
+
 }
 
 // Creating productions
@@ -156,6 +182,8 @@ duyen.updateTenthSec = function() {
 
 // Called every second
 duyen.update1Sec = function() {
+    duyen.speechText = "";
+    //duyen.findFood(duyen.edibility);
 // <<<<<<< HEAD
 //     duyen.hunger.increment();
 // =======
@@ -217,3 +245,5 @@ duyen.eatObject = function(objectToEat) {
     duyen.hunger.subtract(objectToEat.calories);
     duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
 }
+
+

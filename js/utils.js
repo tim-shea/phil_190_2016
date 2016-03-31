@@ -138,7 +138,7 @@ function setUpFood() {
                 addFoodItem("steak", "Fresh meat", 10);
                 break;  
             case 13:
-                addFoodItem("pink_candy", "Yummy candy", 50);
+                addFoodItem("pink_candy", "Yummy candy", 5);
                 break;
             case 14:
                 addFoodItem("Cream_Cake", "Cream cake", 150);
