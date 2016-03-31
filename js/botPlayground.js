@@ -73,13 +73,13 @@ function preload() {
     game.load.audio('cookiecat', 'assets/coockiecatinstrumental.m4a');
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
-    // game.load.audio('drink', 'assets/drinkSound.mp3');
+    game.load.audio('drink', 'assets/drinkSound.mp3');
     // game.load.audio('wilhelm', 'assets/Wilhelm_Scream.wav')
     // game.load.audio('snooze', 'assets/snooze.mp3');
     // game.load.audio('crash', 'assets/crash.mp3');
-    // game.load.audio('attack 1', 'assets/attacksound1.mp3');
-    // game.load.audio('collision', 'assets/collision_noise.mp3');
-    // game.load.audio('collision 2', 'assets/collision_noise2.wav');
+    game.load.audio('attack 1', 'assets/attacksound1.mp3');
+    game.load.audio('collision', 'assets/collision_noise.mp3');
+    game.load.audio('collision 2', 'assets/collision_noise2.wav');
     // game.load.audio('collision 3', 'assets/collision_noise3.m4a');
     // game.load.audio('collision 4', 'assets/collision_noise4.m4a');
     // game.load.audio('collision 5', 'assets/collision_noise5.m4a');
