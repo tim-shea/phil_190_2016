@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Phil 190 Bot Playground</title>
     <script src="js/_phaser.min.js"></script>
+    <script src="js/_vis.js"></script>
     <script src="js/preferences.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/speechBubble.js"></script>
@@ -55,6 +56,10 @@
                         <textarea name="logText" rows="9" cols="50"></textarea>
                     </form>
                 </div>
+                <div class="row">
+                    <br>
+                    <div style="border:1px solid black; width: 500px; height: 500px;" id="mynetwork"></div>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -62,13 +67,13 @@
             <br>
             <br>
         </div>
-<!--
+
         <div class="row">
             <audio controls loop>
                 <source src="assets/coockiecatinstrumental.m4a" type="audio/mp4">
             </audio>
         </div>
--->
+
     </div>
 </body>
 

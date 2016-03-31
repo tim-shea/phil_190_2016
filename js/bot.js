@@ -36,6 +36,12 @@ function Bot(x, y, name, path) {
 
     // A reference to the current speech item
     this.currentSpeech = null;
+
+    // Network stuff
+    this.lastMemory;
+    this.currentMemory;
+    this.currentTransition;
+    this.setNetwork();
 };
 
 /**
@@ -206,6 +212,7 @@ Bot.prototype.attackMotion = function(objectToAttack, numAttacks = 2) {
     if (!objectToAttack || cursorDown || this.currentTween != null || this.motionOverride) {
         return;
     }
+    this.addMemory("Attacked " + objectToAttack.names);
     this.motionOverride = true;
     this.orientTowards(objectToAttack);
     this.currentTween = game.add.tween(this.sprite);
@@ -267,7 +274,7 @@ Bot.prototype.goHome = function(duration = 1000, easing = Phaser.Easing.Exponent
 Bot.objectsOverlap = function(item1, item2) {
     if (item1 != item2) {
         // Add a border around first object so that overlap is detected even when "nearby"
-        return Phaser.Rectangle.intersects( Phaser.Rectangle.inflate(item1.getBounds(), 10,10), item2.getBounds());
+        return Phaser.Rectangle.intersects(Phaser.Rectangle.inflate(item1.getBounds(), 10, 10), item2.getBounds());
     }
     return false;
 }
@@ -411,9 +418,7 @@ Bot.prototype.collision = function(object) {
 /**
  * Pursue food in the indicated radius
  */
-Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(object) {
-    return object.isEdible;
-}) {
+Bot.prototype.findFood = function(radius = 500, edibilityFunction) {
     var nearbyFoods = this.getNearbyObjects(radius).filter(function(object) {
         return edibilityFunction(object);
     });
@@ -425,9 +430,7 @@ Bot.prototype.findFood = function(radius = 500, edibilityFunction = function(obj
 /**
  * Attack bots in the indicated radius
  */
-Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction = function(object) {
-    return object.isEdible;
-}) {
+Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction) {
     var nearbyBots = this.getNearbyBots(radius);
     if (nearbyBots.length > 0) {
         this.bite(nearbyBots[0], 100);
@@ -472,4 +475,157 @@ Bot.prototype.makeSpeechBubble = function(text, howLong = 1000) {
         this.currentSpeech = null;
     }, this);
 
+}
+
+/**
+ * Checks if an object is part of a group.  Todo: there must be a simpler way...
+ * 
+ * @param  {object}  object The object to check
+ * @param  {Group}  group  The group to check the object against
+ * @return {Boolean}        Is the object part of this group?
+ */
+Bot.prototype.isChild = function(object, group) {
+    if (group instanceof Group) {
+        for (i = 0; i < group.children.length; i++) {
+            if (group.children[i] = object) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Initialize the memory network.
+ */
+Bot.prototype.setNetwork = function() {
+    this.nodes = new vis.DataSet();
+    this.edges = new vis.DataSet();
+    this.options = {
+        nodes: {
+            shape: 'dot',
+            scaling: {
+                customScalingFunction: function(min, max, total, value) {
+                    return value / total;
+                },
+                min: 50,
+                max: 200
+            }
+        }
+    };
+};
+
+/**
+ * Add a memory to the network.  A memory is just  a string.
+ * @param {Node} id the string id for the memory (rename id?)
+ */
+Bot.prototype.addNode = function(id) {
+    node = this.nodes.get(id);
+    // If the node is already in the network, change its color
+    if (node) {
+        this.nodes.update({
+            id: id,
+            value: node.value + 2,
+        });
+        this.currentMemory = node;
+    } else {
+        // Otherwise, add a new node
+        this.nodes.update({
+            id: '' + id,
+            label: '' + id,
+            color: 'blue',
+            value: 1 // Start at one
+        });
+    }
+}
+
+/**
+ * Add a memory transition to the network.  This adds an edge just using the
+ * last memory and the current one with a --> between.
+ *
+ * @param {String} last last memory that happened
+ * @param {String} current memory
+ */
+Bot.prototype.addEdge = function(last, current) {
+    id = last + "-->" + current;
+    //No recurrent connections
+    if (last === current) {
+        return;
+    }
+    edge = this.edges.get(id);
+    // Edge already exists.  Update that edge
+    if (edge) {
+        this.edges.update({
+            id: id,
+            value: edge.value + 2,
+        });
+        this.currentTransition = edge;
+    } else {
+        // Add new edge
+        this.edges.update({
+            id: '' + id,
+            label: '',
+            from: '' + last,
+            to: '' + current,
+            value: 1, // Start at one
+            color: 'blue'
+        });
+    }
+    // parse
+}
+
+/**
+ * Add a new memory to the network
+ *
+ * @param {String} memory the new memory
+ */
+Bot.prototype.addMemory = function(memory) {
+    this.addNode(memory);
+    if (this.lastMemory) {
+        this.addEdge(this.lastMemory, memory)
+    }
+    if (this.lastMemory != memory) {
+        this.lastMemory = memory;
+    }
+}
+
+
+/**
+ * Update the memory network by decaying all node and edge activations
+ */
+Bot.prototype.updateNetwork = function() {
+
+    currentBot = this;
+    // Decay nodes
+    this.nodes.forEach(function(node) {
+        // Decay node
+        currentBot.nodes.update({ id: node.id, value: Math.max(.1, node.value - .01) });
+        // Color non-current nodes blue
+        if (currentBot.currentMemory) {
+            if (node.id != currentBot.currentMemory.id) {
+                currentBot.nodes.update({ id: node.id, color: 'blue' });
+            } else {
+                currentBot.nodes.update({ id: node.id, color: 'red' });
+            }
+        }
+    });
+
+    // Decay Edges
+    this.edges.forEach(function(edge) {
+        // Decay edge
+        currentBot.edges.update({ id: edge.id, value: Math.max(.1, edge.value - .001) });
+        // Color non-current edges blue
+        if (currentBot.currentTransition) {
+            // console.log(edge, currentTransition);
+            if (edge.id != currentBot.currentTransition.id) {
+                currentBot.edges.update({ id: edge.id, color: 'blue' });
+            } else {
+                // edges.update({ id: edge.id, color: 'red' });
+            }
+        }
+    });
+
+    // network.selectNodes([node.id]);
+    // console.log(node);
 }

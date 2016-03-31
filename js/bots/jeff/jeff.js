@@ -64,7 +64,7 @@ jeff.makeProductions = function() {
     };
     foodSeeking.action = function() {
         // jeff.currentMotion = Motions.tantrum;
-        jeff.findFood();
+        jeff.findFood(500, jeff.canEat);
         jeff.makeSpeechBubble("Ok I'm hunting!", 400);
     };
 
@@ -243,6 +243,7 @@ jeff.update = function() {
  * Called every second
  */
 jeff.update1Sec = function() {
+    jeff.updateNetwork();
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();
@@ -272,16 +273,12 @@ jeff.update2min = function() {
  * @override
  */
 jeff.collision = function(object) {
+    jeff.addMemory("Saw " + object.name);
     jeff.moveAwayFrom(object);
-    if (jeff.canEat(object)) {
+    if (jeff.canEat(object)  && (jeff.hunger.value > 50)) {
         jeff.eatObject(object);
     }
-    //     if (object instanceof Bot) {
-    //         // jeff.speak(object, "Hello " + object.name);
-    //     } else {
-    //         jeff.moveAwayFrom(object);
-    //     }
-    // }
+
 }
 
 /**
@@ -290,6 +287,7 @@ jeff.collision = function(object) {
  * @param {Entity} objectToEat what to eat
  */
 jeff.eatObject = function(objectToEat) {
+    jeff.addMemory("Ate " + objectToEat.name);
     objectToEat.eat();
     jeff.hunger.subtract(objectToEat.calories);
     jeff.speak(objectToEat, "Yummy " + objectToEat.description + "!");
@@ -300,6 +298,7 @@ jeff.eatObject = function(objectToEat) {
  * @override
  */
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
+    jeff.addMemory(botWhoSpokeToMe.name + " said \"" + whatTheySaid + "\"");
     // jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); 
 }
 
@@ -309,5 +308,7 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
  * @override
  */
 jeff.highFived = function(botWhoHighFivedMe) {
+    jeff.addMemory("High Fived: " + object.name);
+
     jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }

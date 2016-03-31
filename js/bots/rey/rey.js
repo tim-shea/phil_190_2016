@@ -45,7 +45,7 @@ rey.makeProductions = function() {
             return (rey.hunger.value > 10 && rey.hunger.value < 20);
         },
         function() {
-            rey.makeSpeechBubble = "Yum!";
+            rey.makeSpeechBubble("Yum!");
         });
 
     fleeingProduction = new Production("fleeing",
@@ -54,8 +54,8 @@ rey.makeProductions = function() {
             return (rey.emotions.current == "Not in the mood");
         },
         function() {
-            rey.moveAwayFrom(nearbyBots[0], 500);
-            rey.makeSpeechBubble = "Get away from meee!";
+            // rey.moveAwayFrom(nearbyBots[0], 500); <-- You need to check that this has elements first.  See your other use below.
+            rey.makeSpeechBubble("Get away from meee!");
         });
 
     dancingProduction = new Production("dancing",
@@ -64,7 +64,7 @@ rey.makeProductions = function() {
             return (rey.currentMotion == Motions.dancing);
         },
         function() {
-            rey.makeSpeechBubble = "Someone come dance with me pls!";
+            rey.makeSpeechBubble("Someone come dance with me pls!");
         });
 
     lookingforfoodProduction = new Production("scavaging",
@@ -73,7 +73,7 @@ rey.makeProductions = function() {
             return (rey.hunger.value > 30 && rey.emotions.current !== "Sleepy");
         },
         function() {
-            rey.makeSpeechBubble = "I need to find me some food..";
+            rey.makeSpeechBubble("I need to find me some food..");
         });
 
     playingProduction = new Production("playing",
@@ -92,7 +92,7 @@ rey.makeProductions = function() {
         },
         function() {
             rey.currentMotion = Motions.still;
-            rey.makeSpeechBubble = "I'm about to take a nap..";
+            rey.makeSpeechBubble("I'm about to take a nap..");
         });
 
     //five new productions
@@ -130,7 +130,7 @@ rey.makeProductions = function() {
         function() {
             rey.currentMotion = Motions.sonicSpeed;
             rey.productionText = "goood night";
-            rey.orientTowards = "stray dog";
+            // rey.orientTowards("stray dog"); <-- Does not take a string but an object.  We can fix together.
         });
 
     avoidance = new Production("please leave me alone for now",
@@ -141,7 +141,7 @@ rey.makeProductions = function() {
         },
         function() {
             rey.orientTowards(sharAI);
-            rey.makeSpeechBubble = "No one will get close to me if I am close to sharAI";
+            rey.makeSpeechBubble("No one will get close to me if I am close to sharAI");
         });
 
     social = new Production("Does anyone want to talk?",

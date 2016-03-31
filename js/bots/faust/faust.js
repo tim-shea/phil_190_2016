@@ -24,6 +24,8 @@ faust.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 10, faust.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, faust.update2min, this);
 
+    faust.makeProductions();
+
     faust.eatsFood = function(object) {
 		if (object.name == "jerry_can" || "cupCake") {
 			return false;
@@ -50,15 +52,15 @@ faust.init = function() {
 }
 
 faust.makeProductions = function() {
-	var randBot = faust.getRandomBot;
+	var randBot = faust.getRandomBot();
     eatingProduction = new Production("eating food",
         Production.priority.High,
         function() {
             return (faust.hunger.value > 60);
         },
         function() {
-        	faust.findFood();
-            faust.makeSpeechBubble = "I have a craving only steak can satisfy";
+        	// faust.findFood(); <-- fix
+            faust.makeSpeechBubble("I have a craving only steak can satisfy");
         }
     );
     sleepingProduction = new Production("no motion when energy is slow i.e. sleeping",
@@ -70,7 +72,7 @@ faust.makeProductions = function() {
         },
         function() {
             faust.currentMotion = Motions.still;
-            faust.makeSpeechBubble = "So...tired...Zzzz";
+            faust.makeSpeechBubble("So...tired...Zzzz");
         }
     );
     singingProduction = new Production("singing",
@@ -79,7 +81,7 @@ faust.makeProductions = function() {
             return (faust.emotions.current === "Happy")
         },
         function() {
-            faust.makeSpeechBubble = "Doh ray mee~!";
+            faust.makeSpeechBubble("Doh ray mee~!");
         }
     );
     beingFriendly = new Production("making friends",
@@ -102,7 +104,7 @@ faust.makeProductions = function() {
         },
         function() {
             faust.moveAwayFrom(randBot);
-            faust.makeSpeechBubble == "I need some alone time..."
+            faust.makeSpeechBubble("I need some alone time...");
         }
     );
     playChase = new Production("playing chase",
@@ -112,9 +114,9 @@ faust.makeProductions = function() {
     	},
     	function() {
     		faust.pursue(randBot),
-    		faust.makeSpeechBubble = "Let's play"
+    		faust.makeSpeechBubble("Let's play");
     	}
-    )
+    );
 
     // Populate production list
     this.productions = [eatingProduction, sleepingProduction, singingProduction, beingFriendly, solitudeProduction, playChase];

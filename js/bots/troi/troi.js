@@ -157,7 +157,7 @@ troi.makeProductions = function() {
         },
         function() {
             troi.extraText = "Foooooooooooooood.";
-            troi.findFood();
+            // troi.findFood(); <- Change by passing in radius and edibility function
         });
     tinkering_Production = new Production("Tinkering",
         Production.priority.Medium,
