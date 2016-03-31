@@ -24,94 +24,101 @@ faust.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 10, faust.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, faust.update2min, this);
 
-    // Make productions.  Very dumb productions for now.
-    eatingProduction1 = new Production("eating",
-        Production.priority.High,
-        function() {
-            return (faust.hunger.value > 10 && faust.hunger.value < 20);
-        },
-        function() { console.log("Eating 1"); });
-    eatingProduction2 = new Production("eating",
-        Production.priority.Low,
-        function() {
-            return (faust.hunger.value > 20 && faust.hunger.value < 30);
-        },
-        function() { console.log("Eating 2"); });
-    eatingProduction3 = new Production("eating",
-        3,
-        function() {
-            return (faust.hunger.value > 30 && faust.hunger.value < 40);
-        },
-        function() { console.log("Eating 3"); });
+    faust.eatsFood = function(object) {
+		if (object.name == "jerry_can" || "cupCake") {
+			return false;
+		} else {
+			return object.isEdible;
+		}
+	}
 
-    // Populate production list
-    this.productions = [eatingProduction1, eatingProduction2, eatingProduction3];
+	faust.utilityFunction = function(object) {
+		if (object instanceof Bot) {
+        	return 50;
+    	} else if (object.name == "steak") {
+    		return 100
+    	} else if (object.name == "jerry_can") {
+        	return -100;
+    	} else if (object.name == "cupCake") {
+        	return -80;
+    	} else if (object.isEdible) {
+        	return object.calories; //function for calories added later
+    	} else {
+        	return 0;
+    	}
+	}
 }
 
-//faust.makeProductions = function() {
-//    eatingProduction = new Production("eating",
-//        Production.priority.High,
-//        function() {
-//            return (
-//                faust.hunger.value > 50;
-//            )
-//        },
-//        function() { 
-//            faust.extraText = "I have a craving only food can satisfy";
-//        }
-//    );
-//    sleepingProduction = new Production("sleeping",
-//        Production.priority.High,
-//        function() {
-//            return (
-//                faust.energy.value < 20
-//            );
-//        },
-//        function() { 
-//            faust.currentMotion = Motions.still;
-//            faust.extraText = "So...tired...Zzzz"; 
-//        }
-//    );
-//    singingProduction = new Production("singing",
-//        Production.priority.Low,
-//        function() {
-//            return (
-//                faust.energy.value > 20 &&
-//                faust.emotions.current === "Happy"
-//            );
-//        },
-//        function() { 
-//            faust.extraText = "Do ray me~!"; 
-//        }
-//    );                         
-//    beingFriendly = new Production("making friends",
-//        Production.priority.High,
-//        function() {
-//            let d = game.physics.arcade.distanceBetween(faust.sprite, this.sprite);
-//            if ((d > 100) && (d < 500)) && faust.emotions.current === "Happy" {
-//                return true;
-//            };
-//            return false;
-//        }
-//    );
-//    teleportProduction = new Production("teleport",
-//        Production.priority.High,
-//        function() {
-//              return (
-//                  faust.energy.value < 10 &&
-//                  faust.emotions.current === "Sad"
-//              ); 
-//        },
-//        function() {
-//              faust.currentMotion = Motions.zeleport;
-//        }
-//    
-//    )
-//
-//    // Populate production list
-//    this.productions = [eatingProduction, ];
-//}
+faust.makeProductions = function() {
+	var randBot = faust.getRandomBot;
+    eatingProduction = new Production("eating food",
+        Production.priority.High,
+        function() {
+            return (faust.hunger.value > 60;)
+        },
+        function() {
+        	faust.findFood();
+            faust.makeSpeechBubble = "I have a craving only steak can satisfy";
+        }
+    );
+    sleepingProduction = new Production("no motion when energy is slow i.e. sleeping",
+        Production.priority.High,
+        function() {
+            return (
+                faust.hunger.value < 20
+            );
+        },
+        function() {
+            faust.currentMotion = Motions.still;
+            faust.makeSpeechBubble = "So...tired...Zzzz";
+        }
+    );
+    singingProduction = new Production("singing",
+        Production.priority.Low,
+        function() {
+            return (faust.emotions.current === "Happy")
+        },
+        function() {
+            faust.makeSpeechBubble = "Doh ray mee~!";
+        }
+    );
+    beingFriendly = new Production("making friends",
+        Production.priority.High,
+        function() {
+            let d = game.physics.arcade.distanceBetween(faust.sprite, randBot);
+            if ((d > 100) && (d < 500)) && faust.emotions.current === "Upbeat" {
+                return true;
+            };
+            return false;
+        },
+        function() {
+        	return (faust.orientTowards(randBot))
+        },
+    );
+    solitudeProduction = new Production("solitude",
+        Production.priority.Medium,
+        function() {
+            return (faust.emotions.current === "Sad");
+        },
+        function() {
+            faust.moveAwayFrom(randBot);
+            faust.makeSpeechBubble == "I need some alone time..."
+        }
+    );
+    playChase = new Production("playing chase",
+    	Production.priority.Medium,
+    	function() {
+    		return (faust.emotions.current === "Happy" && faust.hunger.value < 30)
+    	}
+    	function() {
+    		faust.pursue(randBot),
+    		faust.makeSpeechBubble = "Let's play"
+    	}
+    )
 
+    // Populate production list
+    this.productions = [eatingProduction, sleepingProduction, singingProduction, beingFriendly, solitudeProduction, playChase];
+}
 
 
 /**
@@ -273,6 +280,7 @@ faust.update2min = function() {
  * @override
  */
 faust.collision = function(object) {
+	faust.moveAwayFrom(object);
     // console.log("Object is edible: " + object.isEdible);
     if (object.isEdible) {
         faust.eatObject(object);
