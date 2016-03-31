@@ -32,6 +32,8 @@ sharAI.init = function() {
 
     // Make productions
     this.makeProductions();
+
+    sharAI.setNetwork();
 }
 
 /**
@@ -386,6 +388,7 @@ sharAI.update = function() {
  * @memberOf sharAI
  */
 sharAI.updatePerSec = function() {
+	sharAI.updateNetwork();
     sharAI.incrementDecayVariables();
     fireProductions(sharAI.productions);
 }
@@ -412,6 +415,7 @@ sharAI.updateFiveSecs = function() {
  * @override
  */
 sharAI.collision = function(object) {
+	sharAI.addMemory("Saw " + object.name);
     if (object.canEat) {
         sharAI.eatObject(object);
     } else if (object instanceof Bot) {
@@ -429,6 +433,7 @@ sharAI.collision = function(object) {
  * @param {Entity} objectToEat what to eat
  */
 sharAI.eatObject = function(objectToEat) {
+	jeff.addMemory("Ate " + objectToEat.name);
     objectToEat.eat();
     sharAI.hunger.subtract(objectToEat.calories);
     sharAI.speak(objectToEat, "Om nom nom");
@@ -441,6 +446,7 @@ sharAI.eatObject = function(objectToEat) {
  */
 sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
     sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
+    sharAI.addMemory(botWhoSpokeToMe.name + " said \"" + whatTheySaid + "\"");
 }
 
 /**
@@ -451,6 +457,7 @@ sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
  */
 sharAI.highFived = function(botWhoHighFivedMe) {
     sharAI.boredom.subtract(5);
+    sharAI.addMemory("High Fived: " + botWhoHighFivedMe.name);
 }
 
 /**
@@ -460,18 +467,9 @@ sharAI.highFived = function(botWhoHighFivedMe) {
  * @override
  */
 sharAI.gotBit = function(botWhoAttackedMe, damage) {
+	sharAI.addMemory("Got bit by " + botWhoAttackedMe.name);
     sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that, " + botWhoAttackedMe.name + "!");
     sharAI.bite(botWhoAttackedMe, 25, 25);
-}
-
-/**
- * Override of Bot.hear
- *
- * @memberOf sharAI
- * @override
- */
-sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    sharAI.ear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
 }
 
 /**
@@ -482,6 +480,7 @@ sharAI.hear = function(botWhoSpokeToMe, whatTheySaid) {
  */
 sharAI.antler_caressed = function(botWhoCaressedMe, message) {
     sharAI.hear(botWhoCaressedMe, message);
+    sharAI.addMemory(botWhoCaressedMe.name + " caressed me with their antlers")
     sharAI.speak(botWhoCaressedMe, "Hey! Don't rub your horns on me, " + botWhoCaressedMe.name + "!");
 }
 
@@ -492,6 +491,7 @@ sharAI.antler_caressed = function(botWhoCaressedMe, message) {
  * @override
  */
 sharAI.gotBow = function(botWhoBowed) {
+	sharAI.addMemory(botWhoBowed.name + " bowed to me");
     sharAI.speak(botWhoBowed, "What are you bending your body for, " + botWhoBowed.name + "?");
 }
 
@@ -502,6 +502,7 @@ sharAI.gotBow = function(botWhoBowed) {
  * @override
  */
 sharAI.gotLicked = function(botWhoLickedMe) {
+	sharAI.addMemory(botWhoLickedMe.name + " licked me");
     sharAI.speak(botWhoLickedMe, "Haha! My turn, " + botWhoLickedMe.name + "!");
     sharAI.lick(botWhoLickedMe);
     sharAI.boredom.subtract(5);
@@ -514,5 +515,7 @@ sharAI.gotLicked = function(botWhoLickedMe) {
  * @override
  */
 sharAI.gotIgnored = function(botWhoIgnoredMe) {
+	sharAI.addMemory(botWhoIgnoredMe.name + " ignored me");
     sharAI.speak(botWhoIgnoredMe, "Hey, pay attention to me, " + botWhoIgnoredMe.name + "!");
 }
+
