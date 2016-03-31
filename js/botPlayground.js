@@ -74,13 +74,13 @@ function preload() {
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
     game.load.audio('attack 1', 'assets/attacksound1.mp3');
-<<<<<<< HEAD
+
     game.load.audio('snooze', 'assets/snooze.mp3');
     game.load.audio('crash', 'assets/crash.mp3');
-=======
+
     game.load.audio('collision', 'assets/collision_noise.mp3');
     game.load.audio('collision 2', 'assets/collision_noise2.wav');
->>>>>>> origin/master
+
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
