@@ -93,7 +93,7 @@ dylan.makeProductions = function() {
 
 
     fleeing = new Production("fleeing");
-    fleeing.priority = Production.priority.High,
+    fleeing.priority = Production.priority.High;
         fleeing.condition = function() {
             return (dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
         };
@@ -101,18 +101,60 @@ dylan.makeProductions = function() {
         dylan.productionText = "MUST HIDE FROM EVERYONE!"
     };
 
-
-
     
     delerium = new Production("delerious");
-        delerium.priority = Production.priority.Low,
+        delerium.priority = Production.priority.Low;
         delerium.condition = function() {
             return (dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
         };
         delerium.action = function() {
             dylan.productionText = "Everything's going fuzzy..."
         };
-    this.productions = [insanity, curiosity, revenge, fleeing, delerium];
+
+    distracted = new Production("distracted");
+    distracted.priority = Production.priority.Medium; 
+    distracted.condition = function() {
+        return (dylan.currentMotion = Motions.still);
+    };   
+    distracted.action = function() {
+        var nearbyBots = dylan.getNearbyBots(100);
+        if (nearbyBots.length <=100) {
+            dylan.orientTowards(nearbyBots[100], 1000);
+        }
+    };
+
+    pester = new Production("pester");
+    pester.priority = Production.priority.Low;
+    pester.condition = function() {
+        return (dylan.emotions.currrent === "Playful" || dylan.emotions.current === "Happy");
+    };
+    pester.action = function() {
+        var randomBot = dylan.getRandomBot();
+        dylan.pursue(randomBot, 500);
+        dylan.makeSpeechBubble("Hey you! Come back!");
+    };
+
+    irritated = new Production ("irritated");
+    irritated.priority = Production.priority.High;
+    irritated.condition = function(){
+        return (dylan.emotions.current === "Angry");
+    };
+    irritated.action = function() {
+        dylan.getOverlappingBots();
+        dylan.speak(overlappingObjects, "Get off me " + overlappingObjects.name + "!")
+    };
+
+    idletalk = new Production ("idle talk");
+    idletalk.priority = Production.priority.Low;
+    idletalk.condition = function() {
+        return (dylan.emotions.current === "Calm");
+
+    };
+    idletalk.action = function() {
+        dylan.makeSpeechBubble("I wonder what it's like having a heart");
+        //I want to add several more speech bubbles with a random chance of using any one of them, not sure how yet
+    };
+    this.productions = [insanity, curiosity, revenge, fleeing, delerium, distracted, pester, irritated, idletalk];
 }
 
 dylan.emotions = new MarkovProcess("Calm");
