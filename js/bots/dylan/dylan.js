@@ -24,8 +24,28 @@ dylan.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 4, dylan.update4min, this);
 
     this.makeProductions();
-
 }
+
+    dylan.canEat = function(object) {
+        if (object.name !== "jerry_can") {
+            return false;
+        } else {
+            return object.isEdible;
+    }
+
+
+    dylan.utilityFunction = function(object) {
+        if (object instanceof Bot) {
+            return 10
+        } else if (object.name !== "jerry_can") {
+            return -80;
+        } else if (object.isEdible) {
+            return object.calories;
+        } else {
+            return 1;
+        }
+    }
+ } 
 /**
  * Create 5 productions from list
  *
@@ -214,6 +234,7 @@ dylan.update4min = function() {
 
 dylan.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
+    dylan.moveAwayFrom(object);
     if (object.isEdible) {
         dylan.eatObject(object);
     } else {
@@ -231,7 +252,7 @@ dylan.collision = function(object) {
 dylan.eatObject = function(objectToEat) {
         objectToEat.eat();
         dylan.fuel.subtract(objectToEat.calories);
-        dylan.speak(objectToEat, "Weird, I don't usually eat " + objectToEat.description);
+        dylan.speak(objectToEat, "Glorious " + objectToEat.description + "!");
     }
     /**
      * Reaction to hearing something

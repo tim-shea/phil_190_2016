@@ -109,8 +109,8 @@ function setUpFood() {
             	addFoodItem("diet_pepsi", "Diet Pepsi", 0);
             	break;
             case 4:
-                addFoodItem("jerry_can", "Gasoline", 100);
-                //31,500 cals in a gallon of gasoline, about 5 gallons in a j100 can  
+                addFoodItem("jerry_can", "Gasoline", 157500);
+                //31,500 cals in a gallon of gasoline, about 5 gallons in a jerry can  
                 break;
             case 5:
                 addFoodItem("Philoberry", "Organic Philosopher's Stone", 5); 
