@@ -52,60 +52,67 @@ dylan.init = function() {
  */
 
 dylan.makeProductions = function() {
-    insanityProduction = new Production("insane",
-        Production.priority.Low,
-        function() {
-            return (
-                dylan.fuel.value > 90 && dylan.emotions.current === "Scared");
-        },
-        function() {
-            dylan.currentMotion = Motions.spazzing;
-            dylan.productionText = "WE RIDE TO VALHALLA!"
-        });
-    curiosityProduction = new Production("curious",
-        Production.priority.Low,
-        function() { 
-                return false; // <-- just forcing this production not to get triggered for now.  we can work together to reimplement this
-                // dylan.emotions.current === "Happy" || dylan.emotions.current === "Playful");
-                // let d = game.physics.arcade.distanceBetween(dylan.sprite, this.sprite);
-                // if ((d > 100) && (d < 350)) {
-                //     return true;
-                // } else {
-                //     return false;
-                // }
-        },
-        function() { dylan.speak(this.sprite, "What's your story?", 10); });
+    insanity = new Production("insane");
+    insanity.priority = Production.priority.Low;
+    insanity.condition = function() {
+        return (dylan.fuel.value > 90 && dylan.emotions.current === "Scared");
+    };
+    insanity.action = function() {
+        dylan.currentMotion = Motions.spazzing;
+        dylan.productionText = "WE RIDE TO VALHALLA!"
+    };
 
-    revengeProduction = new Production("seeking revenge",
-        Production.priority.Medium,
-        function() {
-            return (
-                dylan.emotions.current === "Angry" && dylan.collisionCheck === true);
-        },
-        function() {
-            dylan.currentMotion = Motions.running;
-            dylan.productionText = "Whoever that was, I AM COMING FOR YOU!"
-            dylan.pursueRandomObject
-        });
-    fleeingProduction = new Production("fleeing",
-        Production.priority.High,
-        function() {
-            return (
-               dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
-        },
-        function() {
-            dylan.productionText = "MUST HIDE FROM EVERYONE!"
-        });
-    deleriumProduction = new Production("delerious",
-        Production.priority.Low,
-        function() {
-            return (
-                dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
-        },
-        function() {
+
+
+    curiosity = new Production("curious");
+    curiosity.priority = Production.priority.Low;
+    curiosity.condition = function() {
+        return false; // <-- just forcing this production not to get triggered for now.  we can work together to reimplement this
+        // dylan.emotions.current === "Happy" || dylan.emotions.current === "Playful");
+        // let d = game.physics.arcade.distanceBetween(dylan.sprite, this.sprite);
+        // if ((d > 100) && (d < 350)) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
+    };
+    curiosity.action = function() {
+        dylan.speak(this.sprite, "What's your story?", 10);
+    };
+
+    revenge = new Production("seeking revenge");
+    revenge.priority = Production.priority.Medium;
+    revenge.condition = function() {
+        return (dylan.emotions.current === "Angry" && dylan.collisionCheck === true);
+    };
+    revenge.action = function() {
+        dylan.currentMotion = Motions.running;
+        dylan.productionText = "Whoever that was, I AM COMING FOR YOU!"
+        dylan.pursueRandomObject();
+    };
+
+
+    fleeing = new Production("fleeing");
+    fleeing.priority = Production.priority.High,
+        fleeing.condition = function() {
+            return (dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
+        };
+    fleeing.action = function() {
+        dylan.productionText = "MUST HIDE FROM EVERYONE!"
+    };
+
+
+
+    
+    delerium = new Production("delerious");
+        delerium.priority = Production.priority.Low,
+        delerium.condition = function() {
+            return (dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
+        };
+        delerium.action = function() {
             dylan.productionText = "Everything's going fuzzy..."
-        });
-    this.productions = [insanityProduction, curiosityProduction, revengeProduction, fleeingProduction, deleriumProduction];
+        };
+    this.productions = [insanity, curiosity, revenge, fleeing, delerium];
 }
 
 dylan.emotions = new MarkovProcess("Calm");
