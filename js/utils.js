@@ -116,7 +116,8 @@ function setUpFood() {
                 addFoodItem("Philoberry", "Organic Philosopher's Stone", 5); 
                 break;
             case 6:
-                addFoodItem("Spicy_Poffin", "A very spicy pastry.", 70) ;
+                addFoodItem("Spicy_Poffin", "A very spicy pastry.", 90);
+                //slightly more calories than a madeleine
                 break;
             case 7:
                 addFoodItem("Cheri_berry", "Pokemon berry #01", 20);

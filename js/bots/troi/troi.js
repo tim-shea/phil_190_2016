@@ -33,6 +33,52 @@ troi.init = function() {
 
     this.home.x = 25;
     this.home.y = 2700;
+
+    ///////////////////////////////////////
+    // edibitlity function initization// //
+    ///////////////////////////////////////
+    troi.safeFood = function(object) {
+        if (object.name == "jerry_can" || object.name == "diet_pepsi" || object.name == "devil_fruit_rubber" || object.name == "steak") {
+            return false;
+        } else {
+            return object.isEdible;
+        }
+    }
+
+    /////////////////////////////////////
+    // utility function initialization //
+    /////////////////////////////////////
+    troi.utility = function(object) {
+        if (object instanceof Bot) {
+            return 15;
+        } else if (object.name == "sharAI") {
+            return -65;
+        } else if (object.name == "jeff") {
+            return 0;
+        } else if (object.name == "web") {
+            return -20;
+        } else if (object.name == "easternCastle") {
+            return 69;
+        } else if (object.name == "treasure") {
+            return 88;
+        } else if (object.name == "Cherry Blossom Tree") {
+            return 30;
+        } else if (object.isEdible) {
+            if (object.calories <= 100) {
+                return onject.calories;
+            } else {
+                var temp = object.calories;
+                while (temp > 100) {
+                    temp = temp - temp / 2;
+                }
+                return temp;
+            }
+        } else if (!object.isEdible) {
+            return -35;
+        } else{
+        	return 5;
+        }
+    }
 }
 troi.motionMode = Motions.walking;
 troi.extraText = "";
@@ -160,7 +206,7 @@ troi.setMotion = function() {
             if (Math.random() <= .20) {
                 if (Math.random() <= .10) { //Probability of being startled
                     if (Math.random() > .20) { //Probability of running away
-                      //  console.log('Run, Run Away!');
+                        //  console.log('Run, Run Away!');
                         return Motions.running;
                     } else { //Probably of freezing in fear
                         return troi.resting;
@@ -250,14 +296,14 @@ troi.recovering = {
 //////////
 troi.treasure = {
     description: "treasure",
-    x : 10,
-    y : 2930
+    x: 10,
+    y: 2930
 }
 
 troi.home = {
     description: "home",
-    x : 25,
-    y : 2700
+    x: 25,
+    y: 2700
 }
 
 
