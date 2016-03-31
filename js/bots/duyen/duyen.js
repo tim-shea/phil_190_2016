@@ -200,7 +200,7 @@ duyen.update1Sec = function() {
 
 // Called every two minutes
 duyen.update2min = function() {
-    duyen.hunger.eat(101);
+    //duyen.hunger.eat(101);
 }
 
 // Called every three minutes
