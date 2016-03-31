@@ -30,12 +30,11 @@ rey.utilityFunction = function(object) {
     if (object instanceof Bot) {
         return 10;
     } else if (object.name == "jerry_can" || object.name == "Devil_Fruit_rubber" || object.name == "diet_pepsi") {
-        return -70;
+        return -40;
     } else if (object.isEdible) {
-        // TODO: Introduce a function that scales calories to utilities 
         return object.calories;
     } else {
-        return 1;
+        return 2;
     }
 }
 
@@ -153,11 +152,11 @@ rey.makeProductions = function() {
         },
         function() {
             var nearbyBots = rey.getNearbyBots(800);
-        if (nearbyBots.length > 0) {
-            rey.pursue(nearbyBots[0], 500);
-            rey.speak(nearbyBots[0], "let's hang out! " + nearbyBots[0].name, 1500);
-        }
-    });
+            if (nearbyBots.length > 0) {
+                rey.pursue(nearbyBots[0], 500);
+                rey.speak(nearbyBots[0], "let's hang out! " + nearbyBots[0].name, 1500);
+            }
+        });
 
     this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood, goHome, avoidance, social];
 }
