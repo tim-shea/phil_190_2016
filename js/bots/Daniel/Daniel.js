@@ -4,32 +4,33 @@ Daniel.init = function() {
     this.body = this.sprite.body;
     this.body.angle = 100; // Initial Angle
     this.body.speed = 70; // Initial Speed
-
+    //this.sprite.scale.setTo(3,3);
+    // ^ this is how you scale things.  Use this for the shield.
     //Initialized timed events
     game.time.events.loop(Phaser.Timer.SECOND * 1, Daniel.updateOneSecond, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60, Daniel.updateMin, this);
 }
 
 Daniel.isEdible = function(object) {
-	if (object.name == "jerry_can") {
-		return false;
-	} else {
-		return object.isEdible;
-	}
+    if (object.name == "jerry_can") {
+        return false;
+    } else {
+        return object.isEdible;
+    }
 }
 
 Daniel.utilityFunction = function(object) {
-	if (object instanceof Bot) {
-		return 30;
-	} else if (object.name == "jerry_can") {
-		return -90;
-	} else if (object.name == "steak") {
-		return -40;
-	} else if (object.isEdible) {
-		return object.calories;
-	} else {
-		return 0;
-	}
+    if (object instanceof Bot) {
+        return 30;
+    } else if (object.name == "jerry_can") {
+        return -90;
+    } else if (object.name == "steak") {
+        return -40;
+    } else if (object.isEdible) {
+        return object.calories;
+    } else {
+        return 0;
+    }
 }
 
 //
@@ -213,10 +214,11 @@ Daniel.getStatus = function() {
 
 Daniel.update = function() {
     Daniel.motionMode.update();
-    this.basicUpdate();
+    Daniel.genericUpdate();
 };
 
 Daniel.updateOneSecond = function() {
+    Daniel.updateNetwork();
     Daniel.hunger.update();
     Daniel.fear.update();
     if (Math.random() < Daniel.emotion.transitionProb) {
@@ -231,6 +233,7 @@ Daniel.updateMin = function() {
 }
 
 Daniel.collision = function(object) {
+    Daniel.addMemory("Saw " + object.name);
     Daniel.moveAwayFrom(object);
     if (Daniel.isEdible(object)) {
         Daniel.eatObject(object);
