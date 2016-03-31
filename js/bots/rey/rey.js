@@ -131,21 +131,35 @@ rey.makeProductions = function() {
         function() {
             rey.currentMotion = Motions.sonicSpeed;
             rey.productionText = "goood night";
-            rey.orientTowards = "stray";
+            rey.orientTowards = "stray dog";
         });
 
     avoidance = new Production("please leave me alone for now",
         Production.priority.Medium,
         function() {
             return (
-                rey.emotions.current == "Not in the mood" || rey.emotions.current == "Sleepy")
+                rey.emotions.current == "Not in the mood" || rey.emotions.current == "Sleepy");
         },
         function() {
             rey.orientTowards(sharAI);
             rey.makeSpeechBubble = "No one will get close to me if I am close to sharAI";
         });
 
-    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood, goHome, avoidance];
+    social = new Production("Does anyone want to talk?",
+        Production.priority.High,
+        function() {
+            return (
+                rey.emotions.current == "Hyper" || rey.hunger.value < 20);
+        },
+        function() {
+            var nearbyBots = rey.getNearbyBots(800);
+        if (nearbyBots.length > 0) {
+            rey.pursue(nearbyBots[0], 500);
+            rey.speak(nearbyBots[0], "let's hang out! " + nearbyBots[0].name, 1500);
+        }
+    });
+
+    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood, goHome, avoidance, social];
 }
 
 
