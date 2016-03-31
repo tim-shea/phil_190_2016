@@ -43,7 +43,7 @@ duyen.init = function() {
         } else if (object.isEdible) {
             return object.calories;
         } else {
-            return 0;
+            return 1;
         }
     }
 
@@ -157,6 +157,8 @@ duyen.makeProductions = function() {
             duyen.ProductionText = "Back off!";
             duyen.attackNearbyBots;
         });
+
+     this.productions = [eatingProduction, cleaningProduction, attackEnemy, fleeAway, dancingProduction, goHome, pursueFriend, findFood, defendResources];
 }
 
 
