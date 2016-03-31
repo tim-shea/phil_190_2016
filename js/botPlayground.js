@@ -74,6 +74,8 @@ function preload() {
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
     game.load.audio('attack 1', 'assets/attacksound1.mp3');
+    game.load.audio('drink', 'assets/drinkSound.mp3');
+    game.load.audio('wilhelm', 'assets/Wilhelm_Scream.wav')
 
     game.load.audio('snooze', 'assets/snooze.mp3');
     game.load.audio('crash', 'assets/crash.mp3');

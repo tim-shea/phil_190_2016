@@ -5,7 +5,19 @@ var troi = new Bot(0, 3000, 'troi', 'js/bots/troi/umbreon_2.0.png');
  *@date February 26,2016
  */
 
+// troi.treasure.x = 10;
+// troi.treasure.y = 2930;
+// troi.home.x = 25;
+// troi.home.y = 2700;
 
+troi.treasure = {
+    x: 10,
+    y: 2930
+};
+troi.home = {
+    x: 25,
+    y: 2700
+};
 ///////////////////////////////
 // (Override) Initialize Bot //
 ///////////////////////////////
@@ -20,6 +32,11 @@ troi.init = function() {
 
     troi.attackList = ["Shadow Ball", "Dark Pulse", "Payback", "Toxic", "Moonlight", "Agility"];
     troi.inventory = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    troi.health = 100;
+    troi.grimoire = new Array(100);
+    for (var i = 0; i < troi.grimoire.length; i++) {
+        troi.grimoire[i] = 0;
+    }
 
 
     //////////////////////////////
@@ -29,10 +46,9 @@ troi.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * .1, troi.updateTenthSec, this); //loops (10/sec) for updating the stamina
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, troi.update_1_30_sec, this); //loops every 2 minutes to update for hunger
 
-    this.makeProductions();
 
-    this.home.x = 25;
-    this.home.y = 2700;
+
+    this.makeProductions();
 
     ///////////////////////////////////////
     // edibitlity function initization// //
@@ -75,8 +91,8 @@ troi.init = function() {
             }
         } else if (!object.isEdible) {
             return -35;
-        } else{
-        	return 5;
+        } else {
+            return 5;
         }
     }
 }
@@ -103,7 +119,7 @@ troi.makeProductions = function() {
         },
         function() {
             troi.body.speed = 150; //&&
-            troi.treasure;
+            troi.goto(troi.treasure.x, troi.treasure.y, 3000);
         });
     homeward_Production = new Production("To Home",
         Production.priority.High,
@@ -114,7 +130,7 @@ troi.makeProductions = function() {
             );
         },
         function() {
-            troi.home;
+            troi.goto(troi.home.x, troi.home.y, 2000);
             troi.body.speed = 100;
         });
 
@@ -140,8 +156,7 @@ troi.makeProductions = function() {
         },
         function() {
             troi.extraText = "Foooooooooooooood.";
-            troi.motionMode = Motions.walking;
-
+            troi.findFood();
         });
     tinkering_Production = new Production("Tinkering",
         Production.priority.Medium,
@@ -155,7 +170,7 @@ troi.makeProductions = function() {
         function() {
 
             for (i = 0; i < troi.inventory.length; i++) {
-                if (Math.random > .5) {
+                if (Math.random > .5 && troi.inventory[i] == 0) {
                     troi.inventory[i] += 1;
                 };
             };
@@ -163,11 +178,90 @@ troi.makeProductions = function() {
 
         });
 
+    flee_Production = new Production("Flee",
+        Production.priority.High,
+        function() {
+            return (
+                troi.health < 20 ||
+                (troi.emotion.current === "agitated" || troi.emotion.current === "neutral") &&
+                troi.hunger < 300 &&
+                Math.random < 0.23
+            );
+        },
+        function() {
+            troi.moveAwayFrom(troi.utility(troi.getNearbyBots(200)));
+            troi.makeSpeechBubble("Run, run away!    TxT   ", 2500)
+        });
+
+    tailing_Prpduction = new Production("Sneak-tailing",
+        Production.priority.Medium,
+        function() {
+            return (
+                troi.health > 55 &&
+                (troi.emotion.current === "agitated" || troi.emotion.current === "neutral" || troi.emotion.current === "happy") &&
+                troi.stamina > 12000 &&
+                troi.hunger < 300
+            );
+        },
+        function() {
+            var localBots = troi.getNearbyBots(500);
+            if (nearbyBots.length > 0) {
+                troi.body.speed = 75;
+                troi.pursue(localBots[0], 20000);
+                troi.makeSpeechBubble("* que MGS OST ", 6315)
+            }
+
+        });
+
+    politicking_Production = new Production("Political answering",
+        Production.priority.Medium,
+        function() {
+            var localBots = troi.getNearbyBots(1000);
+            for (var i = 0; i < localBots.length; i++) {
+                if (localBots[i].name === "jeff") {
+                    return (
+                        (troi.emotion.current === "neutral" || troi.emotion.current === "happy") &&
+                        troi.hunger < 200 &&
+                        troi.stamina > 4321
+                    )
+                }
+
+            }
+        },
+        function() {
+            troi.orientTowards(localBots, 1000);
+            troi.pursue(localBots, 25000);
+            troi.speak(localBots, "Politically correct statements", 7000)
+        });
+
+    research_Production = new Production("Research",
+        Production.priority.Low,
+        function() {
+            return (!(troi.emotion.current === "angry" || troi.emotion.current === "agitated") &&
+                troi.hunger < 250 &&
+                troi.stamina > 2100
+            );
+        },
+        function() {
+            var localObj = troi.getNearbyObjects(1000);
+            if (localObj.length > 0) {
+
+                for (var i = 0; i < localObj.length; i++) {
+                    localObj[i] = localObj.name;
+                }
+
+            }
+
+        });
+
+
     this.productions = [treasureHunting_Production, homeward_Production, nap_Production,
-        eating_Production, tinkering_Production
+        eating_Production, tinkering_Production, flee_Production, tailing_Prpduction,
+        politicking_Production, research_Production
     ];
 
-}
+};
+
 
 ///////////////////
 // Emotion Modes //
@@ -289,23 +383,6 @@ troi.recovering = {
         troi.stamina += 20;
     }
 }
-
-
-//////////
-// MISC //
-//////////
-troi.treasure = {
-    description: "treasure",
-    x: 10,
-    y: 2930
-}
-
-troi.home = {
-    description: "home",
-    x: 25,
-    y: 2700
-}
-
 
 
 /////////////
