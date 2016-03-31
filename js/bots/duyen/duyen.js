@@ -38,6 +38,8 @@ duyen.init = function() {
             return -80;
         } else if (object.name == "Spice_Poffin") {
             return -30;
+        } else if (object.name == "Devil_Fruit_rubber") {
+            return -70;
         } else if (object.isEdible) {
             return object.calories;
         } else {
