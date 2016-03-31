@@ -224,7 +224,10 @@ function fireProductions(productions) {
         if(Math.random() < activeProductions[0].probNotFiring) {
             return;
         }
-        activeProductions[0].action();
+        // Choose randomly among those tied for current priority level
+        baselinePriority  = activeProductions[0].priorityLevel;
+        activeProductions = activeProductions.filter(function(production) {return production.priorityLevel === baselinePriority;});
+        activeProductions[game.rnd.integerInRange(0, activeProductions.length-1)].action();
     }
 }
 

@@ -461,7 +461,7 @@ Bot.prototype.speak = function(botToTalkTo, whatToSay, howLong = 2000) {
  * @param  {String} text what to say
  * @param  {Number} howLong  how long to say it in milliseconds.
  */
-Bot.prototype.makeSpeechBubble = function(text, howLong = 1000) {
+Bot.prototype.makeSpeechBubble = function(text, howLong = 1500) {
     if (this.currentSpeech != null) {
         return;
     }

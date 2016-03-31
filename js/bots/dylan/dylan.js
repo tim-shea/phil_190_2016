@@ -141,7 +141,9 @@ dylan.makeProductions = function() {
     };
     irritated.action = function() {
         dylan.getOverlappingBots();
-        dylan.speak(overlappingObjects, "Get off me " + overlappingObjects.name + "!")
+        // Dylan: you need to check if the above is empty or not.
+        //  set a variable to it, and then check if its length > 0
+        // dylan.speak(overlappingObjects, "Get off me " + overlappingObjects.name + "!")
     };
 
     idletalk = new Production ("idle talk");

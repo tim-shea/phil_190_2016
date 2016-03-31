@@ -111,12 +111,13 @@ jeff.makeProductions = function() {
     };
     chatty.action = function() {
         var nearbyBots = jeff.getNearbyBots(800);
+        jeff.addMemory("Was bored");
         if (nearbyBots.length > 0) {
             jeff.pursue(nearbyBots[0], 500);
             jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
         }
     };
-    chatty.probNotFiring = .8;
+    chatty.probNotFiring = .95;
 
     commentOnGoodStuff = new Production("Comment on high utility items");
     commentOnGoodStuff.priority = Production.priority.High;
@@ -138,6 +139,7 @@ jeff.makeProductions = function() {
     findNewFriends = new Production("Talk to random people when happy");
     findNewFriends.priority = Production.priority.Low;
     findNewFriends.condition = function() {
+        jeff.addMemory("Looking for friends");
         return (jeff.emotions.current === "Happy");
     };
     findNewFriends.action = function() {
@@ -147,8 +149,23 @@ jeff.makeProductions = function() {
     };
     findNewFriends.probNotFiring = .8;
 
+    var randStrings = ["Philosophy is good for the heart", 
+        "Please don't buy food during class", 
+        "I can tell you are checking social media",
+        "Happy spouse happy house"];
+    sayRandomStuffWhenCalm = new Production("Say random stuff when calm");
+    sayRandomStuffWhenCalm.priority = Production.priority.High;
+    sayRandomStuffWhenCalm.condition = function() {
+        return jeff.emotions.current == "Calm";
+    };
+    sayRandomStuffWhenCalm.action = function() {
+        jeff.makeSpeechBubble(randStrings[game.rnd.integerInRange(0, randStrings.length-1)]);
+    };
+    sayRandomStuffWhenCalm.probNotFiring = .9;
+
     // Populate production list
-    this.productions = [foodSeeking, admireCar, fight, irritable, chatty, findNewFriends, commentOnGoodStuff];
+    this.productions = [foodSeeking, admireCar, fight, 
+        irritable, chatty, findNewFriends, commentOnGoodStuff, sayRandomStuffWhenCalm];
 }
 
 /**
@@ -309,6 +326,5 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
  */
 jeff.highFived = function(botWhoHighFivedMe) {
     jeff.addMemory("High Fived: " + object.name);
-
     jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
