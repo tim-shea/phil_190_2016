@@ -40,6 +40,7 @@ Bot.prototype.bite = function(botToAttack, damage) {
     if (botToAttack instanceof Bot) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
             botToAttack.gotBit(this, damage);
+            this.attackMotion(botToAttack);
         }
     }
 };

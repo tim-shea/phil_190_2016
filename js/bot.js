@@ -430,7 +430,6 @@ Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction = func
 }) {
     var nearbyBots = this.getNearbyBots(radius);
     if (nearbyBots.length > 0) {
-        this.attackMotion(nearbyBots[0]);
         this.bite(nearbyBots[0], 100);
     }
 }
@@ -473,23 +472,4 @@ Bot.prototype.makeSpeechBubble = function(text, howLong = 1000) {
         this.currentSpeech = null;
     }, this);
 
-}
-
-/**
- * Checks if an object is part of a group
- * 
- * @param  {object}  object The object to check
- * @param  {Group}  group  The group to check the object against
- * @return {Boolean}        Is the object part of this group?
- */
-Bot.prototype.isChild = function(object, group) {
-    if (group instanceof Group) {
-        for (i = 0; i < group.children.length; i++) {
-            if (group.children[i] = object) {
-                return true;
-            }
-        }
-    }
-
-    return false;
 }

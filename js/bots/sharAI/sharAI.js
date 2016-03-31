@@ -50,23 +50,46 @@ sharAI.canEat = function(object) {
     }
 }
 
+sharAI.utilityFunction = function(object) {
+        if (object instanceof Bot) {
+            if (object.name != "dylan") {
+                return 30;
+            }
+            else {
+                return -50;
+            }
+        } else if (object.name == "web" || object.name == "cocoon") {
+            return 70;
+        } else if (sharAI.canEat()) {
+            return object.calories;
+        } else {
+            return 0;
+        }
+    }
+
 /**
  * Create the list of productions for this agent.
  *
  * @memberOf sharAI
  */
 sharAI.makeProductions = function() {
-    getFood = new Production("hunting",
-        10,
-        function() {
-            return (
-                sharAI.hunger.value > 50);
-        },
-        function() {
-            sharAI.findFood(100, sharAI.canEat);
-        });
+    getFood = new Production("hunting");
+    getFood.priority = 10;
+    getFood.condition = function() {
+        return (sharAI.hunger.value > 50);
+    }
+    getFood.action = function() {
+        sharAI.findFood(100, sharAI.canEat);
+    }
 
-
+    returnHome = new Production("going home");
+    returnHome.priority = 7;
+    returnHome.condition = function() {
+        return (sharAI.energyLevel == "Anxious" || sharAI.health.value < 25);
+    }
+    returnHome.action = function() {
+        sharAI.goHome();
+    }
 
     // Populate production list
     this.productions = [getFood];

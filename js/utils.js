@@ -224,3 +224,22 @@ function fireProductions(productions) {
         activeProductions[0].action();
     }
 }
+
+/**
+ * Checks if an object is part of a group
+ * 
+ * @param  {object}  object The object to check
+ * @param  {Group}  group  The group to check the object against
+ * @return {Boolean}        Is the object part of this group?
+ */
+function isChild(object, group) {
+    if (group instanceof Group) {
+        for (i = 0; i < group.children.length; i++) {
+            if (group.children[i].name = object) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
