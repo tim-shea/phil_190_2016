@@ -54,7 +54,7 @@ faust.makeProductions = function() {
     eatingProduction = new Production("eating food",
         Production.priority.High,
         function() {
-            return (faust.hunger.value > 60;)
+            return (faust.hunger.value > 60);
         },
         function() {
         	faust.findFood();
@@ -86,14 +86,14 @@ faust.makeProductions = function() {
         Production.priority.High,
         function() {
             let d = game.physics.arcade.distanceBetween(faust.sprite, randBot);
-            if ((d > 100) && (d < 500)) && faust.emotions.current === "Upbeat" {
+            if ((d > 100) && (d < 500) && faust.emotions.current === "Upbeat") {
                 return true;
             };
             return false;
         },
         function() {
         	return (faust.orientTowards(randBot))
-        },
+        }
     );
     solitudeProduction = new Production("solitude",
         Production.priority.Medium,
@@ -109,7 +109,7 @@ faust.makeProductions = function() {
     	Production.priority.Medium,
     	function() {
     		return (faust.emotions.current === "Happy" && faust.hunger.value < 30)
-    	}
+    	},
     	function() {
     		faust.pursue(randBot),
     		faust.makeSpeechBubble = "Let's play"
