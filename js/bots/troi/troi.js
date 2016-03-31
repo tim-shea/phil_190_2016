@@ -12,7 +12,8 @@ var troi = new Bot(0, 3000, 'troi', 'js/bots/troi/umbreon_2.0.png');
 
 troi.treasure = {
     x: 10,
-    y: 2930
+    y: 2930554
+
 };
 troi.home = {
     x: 25,
@@ -425,6 +426,7 @@ troi.hunger = {
         }
         return hungerLevel + " (Hunger = " + this.amount + ")";
     }
+
 }
 
 ///////////////////////////////////////
@@ -551,7 +553,6 @@ troi.collision = function(object) {
  */
 troi.eatObject = function(objectToEat) {
     objectToEat.eat();
-    troi.hunger.subtract(objectToEat.calories);
     troi.hunger.eat(objectToEat.calories);
     troi.speak(objectToEat, "Yay, food. " + objectToEat.description + "!");
 }
