@@ -72,6 +72,7 @@ function preload() {
     // Load sounds
     game.load.audio('doozer', 'assets/doos.wav');
     game.load.audio('chomp', 'assets/chwl.wav');
+    game.load.audio('attack 1', 'assets/attacksound1.mp3');
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
