@@ -192,7 +192,8 @@ yang.init_state = function() {
         yang["rotation_node"] = yang.def_node;
     }
     //unfinished
-    //TODO: move away ang.tag = new yang.tag_game_obj(); // see helper
+    //TODO: move away 
+    yang.tag = new yang.tag_game_obj(); // see helper
 };
 /**
  * game system accessors
@@ -340,8 +341,6 @@ yang.onemin_timedEvend = function () {
     //empty most of memory
     yang.memory_.friendly_bots = [yang.memory_.friendly_bots[yang.memory_.friendly_bots.length-1]];
     yang.memory_.unfriendly_bots = [yang.memory_.unfriendly_bots[yang.memory_.unfriendly_bots.length-1]]; 
-    //memory update
-    yang.updateNetwork();
 }
 
 /**
@@ -370,7 +369,6 @@ yang.fun_.find_colliding_obj = function (object_in_array) {
  * @Override
  */
 yang.collision = function(object) {//collision
-    yang.addMemory("Saw " + object.name);
     yang.memory_.last_collided_obj = yang.memory_.colliding_obj;
     yang.memory_.colliding_obj = object;
     for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
@@ -394,18 +392,6 @@ yang.collision = function(object) {//collision
         }
     }
 };
-/**
- * edibility
- * @param  {Object} fun_object [description]
- * @return {Bool}
- */
-yang.fun_.edible = function (fun_object) {
-    return (fun_object instanceof Entity) 
-        && (fun_object.isEdible == true)
-        && ((fun_object.name.toLowerCase()).search("berry") > 0
-        || (fun_object.name.toLowerCase()).search("fruit") > 0);
-};
-
 /**
  * called by init_plus
  * push actions and reactions into list
@@ -984,7 +970,9 @@ yang.node_.feast_upon = new yang.fun_.def_node_construct("production_node");
 yang.node_.feast_upon.name = "fiesta";
 yang.node_.feast_upon.priority = Production.priority.High;
 yang.node_.feast_upon.condition = function () {
-    return yang.fun_.edible(yang.memory_.colliding_obj)
+    return (yang.memory_.colliding_obj instanceof Entity)
+        && ((yang.memory_.colliding_obj.name.toLowerCase()).search("berry") > 0
+        || (yang.memory_.colliding_obj.name.toLowerCase()).search("fruit") > 0)
         && yang["mental_task_node"] == yang.node_.id_prime_focus;
 }
 yang.node_.feast_upon.action = function() {
@@ -1003,7 +991,9 @@ yang.node_.memorize_uneaten_food = new yang.fun_.def_node_construct("production_
 yang.node_.memorize_uneaten_food.name = "memorize_uneaten_food";
 yang.node_.memorize_uneaten_food.priority = Production.priority.High;
 yang.node_.memorize_uneaten_food.condition = function () {//I think problem is here
-    return yang.fun_.edible(yang.memory_.colliding_obj)
+    return (yang.memory_.colliding_obj instanceof Entity)
+        && ((yang.memory_.colliding_obj.name.toLowerCase()).search("berry") > 0
+        || (yang.memory_.colliding_obj.name.toLowerCase()).search("fruit") > 0)
         && yang["mental_task_node"] != yang.node_.id_prime_focus
         && typeof yang.memory_.uneaten_food.find(yang.fun_.find_colliding_obj) == "undefined";
 };
