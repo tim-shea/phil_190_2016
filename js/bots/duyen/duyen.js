@@ -13,9 +13,8 @@ duyen.init = function() {
 
     // Initialize Timed Updates
     game.time.events.loop(Phaser.Timer.SECOND * 1, duyen.update1Sec, this);
-    game.time.events.loop(Phaser.Timer.SECOND * .01, duyen.updateTenthSec, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 10, duyen.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, duyen.update2min, this);
-    game.time.events.loop(Phaser.Timer.SECOND * 60 * 3, duyen.update3min, this);
 
     // Make productions
     this.makeProductions();
@@ -228,11 +227,6 @@ duyen.pursuitCompleted = function() {
     duyen.genericUpdate();
 }
 
-// Called every tenth of a second
-duyen.updateTenthSec = function() {
-    //  No implementation
-}
-
 // Called every second
 duyen.update1Sec = function() {
     duyen.speechText = "";
@@ -250,15 +244,9 @@ duyen.update1Sec = function() {
     // >>>>>>> origin/master
 }
 
-// Called every two minutes
-duyen.update2min = function() {
-    //duyen.hunger.eat(101);
-}
+duyen.updateTenSecs = function() {}
 
-// Called every three minutes
-duyen.update3min = function() {
-    duyen.hygiene.clean(101);
-}
+duyen.update2min = function() {}
 
 
 duyen.collision = function(object) {
@@ -301,8 +289,8 @@ duyen.highFived = function(botWhoHighFivedMe) {
 
 duyen.eatObject = function(objectToEat) {
     duyen.addMemory("Ate" + objectToEat.name);
-    objectToEat.eat();
-    duyen.hunger.subtract(objectToEat.calories);
+/*    objectToEat.eat();
+    duyen.hunger.eatIt(objectToEat.calories);
     duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
-    sound.chomp.play();
+    sound.chomp.play();*/
 }
