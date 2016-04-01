@@ -42,7 +42,12 @@ function Bot(x, y, name, path) {
     this.currentMemory;
     this.currentTransition;
     this.setNetwork();
+    // If true, show nodes and edges by their activation values (hides regular labels)
+    this.showActivations = false;
 };
+
+// DO NOT CHANGE.  Temporary variable to avoid errors on startup.    The 'real' variable is in botPlayground.js
+var memoryOn = true;
 
 /**
  * Returns a status string that describes the bot's internal state
@@ -430,7 +435,7 @@ Bot.prototype.findFood = function(radius = 500, edibilityFunction) {
 /**
  * Attack bots in the indicated radius
  */
-Bot.prototype.attackNearbyBots = function(radius = 500, edibilityFunction) {
+Bot.prototype.attackNearbyBots = function(radius = 500) {
     var nearbyBots = this.getNearbyBots(radius);
     if (nearbyBots.length > 0) {
         this.bite(nearbyBots[0], 100);
@@ -497,36 +502,65 @@ Bot.prototype.isChild = function(object, group) {
 }
 
 /**
- * Initialize the memory network.
+ * Initialize the memory network and associated options.
+ *
+ * Docs on dataset object: http://visjs.org/docs/data/dataset.html
  */
 Bot.prototype.setNetwork = function() {
-    this.nodes = new vis.DataSet();
+    if (!memoryOn) {
+        return;
+    }
+    this.nodes = new vis.DataSet(); // Main memory store
     this.edges = new vis.DataSet();
     this.options = {
         nodes: {
             shape: 'dot',
-            scaling: {
-                customScalingFunction: function(min, max, total, value) {
-                    return value / total;
-                },
-                min: 50,
-                max: 200
-            }
+            smooth: false, // For better performance. Todo: does not seem to work...
+            // scaling: {
+            //     customScalingFunction: function(min, max, total, value) {
+            //         return value / total;
+            //     },
+            //     min: 1,
+            //     max: 5
+            // }
         }
     };
 };
+
+
+/**
+ * Get a memory
+ * @param  {String} memoryToGet what to look for
+ * @return a reference to the vis.js node
+ */
+Bot.prototype.getMemory = function(memoryToGet) {
+    if (!memoryOn) {
+        return null;
+    }
+    return this.nodes.get(memoryToGet);
+}
+
+/**
+ * Check if a specified memory is contained in the memory network.
+ */
+Bot.prototype.containsMemory = function(memoryToCheck) {
+    return (this.getMemory(memoryToCheck) != null);
+}
 
 /**
  * Add a memory to the network.  A memory is just  a string.
  * @param {Node} id the string id for the memory (rename id?)
  */
 Bot.prototype.addNode = function(id) {
+    if (!memoryOn) {
+        return;
+    }
     node = this.nodes.get(id);
     // If the node is already in the network, change its color
     if (node) {
         this.nodes.update({
             id: id,
-            value: node.value + 2,
+            value: node.value + .1,
         });
         this.currentMemory = node;
     } else {
@@ -548,6 +582,9 @@ Bot.prototype.addNode = function(id) {
  * @param {String} current memory
  */
 Bot.prototype.addEdge = function(last, current) {
+    if (!memoryOn) {
+        return;
+    }
     id = last + "-->" + current;
     //No recurrent connections
     if (last === current) {
@@ -558,7 +595,7 @@ Bot.prototype.addEdge = function(last, current) {
     if (edge) {
         this.edges.update({
             id: id,
-            value: edge.value + 2,
+            value: edge.value + .1,
         });
         this.currentTransition = edge;
     } else {
@@ -581,6 +618,9 @@ Bot.prototype.addEdge = function(last, current) {
  * @param {String} memory the new memory
  */
 Bot.prototype.addMemory = function(memory) {
+    if (!memoryOn) {
+        return;
+    }
     this.addNode(memory);
     if (this.lastMemory) {
         this.addEdge(this.lastMemory, memory)
@@ -595,12 +635,19 @@ Bot.prototype.addMemory = function(memory) {
  * Update the memory network by decaying all node and edge activations
  */
 Bot.prototype.updateNetwork = function() {
-
+    if (!memoryOn) {
+        return;
+    }
     currentBot = this;
     // Decay nodes
     this.nodes.forEach(function(node) {
         // Decay node
-        currentBot.nodes.update({ id: node.id, value: Math.max(.1, node.value - .01) });
+        let tempval = round(Math.min(2, Math.max(1, node.value - .01)), 2);
+        if (currentBot.showActivations) {
+            currentBot.nodes.update({ id: node.id, label: '' + tempval, value: tempval });
+        } else {
+            currentBot.nodes.update({ id: node.id, value: tempval });
+        }
         // Color non-current nodes blue
         if (currentBot.currentMemory) {
             if (node.id != currentBot.currentMemory.id) {
@@ -613,8 +660,13 @@ Bot.prototype.updateNetwork = function() {
 
     // Decay Edges
     this.edges.forEach(function(edge) {
+        let tempval = round(Math.min(2, Math.max(1, edge.value - .01)), 2);
         // Decay edge
-        currentBot.edges.update({ id: edge.id, value: Math.max(.1, edge.value - .001) });
+        if (currentBot.showActivations) {
+            currentBot.edges.update({ id: edge.id, label: '' + tempval, value: tempval });
+        } else {
+            currentBot.edges.update({ id: edge.id, value: tempval });
+        }
         // Color non-current edges blue
         if (currentBot.currentTransition) {
             // console.log(edge, currentTransition);
@@ -629,34 +681,46 @@ Bot.prototype.updateNetwork = function() {
     // network.selectNodes([node.id]);
     // console.log(node);
 }
+
+
 /**
- * play sound depend on privacy and continuity
+ * Play sound if the provided sprite is visible.  My (Jeff's) version of Yang's code.
+ * 
+ * @param  {Sprite} sprite whose visibility determines whether the sound to play
+ * @param  {Sound} sound_object sound to play if visible
+ */
+Bot.prototype.playSoundIfVisible = function(playingObjectSprite, sound_object) {
+    if(playingObjectSprite.inCamera) {
+        sound_object.play();
+    }
+}
+
+/**
+ * Play a sound, with options to only play it in the visible area of the screen.
+ *
  * @param {Object} sound object created by game
  * @param {Boolean} whether sound object is allowed to be heard by selected bot, when privacy is true, the sound is not going to be heared
  * @param {Boolean} whether sound object should be paused and resume if necessary
+ *
+ * @author Yang Liu
  */
-Bot.prototype.playsound = function (sound_object, privacy = false, is_continuous = false) {
-    if (typeof privacy != "undefined" && privacy 
-        && bots[currentBotIndex] != this) {
+Bot.prototype.playSound = function(sound_object, privacy = false, is_continuous = false) {
+    if (typeof privacy != "undefined" && privacy && bots[currentBotIndex] != this) {
         //stop or pause or do not start to play
-        if (sound_object.isPlaying 
-            && typeof sound_object[this.name + " is playing"] != "undefined"
-            && sound_object[this.name + " is playing"]) {
-            if (typeof is_continuous != "undefined"
-                && is_continuous) {
+        if (sound_object.isPlaying && typeof sound_object[this.name + " is playing"] != "undefined" && sound_object[this.name + " is playing"]) {
+            if (typeof is_continuous != "undefined" && is_continuous) {
                 sound_object.pause();
             } else {
-                sound_object.stop();            
+                sound_object.stop();
             }
-        }     
-    } else if (typeof sound_object[this.name + " is playing"] == "undefined"
-        || !sound_object[this.name + " is playing"]) {
+        }
+    } else if (typeof sound_object[this.name + " is playing"] == "undefined" || !sound_object[this.name + " is playing"]) {
         //resume or play
         sound_object[this.name + " is playing"] = true;
         if (sound_object.paused) {
             sound_object.resume();
         } else {
-            sound_object.play();        
+            sound_object.play();
         }
     } else if (!sound_object.isPlaying) {
         //not private, not playing, then definitely not by me

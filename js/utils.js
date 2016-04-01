@@ -97,7 +97,7 @@ function setUpFood() {
 
     // Add 20 pieces of food in various categories
     for (var i = 0; i < 20; i++) {
-        let rnd = game.rnd.integerInRange(1, 14);
+        let rnd = game.rnd.integerInRange(1, 13);
         switch (rnd) {
             case 1:
                 addFoodItem("food_fruit_veggies", "fruits and veggies", 159);
@@ -132,22 +132,22 @@ function setUpFood() {
                 addFoodItem("Passo_berry", "Pokemon berry #37", 229);
                 break;  
             case 11:
-                addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -480);
-                break;
-            case 12:
                 addFoodItem("steak", "Fresh meat", 387);
                 break;  
-            case 13:
+            case 12:
                 addFoodItem("pink_candy", "Yummy candy", 899);
-                //a tiny piece of candy barely has any calories
+                //a tiny piece of candy barely has any calories <-- 899 is a "lot!"
                 break;
-            case 14:
+            case 13:
                 addFoodItem("Cream_Cake", "Ice Cream cake", 1,860);
                 //There is about 310 calories per slice of ice cream cake, so assuming there is roughly six slices, there would be 1,860 calories in the whole cake
                 break;
             default:
+                // addFoodItem("food_fruit_veggies", "fruits and veggies", 159);
                 break;
         }
+        // Removed Devil_Fruit_rubber since it was incomplete
+        // addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -480);
     }
 }
 
@@ -167,8 +167,12 @@ function addFoodItem(image_id, description, calories) {
         food.isEdible = true;
         foods.push(food);
         food.eat = function() {
+            if(!this.sprite[0] || !this.sprite[1] || !this.sprite || !this) {
+                console.log("Problem with " + this.name);
+                return;
+            }
             // console.log("Eating " + this.description + " with " + this.calories + " calories");
-            let tempSprite = this.sprite;
+            var tempSprite = this.sprite;
             tempSprite.reset(-10,-10);
             tempSprite.visible = false;
             // Respawn food in 5 seconds.
@@ -176,12 +180,12 @@ function addFoodItem(image_id, description, calories) {
             //   So I place the sprite off screen then bring it back
             if (!tempSprite.visible) {
                 game.time.events.add(Phaser.Timer.SECOND * 1, function() {
-                    tempSprite.reset(Math.random() * worldSizeX, Math.random() * worldSizeY);
+                    let location = findEmptyLocation();
+                    tempSprite.reset(location[0], location[1]);
                     tempSprite.visible = true;
                 });
             }
         }
-        entities.push(food);
     }
 }
 
@@ -227,7 +231,7 @@ function fireProductions(productions) {
         // Choose randomly among those tied for current priority level
         baselinePriority  = activeProductions[0].priorityLevel;
         activeProductions = activeProductions.filter(function(production) {return production.priorityLevel === baselinePriority;});
-        activeProductions[game.rnd.integerInRange(0, activeProductions.length-1)].action();
+        activeProductions.randItem().action();
     }
 }
 
@@ -248,4 +252,35 @@ function isChild(object, group) {
     }
 
     return false;
+}
+
+/**
+ * Get a random member of an array.
+ */
+Array.prototype.randItem = function () {
+  return this[Math.floor((Math.random()*this.length))];
+}
+
+/**
+ * Check if a given object is in the array
+ */
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Round a number.
+ * 
+ * @param  {Number} num number to round
+ * @param  {Number} dec integer number of decimal places to round to
+ * @return {Number} the rounded number
+ */
+function round(num, dec) {
+    return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
 }

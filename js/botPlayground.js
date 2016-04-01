@@ -13,6 +13,8 @@ var cursors;
 var cursorDown;
 var worldSizeX = 3000;
 var worldSizeY = 3000;
+// Set to false if the performance drain is getting to be a drag and you want to test other stuff
+var memoryOn = true;
 
 // Phaser groups
 var botGroup, entityGroup;
@@ -66,7 +68,7 @@ function preload() {
     game.load.image('cave', 'assets/cave.png');
     game.load.image('princessCastle', 'assets/large_princess-castle-2.png');
     game.load.image('carousel', 'assets/carousel.png');
-    game.load.image('shield', 'assets/bubble.png'); 
+    game.load.image('shield', 'assets/bubble.png');
     game.load.image('pow', 'assets/pow.png');
 
     // Load sounds
@@ -75,7 +77,7 @@ function preload() {
     game.load.audio('chomp', 'assets/chwl.wav');
     game.load.audio('drink', 'assets/drinkSound.mp3');
     // game.load.audio('wilhelm', 'assets/Wilhelm_Scream.wav')
-    game.load.audio('snooze', 'assets/snooze.mp3');
+    game.load.audio('snooze', 'assets/snooze.mp3'); // TODO; More of a cosmic "peewww"
     // game.load.audio('crash', 'assets/crash.mp3');
     game.load.audio('attack 1', 'assets/attacksound1.mp3');
     game.load.audio('collision', 'assets/collision_noise.mp3');
@@ -86,7 +88,7 @@ function preload() {
     game.load.audio('beepbeep 00', 'assets/BeepBeep_roadrunner.mp3');
     game.load.audio('puuuu 00', 'assets/puuuu_00.mp3');
     game.load.audio('quote_batrider 00', 'assets/quote_batrider.mp3');
-    game.load.audio('sleep 00', 'assets/sleep_00.mp3');
+    game.load.audio('snore', 'assets/sleep_00.mp3');
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
@@ -174,8 +176,7 @@ function create() {
         },
         this);
 
-    // Set up global sounds
-    sounds.coockiecatinstrumental = game.add.audio('cookiecat', undefined, true, undefined);
+    // Set up global sounds (TODO: Rename some of these!)
     sounds.chomp = game.add.audio('chomp');
     sounds.snooze = game.add.audio('snooze')
     sounds.collision_noise3 = game.add.audio('collision 3');
@@ -184,7 +185,7 @@ function create() {
     sounds.beepbeep_00 = game.add.audio('beepbeep 00');
     sounds.puuuu_00 = game.add.audio('puuuu 00');
     sounds.quote_batrider_00 = game.add.audio('quote_batrider 00');
-    sounds.sleep_00 = game.add.audio('sleep 00');
+    sounds.snore = game.add.audio('snore');
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);
@@ -236,6 +237,16 @@ function update() {
         }
     }
 
+    // // For debugging bad images (can swap in entities or bots too)
+    // entities.forEach(function(entity) {
+    //         game.debug.text("-->" + entity.name, entity.sprite.body.x, entity.sprite.body.y);
+    //     },
+    //     this);
+    // foods.forEach(function(entity) {
+    //         game.debug.text("-->" + entity.name, entity.sprite.x, entity.sprite.y);
+    //     },
+    //     this);
+
     // Update the text area
     document.textArea.logText.value = bots[currentBotIndex].getStatus();
 
@@ -249,9 +260,12 @@ function botSelect() {
     newIndex = e.selectedIndex;
     game.camera.follow(sprites[newIndex]);
     currentBotIndex = newIndex;
-    
+
+    if (!memoryOn) {
+        return;
+    }
     // Update memory net each time bot is selected
-    memoryData  = {
+    memoryData = {
         nodes: bots[currentBotIndex].nodes,
         edges: bots[currentBotIndex].edges
     };

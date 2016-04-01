@@ -159,7 +159,7 @@ jeff.makeProductions = function() {
         return jeff.emotions.current == "Calm";
     };
     sayRandomStuffWhenCalm.action = function() {
-        jeff.makeSpeechBubble(randStrings[game.rnd.integerInRange(0, randStrings.length-1)]);
+        jeff.makeSpeechBubble(randStrings.randItem());
     };
     sayRandomStuffWhenCalm.probNotFiring = .9;
 
@@ -261,6 +261,7 @@ jeff.update = function() {
  */
 jeff.update1Sec = function() {
     jeff.updateNetwork();
+    // TODO: Depending on power output of motions increment hunger in different degrees
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();

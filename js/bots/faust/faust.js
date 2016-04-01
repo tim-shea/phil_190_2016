@@ -27,7 +27,7 @@ faust.init = function() {
     faust.makeProductions();
 
     faust.eatsFood = function(object) {
-		if (object.name == "jerry_can" || "cupCake") {
+		if (object.name == "jerry_can" || object.name == "cupCake") { // <-- Discuss. You just had "cupcake" by itself
 			return false;
 		} else {
 			return object.isEdible;
@@ -73,7 +73,7 @@ faust.makeProductions = function() {
         function() {
             faust.currentMotion = Motions.still;
             faust.makeSpeechBubble("So...tired...Zzzz");
-            sounds.snooze.play();
+            faust.playSoundIfVisible(faust.sprite, sounds.snore.play());
         }
     );
     singingProduction = new Production("singing",
