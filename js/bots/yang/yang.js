@@ -142,7 +142,7 @@ yang.init_plus = function() { //object related initialization
     yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
-    yang.test_.test_ongoing = false;
+    yang.test_.test_ongoing = true;
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
     yang.memory_.colliding_obj = {};//current collision
@@ -271,6 +271,7 @@ yang.update = function() {
         yang["mental_task_node"].current_fun();
         yang.fun_.AImotion_current_fun(); //Main Cycle of movement statemachines
     }
+    //TO DO redesign
     //temperory solution before rotation nodes are made
     if (yang.atBoundary()) {
         yang.incrementAngle(100);
@@ -469,6 +470,40 @@ yang.fun_.makeProductions = function() {
     );
     yang.test_.test_production.push(
     );
+};
+/**
+ * play sound
+ * @function yang.fun_.playsound
+ * @param {object} sound object created by game
+ * @memberOf yang.fun_
+ */
+yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
+    if (typeof privacy != "undefined" && privacy 
+        && bots[currentBotIndex] != yang) {
+        //stop or pause or do not start to play
+        if (sound_object.isPlaying 
+            && typeof sound_object.is_playing_by_yang != "undefined"
+            && sound_object.is_playing_by_yang) {
+            if (typeof is_continuous != "undefined"
+                && is_continuous) {
+                sound_object.pause();
+            } else {
+                sound_object.stop();            
+            }
+        }     
+    } else if (typeof sound_object.is_playing_by_yang == "undefined"
+        || !sound_object.is_playing_by_yang) {
+        //resume or play
+        sound_object.is_playing_by_yang = true;
+        if (sound_object.paused) {
+            sound_object.resume();
+        } else {
+            sound_object.play();        
+        }
+    } else if (!sound_object.isPlaying) {
+        //not private, not playing, then definitely not by me
+        sound_object.is_playing_by_yang = false;
+    }
 };
 /**
  * Additional Helper functions - Wrapper
@@ -1118,6 +1153,7 @@ yang.test_.node_test = function() { // test with a permanate state
         //call function of the tested node here
         yang.test_.ini++;
     }
+    yang.fun_.playsound(sounds.coockiecatinstrumental, true, true);
 };
 /**
  * Test - timeevent

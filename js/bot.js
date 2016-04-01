@@ -629,3 +629,37 @@ Bot.prototype.updateNetwork = function() {
     // network.selectNodes([node.id]);
     // console.log(node);
 }
+/**
+ * play sound depend on privacy and continuity
+ * @param {Object} sound object created by game
+ * @param {Boolean} whether sound object is allowed to be heard
+ * @param {Boolean} whether sound object should be paused and resume if necessary
+ */
+Bot.prototype.playsound = function (sound_object, privacy, is_continuous) {
+    if (typeof privacy != "undefined" && privacy 
+        && bots[currentBotIndex] != this) {
+        //stop or pause or do not start to play
+        if (sound_object.isPlaying 
+            && typeof sound_object[this.name + " is playing"] != "undefined"
+            && sound_object[this.name + " is playing"]) {
+            if (typeof is_continuous != "undefined"
+                && is_continuous) {
+                sound_object.pause();
+            } else {
+                sound_object.stop();            
+            }
+        }     
+    } else if (typeof sound_object[this.name + " is playing"] == "undefined"
+        || !sound_object[this.name + " is playing"]) {
+        //resume or play
+        sound_object[this.name + " is playing"] = true;
+        if (sound_object.paused) {
+            sound_object.resume();
+        } else {
+            sound_object.play();        
+        }
+    } else if (!sound_object.isPlaying) {
+        //not private, not playing, then definitely not by me
+        sound_object[this.name + " is playing"] = false;
+    }
+};
