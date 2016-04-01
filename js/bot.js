@@ -632,10 +632,10 @@ Bot.prototype.updateNetwork = function() {
 /**
  * play sound depend on privacy and continuity
  * @param {Object} sound object created by game
- * @param {Boolean} whether sound object is allowed to be heard
+ * @param {Boolean} whether sound object is allowed to be heard by selected bot, when privacy is true, the sound is not going to be heared
  * @param {Boolean} whether sound object should be paused and resume if necessary
  */
-Bot.prototype.playsound = function (sound_object, privacy, is_continuous) {
+Bot.prototype.playsound = function (sound_object, privacy = false, is_continuous = false) {
     if (typeof privacy != "undefined" && privacy 
         && bots[currentBotIndex] != this) {
         //stop or pause or do not start to play
