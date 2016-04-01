@@ -1,3 +1,4 @@
+1. speechbubblefiguer out
 6. reactions filling
 7. convert audios
 8. add storage to tree house

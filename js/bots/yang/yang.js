@@ -79,16 +79,21 @@ yang.production_ = {};
 yang.production_.inter_action = [];
 yang.production_.inter_reaction = [];
 /**
+ * goal related directional adjustment
+ * @memberOf yang.production_
+ */
+yang.production_.direction = [];
+/**
+ * BGM production
+ * @memberOf yang.production_
+ */
+yang.production_.play_BGM = [];
+/**
  * remembered object and etc
  * @memberOf yang
  * @type {Object}
  */
 yang.memory_ = {};
-/**
- * goal related directional adjustment
- * @memberOf yang.production_
- */
-yang.production_.direction = [];
 /**
  * major node reference, those index names are magic
  * @memberOf yang
@@ -111,10 +116,13 @@ yang.init = function() {
     yang.body.rotation = 0;
     yang.body.speed = 100;
     yang.temp_speed = 0;//for special movements
+    yang.urgency_multiplier = 1;
     //other basic variables
     yang.control = false; //detect cursor
     yang.basicupdate_disable = false;
     yang.unstable = false;
+    yang.watch_time = 0;
+    yang.BGM_is_on = false;
     //non state machine objects
     yang.init_plus();
     //state machines objects
@@ -142,7 +150,7 @@ yang.init_plus = function() { //object related initialization
     yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
-    yang.test_.test_ongoing = true;
+    yang.test_.test_ongoing = false;
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
     yang.memory_.colliding_obj = {};//current collision
@@ -191,8 +199,6 @@ yang.init_state = function() {
         yang["acceleration_node"] = yang.def_node;
         yang["rotation_node"] = yang.def_node;
     }
-    //unfinished
-    //TODO: move away ang.tag = new yang.tag_game_obj(); // see helper
 };
 /**
  * game system accessors
@@ -254,6 +260,7 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
         yang.collision_ouch_flag = false;
         yang.collision_nice_flag = false;
     }
+    fireProductions(yang.production_.play_BGM);
     yang.genericUpdate();//yang.collisionCheck() are included
 };
 /**
@@ -271,6 +278,7 @@ yang.update = function() {
         yang["mental_task_node"].current_fun();
         yang.fun_.AImotion_current_fun(); //Main Cycle of movement statemachines
     }
+    /*
     //TO DO redesign
     //temperory solution before rotation nodes are made
     if (yang.atBoundary()) {
@@ -282,6 +290,7 @@ yang.update = function() {
     } else if (yang.chaosmachine_.chance >= .90) {
         yang.incrementAngle(-4);
     }
+    */
     yang.chaosmachine_.chance = 0;
     yang.basicUpdate();
 };
@@ -311,7 +320,7 @@ yang.pre_update = function() { // a reoccouring event...
  */
 yang.onesec_timedEvend = function() {
     //randomness
-    yang.chaosmachine_.randomness += Math.round((Math.random() * 10));
+    yang.chaosmachine_.randomness += Math.round((Math.random() - 0.2) * 10);
     yang.chaosmachine_.randomness = Math.min(200, yang.chaosmachine_.randomness);
     //prime
     yang.biomachine_.metaresources_prime -= 2 * Math.round(yang.body.speed / 150); //change depend on speed
@@ -342,7 +351,7 @@ yang.onemin_timedEvend = function () {
     yang.memory_.friendly_bots = [yang.memory_.friendly_bots[yang.memory_.friendly_bots.length-1]];
     yang.memory_.unfriendly_bots = [yang.memory_.unfriendly_bots[yang.memory_.unfriendly_bots.length-1]]; 
     //memory update
-    yang.updateNetwork();
+    fireProductions(yang.updateNetwork());
 }
 
 /**
@@ -364,6 +373,40 @@ yang.fun_.distance_between_us = function (encounteredobject) {
 yang.fun_.find_colliding_obj = function (object_in_array) {
      return object_in_array == yang.memory_.colliding_obj;
 }
+/**
+ * play sound
+ * @function yang.fun_.playsound
+ * @param {object} sound object created by game
+ * @memberOf yang.fun_
+ */
+yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
+    if (typeof privacy != "undefined" && privacy 
+        && bots[currentBotIndex] != yang) {
+        //stop or pause or do not start to play
+        if (sound_object.isPlaying 
+            && typeof sound_object.is_playing_by_yang != "undefined"
+            && sound_object.is_playing_by_yang) {
+            if (typeof is_continuous != "undefined"
+                && is_continuous) {
+                sound_object.pause();
+            } else {
+                sound_object.stop();            
+            }
+        }     
+    } else if (typeof sound_object.is_playing_by_yang == "undefined"
+        || !sound_object.is_playing_by_yang) {
+        //resume or play
+        sound_object.is_playing_by_yang = true;
+        if (sound_object.paused) {
+            sound_object.resume();
+        } else {
+            sound_object.play();        
+        }
+    } else if (!sound_object.isPlaying) {
+        //not private, not playing, then definitely not by me
+        sound_object.is_playing_by_yang = false;
+    }
+};
 /**
  * collision
  * @param {Object}
@@ -406,7 +449,22 @@ yang.fun_.edible = function (fun_object) {
         && ((fun_object.name.toLowerCase()).search("berry") > 0
         || (fun_object.name.toLowerCase()).search("fruit") > 0);
 };
-
+/**
+ * [findFood description]
+ * @param  {Number} radius
+ * @param  {Function} edibilityFunction
+ * @return {Object} Food item
+ */
+yang.findFood = function(radius = 200, edibilityFunction = yang.fun_.edible) {
+    var nearbyFoods = this.getNearbyObjects(radius).filter(
+        function(object) {
+            return edibilityFunction(object);
+        }
+    );
+    if (nearbyFoods.length > 0) {
+        this.pursue(nearbyFoods[0]);
+    }
+};
 /**
  * called by init_plus
  * push actions and reactions into list
@@ -468,42 +526,16 @@ yang.fun_.makeProductions = function() {
                 yang.def_node.action
         )
     );
+    yang.production_.play_BGM.push(
+        new Production(//example
+                yang.node_.coockiecatsong.name,
+                yang.node_.coockiecatsong.priority,
+                yang.node_.coockiecatsong.condition,
+                yang.node_.coockiecatsong.action
+        )
+    );
     yang.test_.test_production.push(
     );
-};
-/**
- * play sound
- * @function yang.fun_.playsound
- * @param {object} sound object created by game
- * @memberOf yang.fun_
- */
-yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
-    if (typeof privacy != "undefined" && privacy 
-        && bots[currentBotIndex] != yang) {
-        //stop or pause or do not start to play
-        if (sound_object.isPlaying 
-            && typeof sound_object.is_playing_by_yang != "undefined"
-            && sound_object.is_playing_by_yang) {
-            if (typeof is_continuous != "undefined"
-                && is_continuous) {
-                sound_object.pause();
-            } else {
-                sound_object.stop();            
-            }
-        }     
-    } else if (typeof sound_object.is_playing_by_yang == "undefined"
-        || !sound_object.is_playing_by_yang) {
-        //resume or play
-        sound_object.is_playing_by_yang = true;
-        if (sound_object.paused) {
-            sound_object.resume();
-        } else {
-            sound_object.play();        
-        }
-    } else if (!sound_object.isPlaying) {
-        //not private, not playing, then definitely not by me
-        sound_object.is_playing_by_yang = false;
-    }
 };
 /**
  * Additional Helper functions - Wrapper
@@ -882,11 +914,6 @@ yang.node_.leap.current_fun = function() { //control sensitive
         yang.node_.gallop.switch_to_this_node();
     }
 };
-
-////////////////////////////////
-//Rotation Nodes Under design //
-////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////
 //Mental Task(Id-Ego-Super) Nodes                                     //
 //mental task is independent from motions, use always _fun more often //
@@ -915,6 +942,9 @@ yang.node_.id_prime_focus.berry_game_obj_renew = function () {
     }
 };
 yang.node_.id_prime_focus.description = ""; //write by functions
+yang.node_.id_prime_focus.current_fun = function () {
+    yang.findFood();
+};
 yang.node_.id_prime_focus.always_fun = function() { //ignore control
     //find food from memory
     if (yang.memory_.uneaten_food.length > 0) {
@@ -997,16 +1027,43 @@ yang.node_.superego_drain_focus.always_fun = function() { //control sensitive
  */
 yang.node_.id_secondary_focus = new yang.fun_.def_node_construct("mental_task_node");
 yang.node_.id_secondary_focus.description = "No one catches Deer~";
+yang.node_.id_secondary_focus.init_fun = function() { //only call once
+    yang.node_.id_secondary_focus.new_task = new yang.tag_game_obj();
+};
+yang.node_.id_secondary_focus.current_fun = function() {
+    yang.node_.id_secondary_focus.new_task.run_away_from_it(yang.node_.id_secondary_focus.new_task.it);
+    yang.node_.id_secondary_focus.new_task.run_toward_target(yang.node_.id_secondary_focus.new_task.target);
+};
 yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
-    if (typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) != "undefined") {
-    //TO DO : tag game mechanism
+    if (yang.fun_.distance_between_us(yang.node_.id_secondary_focus.new_task.target) < 50) {
         yang.biomachine_.metaresources_secondary += yang.chaosmachine_.randomness;
+        if (typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) != "undefined") { 
+            //if its a friend, then bonus 50%       
+            yang.biomachine_.metaresources_secondary += yang.chaosmachine_.randomness / 2;
+        }
+        yang.chaosmachine_.randomness = 0;
+        yang.node_.id_secondary_focus.init_fun();
+    }
+    if (yang.fun_.distance_between_us(yang.node_.id_secondary_focus.new_task.it) < 50) {
+        yang.biomachine_.metaresources_secondary -= yang.chaosmachine_.randomness;
+        yang.chaosmachine_.randomness += 50;
+        yang.node_.id_secondary_focus.init_fun();
     }
     //switch check
     if (yang.mindmachine_.emptyness >= 90) {
         yang.node_.superego_brood_focus.switch_to_this_node();
     }
 };
+//////////////////////////////
+//Micro Rotation Production //
+//////////////////////////////
+/*
+yang.node_.go_home
+yang.node_.run_away
+yang.node_.bumpinto
+yang.node_.
+*/
+
 ////////////////////////////
 //Inter-action Production //
 ////////////////////////////
@@ -1026,7 +1083,11 @@ yang.node_.feast_upon.action = function() {
     for (var brakeloop = 0; brakeloop < 2; brakeloop++) {    
         yang.node_.brake.brake();
     } 
-    yang.biomachine_.metaresources_prime += yang.memory_.colliding_obj.calories * 10;
+    yang.biomachine_.metaresources_prime += yang.memory_.colliding_obj.calories * 0.1;
+    if (yang.memory_.colliding_obj.name = "Philoberry") {
+        yang.mindmachine_.inspiration += 50;
+        yang.mindmachine_.emptyness -= 50;
+    }
     yang.memory_.colliding_obj.eat();//a function of food
 }
 /**
@@ -1119,6 +1180,23 @@ yang.node_.recognization.action = function () {
 //Inter-reaction Production //
 //////////////////////////////
 
+///////////////////////
+//BGMusic Production //
+///////////////////////
+/**
+ * Play cookiecat song during tag game
+ * @type {yang}
+ */
+yang.node_.coockiecatsong = new yang.fun_.def_node_construct("production_node");
+yang.node_.coockiecatsong.name = "Play Cookiecat song";
+yang.node_.coockiecatsong.priority = Production.priority.high;
+yang.node_.coockiecatsong.condition = function () {
+    return yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+};
+yang.node_.coockiecatsong.action = function () {
+    yang.BGM_is_on = true;
+    yang.fun_.playsound(sounds.coockiecatinstrumental, true, true);
+};
 //////////////
 //Test Zone //
 //////////////
@@ -1126,12 +1204,33 @@ yang.node_.recognization.action = function () {
  * unfinished tag game
  * @memberOf yang
  */
-//TO DO
-//redesign
 yang.tag_game_obj = function() {
-    this.it; //index in the bots
-    this.tagger_list = ["jeff", "sharAI"]; //the name tags
+    this.it = yang.getRandomBot(); //index in the bots
+    this.run_away_from_it = function (it_obj) {
+        yang.faceAwayFrom(it_obj); 
+    };
+    this.target = yang.getNearbyBots();
+    this.run_toward_target = function (target_obj) {
+        yang.orientTowards(target_obj);     
+    };
 };
+/**
+ * unfinished utility rate adjustment
+ * @memberOf yang
+ */
+yang.fun_.utility_value_adjustment = function (obj) {
+    var u_rate_adj = 0;
+    if (typeof yang.memory_.uneaten_food.find(yang.fun_.find_colliding_obj) == "undefined") {
+        u_rate_adj += 100;
+    } else if (typeof yang.memory_.bene_bots.find(yang.fun_.find_colliding_obj) == "undefined") {
+        u_rate_adj += 25;
+    } else if (typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) == "undefined") {
+        u_rate_adj += 50;
+    } else if (typeof yang.memory_.unfriendly_bots.find(yang.fun_.find_colliding_obj) == "undefined") {
+        u_rate_adj -= 100;
+    }
+    return u_rate_adj; 
+}
 /**
  * Test - Update
  * @function yang.test_.node_test
@@ -1149,11 +1248,15 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
-        yang.test_.current_testnode = yang.node_.id_prime_focus;
+        yang.test_.current_testnode = yang.node_.coockiecatsong;
+        yang.test_.current_testnode.condition();
+        yang.test_.current_testnode.action();
         //call function of the tested node here
         yang.test_.ini++;
+        yang.watch_time = game.time.totalElapsedSeconds();
     }
-    yang.fun_.playsound(sounds.coockiecatinstrumental, true, true);
+    //song is_continuous demostration
+    yang.test_.current_testnode.action();
 };
 /**
  * Test - timeevent
