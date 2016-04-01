@@ -100,7 +100,7 @@ function setUpFood() {
         let rnd = game.rnd.integerInRange(1, 14);
         switch (rnd) {
             case 1:
-                addFoodItem("food_fruit_veggies", "fruits and veggies", 10);
+                addFoodItem("food_fruit_veggies", "fruits and veggies", 159);
                 break;
             case 2:
                 addFoodItem("cupCake", "cupCake", 130);
@@ -113,32 +113,32 @@ function setUpFood() {
                 //31,500 cals in a gallon of gasoline, about 5 gallons in a jerry can  
                 break;
             case 5:
-                addFoodItem("Philoberry", "Organic Philosopher's Stone", 5); 
+                addFoodItem("Philoberry", "Organic Philosopher's Stone", 85); 
                 break;
             case 6:
                 addFoodItem("Spicy_Poffin", "A very spicy pastry.", 90);
                 //slightly more calories than a madeleine
                 break;
             case 7:
-                addFoodItem("Cheri_berry", "Pokemon berry #01", 20);
+                addFoodItem("Cheri_berry", "Pokemon berry #01", 77);
                 break;
             case 8:
-                addFoodItem("Enigma_berry", "Pokemon berry #60", 20);
+                addFoodItem("Enigma_berry", "Pokemon berry #60", ((Math.random() - 0.5) * 200));//different every game
                 break;
             case 9:
-                addFoodItem("Hondew_berry", "Pokemon berry #24", 20);
+                addFoodItem("Hondew_berry", "Pokemon berry #24", 64);
                 break;
             case 10:
-                addFoodItem("Passo_berry", "Pokemon berry #37", 20);
+                addFoodItem("Passo_berry", "Pokemon berry #37", 229);
                 break;  
             case 11:
-                addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -10);
+                addFoodItem("Devil_Fruit_rubber", "Its taste is worse than crap; eater becomes hammer for life", -480);
                 break;
             case 12:
-                addFoodItem("steak", "Fresh meat", 10);
+                addFoodItem("steak", "Fresh meat", 387);
                 break;  
             case 13:
-                addFoodItem("pink_candy", "Yummy candy", 5);
+                addFoodItem("pink_candy", "Yummy candy", 899);
                 //a tiny piece of candy barely has any calories
                 break;
             case 14:
