@@ -260,6 +260,7 @@ dylan.update = function() {
 
 
 dylan.update1Sec = function() {
+    dylan.updateNetwork();
     dylan.fuel.increment();
     dylan.emotions.update();
     dylan.setMotion();
@@ -285,6 +286,7 @@ dylan.update4min = function() {
 
 dylan.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
+    dylan.addMemory("Saw" + object.name);
     dylan.moveAwayFrom(object);
     if (object.isEdible) {
         dylan.eatObject(object);
@@ -301,6 +303,7 @@ dylan.collision = function(object) {
  */
 
 dylan.eatObject = function(objectToEat) {
+        dylan.addMemory("Ate " + objectToEat.name);
         objectToEat.eat();
         dylan.fuel.subtract(objectToEat.calories);
         dylan.speak(objectToEat, "Glorious " + objectToEat.description + "!");
@@ -320,5 +323,6 @@ dylan.hear = function(botWhoSpokeToMe, whatTheySaid) {
      * @override
      */
 dylan.highFived = function(botWhoHighFivedMe) {
+    dylan.addMemory("High Fived: " + object.name);
     dylan.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
