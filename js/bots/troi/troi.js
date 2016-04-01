@@ -113,7 +113,7 @@ troi.makeProductions = function() {
                 troi.hunger.amount < 300 &&
                 troi.stamina > 12000 &&
                 (troi.emotion.current === "neutral" ||
-                    troi.emotion === "happy" ||
+                    troi.emotion.current === "happy" ||
                     troi.emotion.current === "euphoric")
                 /* && (world.time > sunrise && world.time < sunset) */
             );
@@ -399,6 +399,7 @@ troi.hunger = {
     },
     update: function() {
         if (this.amount >= 500) {
+        	this.amount = 500;
             // Do nothing.  Hunger is capped. 
         } else {
             this.amount += 10;
@@ -537,6 +538,7 @@ troi.update_1_30_sec = function() {
  */
 troi.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
+    troi.addMemory("Observed " + object.name);
     if (object.isEdible) {
         if (troi.hunger > 100) {
             troi.eatObject(object);
@@ -552,6 +554,7 @@ troi.collision = function(object) {
  *
  */
 troi.eatObject = function(objectToEat) {
+	troi.addMemory("Ate " + objectToEat.name);
     objectToEat.eat();
     troi.hunger.eat(objectToEat.calories);
     troi.speak(objectToEat, "Yay, food. " + objectToEat.description + "!");
@@ -570,10 +573,12 @@ troi.highFive = function(botToHighFive) {
 }
 
 troi.highFived = function(botWhoHighFivedMe) {
+   	troi.addMemory("High Fived: " + object.name);
     troi.speak(botWhoHighFivedMe, "Yo, wasuuuup? " + botWhoHighFivedMe.name + ".");
 }
 
 troi.ignore = function(annoyingBot) {
+	troi.addMemory("\'Walk away slowly an ignore the wierdo.\'" + object.names);
     this.incrementAngle(180);
     this.body.speed = 250;
 }
