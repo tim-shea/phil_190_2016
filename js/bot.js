@@ -37,6 +37,9 @@ function Bot(x, y, name, path) {
     // A reference to the current speech item
     this.currentSpeech = null;
 
+    // A reference to any sound playing now
+    this.currentSound = null;
+
     // Network stuff
     this.lastMemory;
     this.currentMemory;
@@ -684,15 +687,17 @@ Bot.prototype.updateNetwork = function() {
 
 
 /**
- * Play sound if the provided sprite is visible.  My (Jeff's) version of Yang's code.
+ * Play sound, but only if the entity is visible.
  * 
- * @param  {Sprite} sprite whose visibility determines whether the sound to play
  * @param  {Sound} sound_object sound to play if visible
  */
-Bot.prototype.playSoundIfVisible = function(playingObjectSprite, sound_object) {
-    if(playingObjectSprite.inCamera) {
-        sound_object.play();
+Bot.prototype.play = function(sound_object) {
+    if(this.currentSound != null || !this.sprite.inCamera) {
+        return;
     }
+    this.currentSound = sound_object;
+    sound_object.play();
+    sound_object.onStop.addOnce(function() {this.currentSound = null;}, this);
 }
 
 /**

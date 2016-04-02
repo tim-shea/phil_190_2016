@@ -73,7 +73,7 @@ faust.makeProductions = function() {
         function() {
             faust.currentMotion = Motions.still;
             faust.makeSpeechBubble("So...tired...Zzzz");
-            faust.playSoundIfVisible(faust.sprite, sounds.snore.play());
+            faust.play(sounds.snore);
         }
     );
     singingProduction = new Production("singing",
