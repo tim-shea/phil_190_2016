@@ -351,7 +351,7 @@ yang.onemin_timedEvend = function () {
     yang.memory_.friendly_bots = [yang.memory_.friendly_bots[yang.memory_.friendly_bots.length-1]];
     yang.memory_.unfriendly_bots = [yang.memory_.unfriendly_bots[yang.memory_.unfriendly_bots.length-1]]; 
     //memory update
-    fireProductions(yang.updateNetwork());
+    yang.updateNetwork();
 }
 
 /**
