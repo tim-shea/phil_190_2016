@@ -57,59 +57,64 @@ jeff.init = function() {
  */
 jeff.makeProductions = function() {
 
-    foodSeeking = new Production("find food when hungry");
-    foodSeeking.priority = Production.priority.High;
-    foodSeeking.condition = function() {
+    jeff.foodSeeking = new Production("find food when hungry");
+    jeff.foodSeeking.priority = Production.priority.High;
+    jeff.foodSeeking.condition = function() {
         return (jeff.hunger.value > 50);
     };
-    foodSeeking.action = function() {
+    jeff.foodSeeking.action = function() {
         // jeff.currentMotion = Motions.tantrum;
         jeff.findFood(500, jeff.canEat);
+        jeff.addMemory("Looked for food");
         jeff.makeSpeechBubble("Ok I'm hunting!", 400);
     };
 
-    admireCar = new Production("admiring car");
-    admireCar.priority = Production.priority.Medium;
-    admireCar.condition = function() {
+    jeff.admireCar = new Production("admiring car");
+    jeff.admireCar.priority = Production.priority.Medium;
+    jeff.admireCar.condition = function() {
         let d = jeff.getDistanceTo(dylan);
         if ((d > 100) && (d < 300)) {
             return true;
         };
         return false;
     };
-    admireCar.action = function() {
+    jeff.admireCar.action = function() {
         jeff.speak(dylan, "Nice car!", 2000);
+        jeff.addMemory("Said Nice Car");
         jeff.orientTowards(dylan);
     };
 
-    fight = new Production("pick a fight when grumpy");
-    fight.priority = Production.priority.Low;
-    fight.condition = function() {
-        return (jeff.emotions.current === "Angry");
+    jeff.fight = new Production("pick a fight when grumpy");
+    jeff.fight.priority = Production.priority.Low;
+    jeff.fight.condition = function() {
+        return true; // (jeff.emotions.current === "Angry");
     };
-    fight.action = function() {
+    jeff.fight.action = function() {
         jeff.makeSpeechBubble("Attack!", 2000);
+        jeff.addMemory("Attack mode");
         jeff.attackNearbyBots();
+        jeff.play(sounds.attack1);
     };
-    fight.probNotFiring = .7;
+    jeff.fight.probNotFiring = .7;
 
-    irritable = new Production("irritable when hungry");
-    irritable.priority = Production.priority.Medium;
-    irritable.condition = function() {
+    jeff.irritable = new Production("irritable when hungry");
+    jeff.irritable.priority = Production.priority.Medium;
+    jeff.irritable.condition = function() {
         return (jeff.hunger.value > 40);
     };
-    irritable.action = function() {
+    jeff.irritable.action = function() {
+        jeff.addMemory("Got angry");
         jeff.emotions.current = "Angry";
         jeff.makeSpeechBubble("Need food!", 1000);
     };
-    irritable.probNotFiring = .5;
+    jeff.irritable.probNotFiring = .5;
 
-    chatty = new Production("talk to people when bored");
-    chatty.priority = Production.priority.Medium;
-    chatty.condition = function() {
+    jeff.chatty = new Production("talk to people when bored");
+    jeff.chatty.priority = Production.priority.Medium;
+    jeff.chatty.condition = function() {
         return (jeff.emotions.current === "Calm" || jeff.emotions.current == "Sad");
     };
-    chatty.action = function() {
+    jeff.chatty.action = function() {
         var nearbyBots = jeff.getNearbyBots(800);
         jeff.addMemory("Was bored");
         if (nearbyBots.length > 0) {
@@ -117,11 +122,11 @@ jeff.makeProductions = function() {
             jeff.speak(nearbyBots[0], "I'm bored " + nearbyBots[0].name, 2000);
         }
     };
-    chatty.probNotFiring = .95;
+    jeff.chatty.probNotFiring = .95;
 
-    commentOnGoodStuff = new Production("Comment on high utility items");
-    commentOnGoodStuff.priority = Production.priority.High;
-    commentOnGoodStuff.condition = function() {
+    jeff.commentOnGoodStuff = new Production("Comment on high utility items");
+    jeff.commentOnGoodStuff.priority = Production.priority.High;
+    jeff.commentOnGoodStuff.condition = function() {
         var nearbyObjects = jeff.getNearbyObjects(800);
         if (nearbyObjects.length > 0) {
             if (jeff.utilityFunction(nearbyObjects[0]) > 30) {
@@ -131,41 +136,45 @@ jeff.makeProductions = function() {
             }
         }
     };
-    commentOnGoodStuff.action = function() {
+    jeff.commentOnGoodStuff.action = function() {
+        jeff.addMemory("Noticed good stuff");
         jeff.makeSpeechBubble("Something good around here...!");
     };
-    commentOnGoodStuff.probNotFiring = .9;
+    jeff.commentOnGoodStuff.probNotFiring = .9;
 
-    findNewFriends = new Production("Talk to random people when happy");
-    findNewFriends.priority = Production.priority.Low;
-    findNewFriends.condition = function() {
-        jeff.addMemory("Looking for friends");
+    jeff.findNewFriends = new Production("Talk to random people when happy");
+    jeff.findNewFriends.priority = Production.priority.Low;
+    jeff.findNewFriends.condition = function() {
+        // jeff.addMemory("Looking for friends");
         return (jeff.emotions.current === "Happy");
     };
-    findNewFriends.action = function() {
+    jeff.findNewFriends.action = function() {
+        jeff.addMemory("Looked for friends");
         var randBot = jeff.getRandomBot();
         jeff.pursue(randBot, 700);
         jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
     };
-    findNewFriends.probNotFiring = .8;
+    jeff.findNewFriends.probNotFiring = .8;
 
     var randStrings = ["Philosophy is good for the heart", 
         "Please don't buy food during class", 
         "I can tell you are checking social media",
         "Happy spouse happy house"];
-    sayRandomStuffWhenCalm = new Production("Say random stuff when calm");
-    sayRandomStuffWhenCalm.priority = Production.priority.High;
-    sayRandomStuffWhenCalm.condition = function() {
+    jeff.sayRandomStuffWhenCalm = new Production("Say random stuff when calm");
+    jeff.sayRandomStuffWhenCalm.priority = Production.priority.High;
+    jeff.sayRandomStuffWhenCalm.condition = function() {
         return jeff.emotions.current == "Calm";
     };
-    sayRandomStuffWhenCalm.action = function() {
+    jeff.sayRandomStuffWhenCalm.action = function() {
+        jeff.addMemory("Said random thing");
         jeff.makeSpeechBubble(randStrings.randItem());
     };
-    sayRandomStuffWhenCalm.probNotFiring = .9;
+    jeff.sayRandomStuffWhenCalm.probNotFiring = .9;
 
     // Populate production list
-    this.productions = [foodSeeking, admireCar, fight, 
-        irritable, chatty, findNewFriends, commentOnGoodStuff, sayRandomStuffWhenCalm];
+    this.productions = [jeff.foodSeeking, jeff.admireCar, jeff.fight,
+        jeff.irritable, jeff.chatty, jeff.findNewFriends, jeff.commentOnGoodStuff, 
+        jeff.sayRandomStuffWhenCalm];
 }
 
 /**

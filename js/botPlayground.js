@@ -178,6 +178,7 @@ function create() {
 
     // Set up global sounds (TODO: Rename some of these!)
     sounds.chomp = game.add.audio('chomp');
+    sounds.attack1 = game.add.audio('attack 1');
     sounds.snooze = game.add.audio('snooze')
     sounds.collision_noise3 = game.add.audio('collision 3');
     sounds.collision_noise4 = game.add.audio('collision 4');
