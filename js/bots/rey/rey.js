@@ -97,7 +97,7 @@ rey.makeProductions = function() {
 
     //five new productions
 
-    attack = new Production("fighting"); ///this production still needs some work 
+    fight = new Production("fighting"); ///this production still needs some work 
     fight.priority = Production.priority.High;
     fight.condition = function() {
         return (rey.emotions.current == "Not in the mood");
