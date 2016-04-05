@@ -1,10 +1,14 @@
 1. speechbubblefiguer out
+2. BGM 5<Markov Chain> * 4<mental tasks> = 20 songs
 6. reactions filling
 7. convert audios
 8. add storage to tree house
 9. death and reset
 
 node_modules\.bin\jsdoc C:\Users\louis\Desktop\Phil190\projectexperiment\js\bots\yang\yang.js
+
+mabinogi music
+http://zermoth.net/mabinogi/ost/?lang=en
 
 /*
 Timed Rotation

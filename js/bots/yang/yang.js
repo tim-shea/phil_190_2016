@@ -122,7 +122,7 @@ yang.init = function() {
     yang.basicupdate_disable = false;
     yang.unstable = false;
     yang.watch_time = 0;
-    yang.BGM_is_on = false;
+    yang.BGM_is_on = true;
     //non state machine objects
     yang.init_plus();
     //state machines objects
@@ -150,7 +150,7 @@ yang.init_plus = function() { //object related initialization
     yang.text_.testFeedBack = "";
     //test related
     yang.test_.ini = 0;
-    yang.test_.test_ongoing = false;
+    yang.test_.test_ongoing = true;
     yang.test_.current_testnode = yang.def_node;
     //interaction production setup
     yang.memory_.colliding_obj = {};//current collision
@@ -260,7 +260,9 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
         yang.collision_ouch_flag = false;
         yang.collision_nice_flag = false;
     }
-    fireProductions(yang.production_.play_BGM);
+    if (yang.BGM_is_on) {
+        fireProductions(yang.production_.play_BGM);
+    }
     yang.genericUpdate();//yang.collisionCheck() are included
 };
 /**
@@ -352,7 +354,7 @@ yang.onemin_timedEvend = function () {
     yang.memory_.unfriendly_bots = [yang.memory_.unfriendly_bots[yang.memory_.unfriendly_bots.length-1]]; 
     //memory update
     yang.updateNetwork();
-}
+};
 
 /**
  * remembered object and etc
@@ -527,12 +529,127 @@ yang.fun_.makeProductions = function() {
         )
     );
     yang.production_.play_BGM.push(
-        new Production(//example
-                yang.node_.coockiecatsong.name,
-                yang.node_.coockiecatsong.priority,
-                yang.node_.coockiecatsong.condition,
-                yang.node_.coockiecatsong.action
-        )
+        /*
+        new Production(
+                yang.node_.play_BGM_00.name,
+                yang.node_.play_BGM_00.priority,
+                yang.node_.play_BGM_00.condition,
+                yang.node_.play_BGM_00.action
+        ),
+        new Production(
+                yang.node_.play_BGM_01.name,
+                yang.node_.play_BGM_01.priority,
+                yang.node_.play_BGM_01.condition,
+                yang.node_.play_BGM_01.action
+        ),
+        new Production(
+                yang.node_.play_BGM_02.name,
+                yang.node_.play_BGM_02.priority,
+                yang.node_.play_BGM_02.condition,
+                yang.node_.play_BGM_02.action
+        ),
+        new Production(
+                yang.node_.play_BGM_03.name,
+                yang.node_.play_BGM_03.priority,
+                yang.node_.play_BGM_03.condition,
+                yang.node_.play_BGM_03.action
+        ),
+        new Production(
+                yang.node_.play_BGM_04.name,
+                yang.node_.play_BGM_04.priority,
+                yang.node_.play_BGM_04.condition,
+                yang.node_.play_BGM_04.action
+        ),
+        new Production(
+                yang.node_.play_BGM_05.name,
+                yang.node_.play_BGM_05.priority,
+                yang.node_.play_BGM_05.condition,
+                yang.node_.play_BGM_05.action
+        ),
+        new Production(
+                yang.node_.play_BGM_06.name,
+                yang.node_.play_BGM_06.priority,
+                yang.node_.play_BGM_06.condition,
+                yang.node_.play_BGM_06.action
+        ),
+        new Production(
+                yang.node_.play_BGM_07.name,
+                yang.node_.play_BGM_07.priority,
+                yang.node_.play_BGM_07.condition,
+                yang.node_.play_BGM_07.action
+        ),
+        new Production(
+                yang.node_.play_BGM_08.name,
+                yang.node_.play_BGM_08.priority,
+                yang.node_.play_BGM_08.condition,
+                yang.node_.play_BGM_08.action
+        ),
+        new Production(
+                yang.node_.play_BGM_09.name,
+                yang.node_.play_BGM_09.priority,
+                yang.node_.play_BGM_09.condition,
+                yang.node_.play_BGM_09.action
+        ),
+        new Production(
+                yang.node_.play_BGM_10.name,
+                yang.node_.play_BGM_10.priority,
+                yang.node_.play_BGM_10.condition,
+                yang.node_.play_BGM_10.action
+        ),
+        new Production(
+                yang.node_.play_BGM_11.name,
+                yang.node_.play_BGM_11.priority,
+                yang.node_.play_BGM_11.condition,
+                yang.node_.play_BGM_11.action
+        ),
+        new Production(
+                yang.node_.play_BGM_12.name,
+                yang.node_.play_BGM_12.priority,
+                yang.node_.play_BGM_12.condition,
+                yang.node_.play_BGM_12.action
+        ),
+        new Production(
+                yang.node_.play_BGM_13.name,
+                yang.node_.play_BGM_13.priority,
+                yang.node_.play_BGM_13.condition,
+                yang.node_.play_BGM_13.action
+        ),
+        new Production(
+                yang.node_.play_BGM_14.name,
+                yang.node_.play_BGM_14.priority,
+                yang.node_.play_BGM_14.condition,
+                yang.node_.play_BGM_14.action
+        ),
+        new Production(
+                yang.node_.play_BGM_15.name,
+                yang.node_.play_BGM_15.priority,
+                yang.node_.play_BGM_15.condition,
+                yang.node_.play_BGM_15.action
+        ),
+        new Production(
+                yang.node_.play_BGM_16.name,
+                yang.node_.play_BGM_16.priority,
+                yang.node_.play_BGM_16.condition,
+                yang.node_.play_BGM_16.action
+        ),
+        new Production(
+                yang.node_.play_BGM_17.name,
+                yang.node_.play_BGM_17.priority,
+                yang.node_.play_BGM_17.condition,
+                yang.node_.play_BGM_17.action
+        ),
+        new Production(
+                yang.node_.play_BGM_18.name,
+                yang.node_.play_BGM_18.priority,
+                yang.node_.play_BGM_18.condition,
+                yang.node_.play_BGM_18.action
+        ),
+        new Production(
+                yang.node_.play_BGM_19.name,
+                yang.node_.play_BGM_19.priority,
+                yang.node_.play_BGM_19.condition,
+                yang.node_.play_BGM_19.action
+        )*/
     );
     yang.test_.test_production.push(
     );
@@ -565,24 +682,24 @@ yang.fun_.AImotion_always_fun = function() { //this is the current state
  */
 yang.MRGPRB4 = new MarkovProcess("wary");
 yang.MRGPRB4.add("wary", [
-    ["wary", "alert", "demanding", "caress", "annoyed"],
-    [.5, .45, .2, .1, .2]
+    ["wary", "alert", "demanding", "empathetic", "annoyed"],
+    [.995, .0025, .001, .0005, .001]
 ]);
-yang.MRGPRB4.add("caress", [
-    ["caress", "annoyed"],
-    [.9, .1]
+yang.MRGPRB4.add("empathetic", [
+    ["empathetic", "annoyed"],
+    [.995, .005]
 ]);
 yang.MRGPRB4.add("demanding", [
-    ["caress", "wary", "demanding"],
-    [.05, .05, 0.9]
+    [ "demanding", "empathetic", "wary"],
+    [.995, .0025, .0025]
 ]);
 yang.MRGPRB4.add("alert", [
     ["alert", "annoyed"],
-    [.5, .5]
+    [.995, .005]
 ]);
 yang.MRGPRB4.add("annoyed", [
     ["annoyed", "wary"],
-    [.8, .2]
+    [.995, .005]
 ]);
 ////////////////////////////
 //Inter-reaction Override //
@@ -1180,22 +1297,369 @@ yang.node_.recognization.action = function () {
 //Inter-reaction Production //
 //////////////////////////////
 
-///////////////////////
-//BGMusic Production //
-///////////////////////
+/////////////////////////////////////////////////////
+//BGMusic Production                               //
+//BGM 5<Markov Chain> X 4<mental tasks> = 20 songs //
+/////////////////////////////////////////////////////
 /**
- * Play cookiecat song during tag game
- * @type {yang}
+ * Play
+ * id_prime_focus X wary
+ * @type {yang.fun_.def_node_construct}
  */
-yang.node_.coockiecatsong = new yang.fun_.def_node_construct("production_node");
-yang.node_.coockiecatsong.name = "Play Cookiecat song";
-yang.node_.coockiecatsong.priority = Production.priority.high;
-yang.node_.coockiecatsong.condition = function () {
-    return yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+yang.node_.play_BGM_04 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_04.name = "Shadowy Requiem";
+yang.node_.play_BGM_04.priority = Production.priority.high;
+yang.node_.play_BGM_04.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.id_prime_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_04.stop();
+    }
+    return condition_bool;
 };
-yang.node_.coockiecatsong.action = function () {
-    yang.BGM_is_on = true;
-    yang.fun_.playsound(sounds.coockiecatinstrumental, true, true);
+yang.node_.play_BGM_04.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_04, true, true);
+};
+/**
+ * Play
+ * id_prime_focus X alert
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_08 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_08.name = "Nameless Tombstone";
+yang.node_.play_BGM_08.priority = Production.priority.high;
+yang.node_.play_BGM_08.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.id_prime_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_08.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_08.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_08, true, true);
+};
+/**
+ * Play
+ * id_prime_focus X demanding
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_03 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_03.name = "coockiecat - Steven Universe";
+yang.node_.play_BGM_03.priority = Production.priority.high;
+yang.node_.play_BGM_03.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.id_prime_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_03.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_03.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_03, true, true);
+};
+/**
+ * Play
+ * id_prime_focus X empathetic
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_13 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_13.name = "Tale that was not told";
+yang.node_.play_BGM_13.priority = Production.priority.high;
+yang.node_.play_BGM_13.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.id_prime_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_13.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_13.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_13, true, true);
+};
+/**
+ * Play
+ * id_prime_focus X annoyed
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_15 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_15.name = "The Final Stand";
+yang.node_.play_BGM_15.priority = Production.priority.high;
+yang.node_.play_BGM_15.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.id_prime_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_15.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_15.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_15, true, true);
+};
+/**
+ * Play
+ * id_secondary_focus X wary
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_02 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_02.name = "Belfast";
+yang.node_.play_BGM_02.priority = Production.priority.high;
+yang.node_.play_BGM_02.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_02.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_02.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_02, true, true);
+};
+/**
+ * Play
+ * id_secondary_focus X alert
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_01 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_01.name = "At the End of the Wait";
+yang.node_.play_BGM_01.priority = Production.priority.high;
+yang.node_.play_BGM_01.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_01.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_01.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_01, true, true);
+};
+/**
+ * Play
+ * id_secondary_focus X demanding
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_00 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_00.name = "A Magnificent Sight";
+yang.node_.play_BGM_00.priority = Production.priority.high;
+yang.node_.play_BGM_00.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_00.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_00.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_00, true, true);
+};
+/**
+ * Play
+ * id_secondary_focus X empathetic
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_06 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_06.name = "Friend of solitude and loneliness";
+yang.node_.play_BGM_06.priority = Production.priority.high;
+yang.node_.play_BGM_06.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_06.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_06.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_06, true, true);
+};
+/**
+ * Play
+ * id_secondary_focus X annoyed
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_05 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_05.name = "Do not Tease Me";
+yang.node_.play_BGM_05.priority = Production.priority.high;
+yang.node_.play_BGM_05.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_05.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_05.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_05, true, true);
+};
+/**
+ * Play
+ * superego_drain_focus X wary
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_07 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_07.name = "Mischievous Soul";
+yang.node_.play_BGM_07.priority = Production.priority.high;
+yang.node_.play_BGM_07.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_07.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_07.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_07, true, true);
+};
+/**
+ * Play
+ * superego_drain_focus X alert
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_14 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_14.name = "The Dance of Leaves";
+yang.node_.play_BGM_14.priority = Production.priority.high;
+yang.node_.play_BGM_14.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_14.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_14.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_14, true, true);
+};
+/**
+ * Play
+ * superego_drain_focus X demanding
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_09 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_09.name = "okkusenman";
+yang.node_.play_BGM_09.priority = Production.priority.high;
+yang.node_.play_BGM_09.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_09.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_09.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_09, true, true);
+};
+/**
+ * Play
+ * superego_drain_focus X empathetic
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_12 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_12.name = "Soul of Freedom";
+yang.node_.play_BGM_12.priority = Production.priority.high;
+yang.node_.play_BGM_12.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_12.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_12.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_12, true, true);
+};
+/**
+ * Play
+ * superego_drain_focus X annoyed
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_16 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_16.name = "The Star above Falias";
+yang.node_.play_BGM_16.priority = Production.priority.high;
+yang.node_.play_BGM_16.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_16.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_16.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_16, true, true);
+};
+/**
+ * Play
+ * superego_brood_focus X wary
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_10 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_10.name = "Old Heros Visage";
+yang.node_.play_BGM_10.priority = Production.priority.high;
+yang.node_.play_BGM_10.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_10.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_10.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_10, true, true);
+};
+/**
+ * Play
+ * superego_brood_focus X alert
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_11 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_11.name = "Shadow of Early Dawn";
+yang.node_.play_BGM_11.priority = Production.priority.high;
+yang.node_.play_BGM_11.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_11.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_11.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_11, true, true);
+};
+/**
+ * Play
+ * superego_brood_focus X demanding
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_19 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_19.name = "Battle";
+yang.node_.play_BGM_19.priority = Production.priority.high;
+yang.node_.play_BGM_19.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_19.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_19.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_19, true, true);
+};
+/**
+ * Play
+ * superego_brood_focus X empathetic
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_17 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_17.name = "Final Stand";
+yang.node_.play_BGM_17.priority = Production.priority.high;
+yang.node_.play_BGM_17.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_17.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_17.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_17, true, true);
+};
+/**
+ * Play
+ * superego_brood_focus X annoyed
+ * @type {yang.fun_.def_node_construct}
+ */
+yang.node_.play_BGM_18 = new yang.fun_.def_node_construct("production_node");
+yang.node_.play_BGM_18.name = "Impulsive Philosopher";
+yang.node_.play_BGM_18.priority = Production.priority.high;
+yang.node_.play_BGM_18.condition = function () {
+    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
+    if (!condition_bool) {
+        sounds.yang_BGM_18.stop();
+    }
+    return condition_bool;
+};
+yang.node_.play_BGM_18.action = function () {
+    yang.fun_.playsound(sounds.yang_BGM_18, true, true);
 };
 //////////////
 //Test Zone //
@@ -1241,14 +1705,13 @@ yang.test_.node_test = function() { // test with a permanate state
     //single run node test 
 
     if (yang.test_.ini === 0) {
-        //
         yang.chaosmachine_.randomness = 0;
         yang.biomachine_.metaresources_prime = 1;
         yang.biomachine_.metaresources_secondary = 100;
         yang.mindmachine_.emptyness = 0;
         yang.mindmachine_.inspiration = 0;
         //test node
-        yang.test_.current_testnode = yang.node_.coockiecatsong;
+        //yang.test_.current_testnode = yang.node_.play_BGM_00;
         yang.test_.current_testnode.condition();
         yang.test_.current_testnode.action();
         //call function of the tested node here
@@ -1256,7 +1719,7 @@ yang.test_.node_test = function() { // test with a permanate state
         yang.watch_time = game.time.totalElapsedSeconds();
     }
     //song is_continuous demostration
-    yang.test_.current_testnode.action();
+    //yang.test_.current_testnode.action();
 };
 /**
  * Test - timeevent
