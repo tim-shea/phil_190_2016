@@ -209,6 +209,7 @@ function create() {
     sounds.puuuu_00 = game.add.audio('puuuu 00');
     sounds.quote_batrider_00 = game.add.audio('quote_batrider 00');
     sounds.snore = game.add.audio('snore');
+
     /*
     sounds.yang_BGM_00 = game.add.audio('BGM 00', undefined, true, undefined);
     sounds.yang_BGM_01 = game.add.audio('BGM 01', undefined, true, undefined);
@@ -243,6 +244,9 @@ function create() {
 
     // Update selection box
     document.getElementById("botSelect").selectedIndex = defaultBotIndex;
+
+    // Initialize visibility of show memory checkbox
+    document.getElementById('memoryVisible').checked = true;
 
     // Init network
     botSelect();
@@ -314,7 +318,15 @@ function botSelect() {
         nodes: bots[currentBotIndex].nodes,
         edges: bots[currentBotIndex].edges
     };
-    currentNetwork = new vis.Network(document.getElementById('mynetwork'), memoryData, bots[currentBotIndex].options);
+
+    if (document.getElementById('memoryVisible').checked) {
+        currentNetwork = new vis.Network(document.getElementById('mynetwork'), memoryData, bots[currentBotIndex].options);
+    } else {
+        var node = document.getElementById('mynetwork');
+        while (node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+    }
 }
 
 //

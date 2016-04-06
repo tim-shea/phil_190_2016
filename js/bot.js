@@ -40,6 +40,9 @@ function Bot(x, y, name, path) {
     // A reference to any sound playing now
     this.currentSound = null;
 
+    // Reference to shield, if any...
+    this.shield = null;
+
     // Network stuff
     this.lastMemory;
     this.currentMemory;
@@ -97,6 +100,10 @@ Bot.prototype.genericUpdate = function() {
         this.speechBubble.x = this.sprite.x + 50;
         this.speechBubble.y = this.sprite.y - 40;
     }
+    if (this.shield) {
+        this.shield.x = this.sprite.x - 45;
+        this.shield.y = this.sprite.y - 45;
+    }
     game.physics.arcade.collide(this.sprite, entityGroup);
 };
 
@@ -118,6 +125,19 @@ Bot.prototype.atBoundary = function() {
         return true;
     }
     return false;
+}
+
+/**
+ * Display a shield around the agent for 1 second
+ */
+Bot.prototype.defend = function() {
+    if (!this.shield) {
+        console.log(this.shield);
+        this.shield = game.add.sprite(this.sprite.x - 45, this.sprite.y - 45, "shield");
+    }
+    timer = game.time.events.add(1000, function() {
+        if (this.shield) { this.shield.kill();
+            this.shield = null; } }, this);
 }
 
 /**
@@ -220,7 +240,6 @@ Bot.prototype.attackMotion = function(objectToAttack, numAttacks = 2) {
     if (!objectToAttack || cursorDown || this.currentTween != null || this.motionOverride) {
         return;
     }
-    this.addMemory("Attacked " + objectToAttack.names);
     this.motionOverride = true;
     this.orientTowards(objectToAttack);
     this.currentTween = game.add.tween(this.sprite);
@@ -692,12 +711,12 @@ Bot.prototype.updateNetwork = function() {
  * @param  {Sound} sound_object sound to play if visible
  */
 Bot.prototype.play = function(sound_object) {
-    if(this.currentSound != null || !this.sprite.inCamera) {
+    if (this.currentSound != null || !this.sprite.inCamera) {
         return;
     }
     this.currentSound = sound_object;
     sound_object.play();
-    sound_object.onStop.addOnce(function() {this.currentSound = null;}, this);
+    sound_object.onStop.addOnce(function() { this.currentSound = null; }, this);
 }
 
 /**
