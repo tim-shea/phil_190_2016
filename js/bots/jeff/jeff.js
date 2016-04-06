@@ -318,7 +318,7 @@ jeff.eatObject = function(objectToEat) {
     objectToEat.eat();
     jeff.hunger.subtract(objectToEat.calories);
     jeff.speak(objectToEat, "Yummy " + objectToEat.description + "!");
-    sounds.chomp.play();
+    jeff.play(sounds.chomp);
 }
 
 /**
