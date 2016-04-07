@@ -75,7 +75,7 @@ sharAI.utilityFunction = function(object) {
  * @memberOf sharAI
  */
 sharAI.makeProductions = function() {
-    getFood = new Production("hunting");
+    var getFood = new Production("hunting");
     getFood.priority = 10;
     getFood.condition = function() {
         return (sharAI.hunger.value > 50);
@@ -85,7 +85,7 @@ sharAI.makeProductions = function() {
         sharAI.motionText = "sharAI is looking for their next meal";
     }
 
-    sleep = new Production("sleeping");
+    var sleep = new Production("sleeping");
     sleep.priority = 10;
     sleep.condition = function() {
         return (sharAI.lethargy.value > 75);
@@ -96,7 +96,7 @@ sharAI.makeProductions = function() {
         sharAI.makeSpeechBubble("Zzz...");
     }
 
-    returnHome = new Production("going home");
+    var returnHome = new Production("going home");
     returnHome.priority = 7;
     returnHome.condition = function() {
         return (sharAI.energyLevel == "Anxious" || sharAI.health.value < 25);
@@ -106,7 +106,7 @@ sharAI.makeProductions = function() {
         sharAI.goHome();
     }
 
-    curse = new Production("cursing");
+    var curse = new Production("cursing");
     curse.priority = 0;
     curse.condition = function() {
         return (sharAI.mood == "Angry");
@@ -183,76 +183,24 @@ sharAI.hunger.toString = function() {
  * @memberOf sharAI
  */
 sharAI.lethargy = new DecayVariable(0, 1, 0, 100);
-sharAI.lethargy.toString = function() {
-    let lethargyBar = "Lethargy:\t\t";
-    let lethargyAmount = Math.floor(sharAI.lethargy.value / 10);
-    let iCount = 0;
-    for (i = 0; i < lethargyAmount; i++) {
-        lethargyBar += "▓"
-        iCount++;
-    }
-    for (i = 0; i < (10 - iCount); i++) {
-        lethargyBar += "░"
-    }
-    return lethargyBar;
-}
 
 /**
  * Exhaustion Variable
  * @memberOf sharAI
  */
 sharAI.exhaustion = new DecayVariable(0, 1, 0, 100);
-sharAI.exhaustion.toString = function() {
-    let exhaustionBar = "Exhaustion:\t";
-    let exhaustionAmount = Math.floor(sharAI.exhaustion.value / 10);
-    let iCount = 0;
-    for (i = 0; i < exhaustionAmount; i++) {
-        exhaustionBar += "▓"
-        iCount++;
-    }
-    for (i = 0; i < (10 - iCount); i++) {
-        exhaustionBar += "░"
-    }
-    return exhaustionBar;
-}
 
 /**
  * Boredom Variable
  * @memberOf sharAI
  */
 sharAI.boredom = new DecayVariable(0, 1, 0, 100);
-sharAI.boredom.toString = function() {
-    let boredomBar = "Boredom:\t\t";
-    let boredomAmount = Math.floor(sharAI.boredom.value / 10);
-    let iCount = 0;
-    for (i = 0; i < boredomAmount; i++) {
-        boredomBar += "▓"
-        iCount++;
-    }
-    for (i = 0; i < (10 - iCount); i++) {
-        boredomBar += "░"
-    }
-    return boredomBar;
-}
 
 /**
  * Health Variable
  * @memberOf sharAI
  */
 sharAI.health = new DecayVariable(100, 1, 0, 100);
-sharAI.health.toString = function() {
-    let healthBar = "Health:\t\t";
-    let healthAmount = Math.floor(sharAI.health.value / 10);
-    let iCount = 0;
-    for (i = 0; i < healthAmount; i++) {
-        healthBar += "▓"
-        iCount++;
-    }
-    for (i = 0; i < (10 - iCount); i++) {
-        healthBar += "░"
-    }
-    return healthBar;
-}
 
 /**
  * Populate the status field
@@ -261,7 +209,7 @@ sharAI.health.toString = function() {
  * @override
  */
 sharAI.getStatus = function() {
-    let statusString = sharAI.health.toString() + "\n" + sharAI.hunger.toString() + "\n" + sharAI.lethargy.toString() + "\n" + sharAI.exhaustion.toString() + "\n" + sharAI.boredom.toString() + "\n" + sharAI.motionText + "\n" + sharAI.ear;
+    let statusString = sharAI.health.getBar("Health:") + "\n" + sharAI.hunger.getBar("Hunger:") + "\n" + sharAI.lethargy.getBar("Lethargy:") + "\n" + sharAI.exhaustion.getBar("Exhaustion:") + "\n" + sharAI.boredom.getBar("Boredom:") + "\n" + sharAI.motionText + "\n" + sharAI.ear;
     return statusString;
 }
 
@@ -467,7 +415,14 @@ sharAI.highFived = function(botWhoHighFivedMe) {
  * @override
  */
 sharAI.gotBit = function(botWhoAttackedMe, damage) {
-	sharAI.addMemory("Got bit by " + botWhoAttackedMe.name);
+	if (!this.shield) {
+		sharAI.health.subtract(damage);
+		sharAI.addMemory("Got bit by " + botWhoAttackedMe.name);
+		sharAI.defend();
+	}
+	else {
+		sharAI.addMemory(botWhoAttackedMe.name + " tried to bite me");
+	}
     sharAI.speak(botWhoAttackedMe, "Ow! You'll pay for that, " + botWhoAttackedMe.name + "!");
     sharAI.bite(botWhoAttackedMe, 25, 25);
 }
