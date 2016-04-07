@@ -82,6 +82,26 @@ DecayVariable.prototype.add = function(amount) {
 DecayVariable.prototype.subtract = function(amount) {
     this.value = Math.max(this.minVal, this.value - amount);
 }
+DecayVariable.prototype.getBar = function(prefix = "", showVal = true, numTicks = 10) {
+    // Thanks to SharAI for this code idea!
+    var bar = "";
+    if(showVal) {
+        bar = prefix + ": " + this.value + "\t\t" + this.minVal + " ";
+    } else {
+        bar = prefix + ": " + this.minVal + " ";
+    }
+    let tick_size = (this.maxVal - this.minVal) / numTicks;
+    let tick_location = Math.floor(this.value / tick_size);
+    for (i = 0; i < tick_location; i++) {
+        bar += "▓"
+    }
+    for (i = 0; i < (numTicks - tick_location); i++) {
+        bar += "░"
+    }
+    bar += " " + this.maxVal;
+    return bar;
+}
+
 
 /**
  * Adding a contains function to String
@@ -284,3 +304,24 @@ Array.prototype.contains = function(obj) {
 function round(num, dec) {
     return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
 }
+
+
+/**
+ * A goal object.  (Incomplete thus far)
+ * @param {String} name the name / id of the goal
+ * @param {Priority} priorityLevel it's priority level
+ */
+function Goal(name, priorityLevel) {
+    this.name = name;
+    this.priorityLevel = priorityLevel; // 1-1.  Reuse production priority levels?
+    this.satisfied = false; // Manually set to true when success
+    this.failedAttemptsToSatisfy = 0; // Manually update this when failed
+
+};
+
+// Update goal list
+//  pass in list
+//  rank by priority
+//  any that are satisfied, remove.
+//  or make a goal-list object, that returns a string status, and from which things can be removed
+

@@ -202,19 +202,6 @@ jeff.emotions.add("Happy", [
  * Hunger Variable
  */
 jeff.hunger = new DecayVariable(0, 1, 0, 100);
-jeff.hunger.toString = function() {
-    var hungerLevel = "";
-    if (this.value < 20) {
-        hungerLevel = "Not hungry";
-    } else if (this.value < 60) {
-        hungerLevel = "Hungry";
-    } else if (this.value < 80) {
-        hungerLevel = "Starving!!";
-    } else {
-        hungerLevel = "FEED ME!";
-    }
-    return hungerLevel + " (Hunger = " + this.value + ")";
-}
 
 /**
  * Populate the status field
@@ -224,7 +211,7 @@ jeff.hunger.toString = function() {
 jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
     statusString += "\nMotion: " + (jeff.motionOverride ? "Override" : jeff.currentMotion.description);
-    statusString += "\n" + jeff.hunger.toString();
+    statusString += "\n" + jeff.hunger.getBar("Hunger", false, 10);
     return statusString;
 }
 
