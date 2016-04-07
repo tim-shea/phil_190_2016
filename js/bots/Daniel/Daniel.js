@@ -1,9 +1,10 @@
 var Daniel = new Bot(240, 220, 'Daniel', 'js/bots/Daniel/espeon.png');
+Daniel.currentMotion = Motions.walking;
 
 Daniel.init = function() {
     this.body = this.sprite.body;
     this.body.angle = 100; // Initial Angle
-    this.body.speed = 70; // Initial Speed
+    this.body.speed = 0; // Initial Speed
     //this.sprite.scale.setTo(3,3);
     // ^ this is how you scale things.  Use this for the shield.
     //Initialized timed events
@@ -79,12 +80,21 @@ Daniel.hunger = {
     update: function() {
         if (this.amount >= 100) {
             //do nothing
-        } else if (Daniel.motionMode == Daniel.baseline) {
-            this.amount += 1;;
-        } else if (Daniel.motionMode == Daniel.powerwalking) {
-            this.amount += 2;
-        } else if (Daniel.motionMode == Daniel.sonic) {
-            this.amount += 5;
+        // working on this atm
+        // } else if (Daniel.currentMotion == motion.stop) {
+        //     this.amount += 1;
+        // } else if (Daniel.currentMotion == motion.still) {
+        //     this.amount += 1;
+        // } else if (Daniel.currentMotion == motion.walking) {
+        //     this.amount += 2;
+        // } else if (Daniel.currentMotion == motion.running) {
+        //     this.amount += 3;
+        // } else if (Daniel.currentMotion == motion.sonicSpeed) {
+        //     this.amount += 5;
+        // } else if (Daniel.currentMotion == motion.moping) {
+        //     this.amount += 1.5;
+        // } else if (Daniel.currentMotion == motion.tantrum) {
+        //     this.amount += 5;
         } else {
             this.amount += 0.5;
         }
@@ -105,115 +115,66 @@ Daniel.hunger = {
 }
 
 //
-// Motion States
-//
-Daniel.baseline = {
-    description: "Walking pace",
-    update: function() {
-        Daniel.body.speed = 70;
-        if (Math.random() < .3) {
-            Daniel.incrementAngle(Daniel.getRandom(-5, 5));
-        }
-    }
-}
-Daniel.powerwalking = {
-    description: "A little faster now",
-    update: function() {
-        Daniel.body.speed = 100;
-        if (Math.random() < .5) {
-            Daniel.incrementAngle(Daniel.getRandom(-10, 10));
-        }
-    }
-}
-Daniel.sonic = {
-    description: "GOTTA GO FAST GOTTA GO FAST GOTTA GO FAST",
-    update: function() {
-        Daniel.body.speed = 500;
-    }
-}
-Daniel.exhaustion = {
-    description: "I need to sit down now...",
-    update: function() {
-        Daniel.body.speed = 0;
-        if (Math.random() < .2) {
-            Daniel.incrementAngle(Daniel.getRandom(-3, 3));
-        }
-    }
-}
-
-//
 // Mental States
 //
 
-Daniel.chill = {
-    name: "calm.",
-    transitionProb: .3,
-    transition: function() {
-        if (Math.random() < .4) {
-            return Daniel.enthusiastic;
-        } else {
-            return Daniel.apathetic;
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .9) {
-            return Daniel.baseline;
-        } else {
-            return Daniel.exhaustion;
-        }
-    }
-}
-Daniel.enthusiastic = {
-    name: "enthusiastic!",
-    transitionProb: .4,
-    transition: function() {
-        if (Math.random() < .3) {
-            return Daniel.chill;
-        } else {
-            return Daniel.enthusiastic
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .5) {
-            return Daniel.powerwalking;
-        } else {
-            return Daniel.sonic;
-        }
-    }
-}
-Daniel.apathetic = {
-    name: "bored.",
-    transitionProb: .7,
-    transition: function() {
-        if (Math.random() < .7) {
-            return Daniel.chill;
-        } else {
-            return Daniel.apathetic;
-        }
-    },
-    getMotionMode: function() {
-        if (Math.random() < .8) {
-            return Daniel.exhaustion;
-        } else {
-            return Daniel.baseline;
-        }
-    }
-}
+Daniel.emotion = new MarkovProcess("Chill");
+Daniel.emotion.add("Chill", [
+    ["Chill", "Enthusiastic", "Apathetic", "Irate"],
+    [.8, .1, .05, .05]
+]);
+Daniel.emotion.add("Enthusiastic", [
+    ["Chill", "Enthusiastic", "Apathetic", "Irate"],
+    [.3, .5, .1, .1]
+]);
+Daniel.emotion.add("Apathetic", [
+    ["Chill", "Enthusiastic", "Apathetic", "Irate"],
+    [.2, .05, .6, .15]
+]);
+Daniel.emotion.add("Irate", [
+    ["Chill", "Enthusiastic", "Apathetic", "Irate"],
+    [.1, .25, .25, .4]
+]);
 
-Daniel.emotion = Daniel.chill;
-Daniel.motionMode = Daniel.baseline;
+Daniel.setMotion = function() {
+    if (Daniel.emotion.current === "Chill") {
+        if (Math.random < .5) {
+            Daniel.currentMotion = Motions.still;
+        } else {
+            Daniel.currentMotion = Motions.walking;
+        }
+    } else if (Daniel.emotion.current === "Enthusiastic") {
+        if (Math.random < .95) {
+            Daniel.currentMotion = Motions.running;
+        } else {
+            Daniel.currentMotion = Motions.sonicSpeed;
+        }
+    } else if (Daniel.emotion.current === "Apathetic") {
+        if (Math.random < .6) {
+            Daniel.currentMotion = Motions.moping;
+        } else {
+            Daniel.currentMotion = Motions.stop;
+        }
+    } else if (Daniel.emotion.current === "Irate") {
+        if (Math.random < .7) {
+            Daniel.currentMotion = Motions.running;
+        } else {
+            Daniel.currentMotion = Motions.tantrum;
+        }
+    }
+}
 
 Daniel.getStatus = function() {
-    var statusString = "I am feeling " + Daniel.emotion.name;
+    var statusString = "I am feeling " + Daniel.emotion.current;
     statusString += "\n>------<";
-    statusString += "\nSpeed: " + Daniel.motionMode.description;
+    statusString += "\nSpeed: " + Daniel.currentMotion.description;
     statusString += "\n" + Daniel.hunger.toString();
     statusString += "\n" + Daniel.fear.toString();
     return statusString;
 }
 
 Daniel.update = function() {
-    Daniel.motionMode.update();
+    this.currentMotion.apply(Daniel);
     Daniel.genericUpdate();
 };
 
@@ -221,10 +182,8 @@ Daniel.updateOneSecond = function() {
     Daniel.updateNetwork();
     Daniel.hunger.update();
     Daniel.fear.update();
-    if (Math.random() < Daniel.emotion.transitionProb) {
-        Daniel.emotion = Daniel.emotion.transition();
-    }
-    Daniel.motionMode = Daniel.emotion.getMotionMode();
+    Daniel.emotion.update();
+    Daniel.setMotion();
 }
 
 Daniel.updateMin = function() {
