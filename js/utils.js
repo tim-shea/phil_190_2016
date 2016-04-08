@@ -82,7 +82,7 @@ DecayVariable.prototype.add = function(amount) {
 DecayVariable.prototype.subtract = function(amount) {
     this.value = Math.max(this.minVal, this.value - amount);
 }
-DecayVariable.prototype.getBar = function(prefix = "", showVal = true, numTicks = 10) {
+DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10) {
     // Thanks to SharAI for this code idea!
     var bar = "";
     if(showVal) {
@@ -99,6 +99,37 @@ DecayVariable.prototype.getBar = function(prefix = "", showVal = true, numTicks 
         bar += "░"
     }
     bar += " " + this.maxVal;
+    return bar;
+}
+
+/**
+ * Creates a simple ascii bargraph using Sharai's basic method
+ * @param  {Number}  minVal minimum value in range
+ * @param  {Number}  maxVal max val in range
+ * @param  {Number}  value the current value to show  as a tick
+ * @param  {String}  prefix prefix for the bar graph
+ * @param  {Boolean} showVal whether to show the current value separtely
+ * @param  {Number}  numTicks how many ticks in the graph
+ * @return {String}  the formatted graph representation
+ */
+function getBarWithTick(minVal, maxVal, value, prefix = "", showVal = false, numTicks = 10) {
+    var bar = "";
+    if(showVal) {
+        bar = prefix + ": " + value + "\t\t" + minVal + " ";
+    } else {
+        bar = prefix + ": " + minVal + " ";
+    }
+    let range = maxVal - minVal;
+    let rescaledValue = -minVal + value;
+    let tick_location = Math.floor((rescaledValue/range)*numTicks);
+    for (i = 0; i < numTicks; i++) {
+        if (i === tick_location) {
+            bar += "▓";
+        } else {
+            bar += "░";           
+        }
+    }
+    bar += " " + maxVal;
     return bar;
 }
 

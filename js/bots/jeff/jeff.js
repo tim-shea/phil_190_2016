@@ -211,7 +211,7 @@ jeff.hunger = new DecayVariable(0, 1, 0, 100);
 jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
     statusString += "\nMotion: " + (jeff.motionOverride ? "Override" : jeff.currentMotion.description);
-    statusString += "\n" + jeff.hunger.getBar("Hunger", false, 10);
+    statusString += "\n" + jeff.hunger.getBar("Hunger: ");
     return statusString;
 }
 
@@ -257,6 +257,11 @@ jeff.update = function() {
  */
 jeff.update1Sec = function() {
     jeff.updateNetwork();
+    // if(jeff.containsMemory("Was bored")) {
+    //     console.log(jeff.getMemory("Was bored").value);
+    //     // TODO: Give a sense of how values are related to recency
+    // }
+    // jeff.play(sounds.beepbeep_00);
     // TODO: Depending on power output of motions increment hunger in different degrees
     jeff.hunger.increment();
     jeff.emotions.update();
@@ -267,7 +272,8 @@ jeff.update1Sec = function() {
 /**
  * Called every ten seconds
  */
-jeff.updateTenSecs = function() {}
+jeff.updateTenSecs = function() {
+}
 
 /**
  *  Called every two minutes

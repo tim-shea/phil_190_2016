@@ -48,7 +48,7 @@ function Bot(x, y, name, path) {
     this.currentMemory;
     this.currentTransition;
     this.setNetwork();
-    // If true, show nodes and edges by their activation values (hides regular labels)
+    // If below true, show nodes and edges by their activation values (hides regular labels)
     this.showActivations = false;
 };
 
@@ -535,6 +535,7 @@ Bot.prototype.setNetwork = function() {
     this.nodes = new vis.DataSet(); // Main memory store
     this.edges = new vis.DataSet();
     this.options = {
+        // configurePhysics:true,  // Uncomment to fine-tune graph
         nodes: {
             shape: 'dot',
             smooth: false, // For better performance. Todo: does not seem to work...
@@ -653,6 +654,18 @@ Bot.prototype.addMemory = function(memory) {
     }
 }
 
+/**
+ * Remove the indicated memory
+ *
+ * @param {String} memory id of memory to remove
+ */
+Bot.prototype.forget = function(memory_id) {
+    if (!memoryOn) {
+        return;
+    }
+    this.nodes.remove(memory_id);
+}
+
 
 /**
  * Update the memory network by decaying all node and edge activations
@@ -715,6 +728,7 @@ Bot.prototype.play = function(sound_object) {
     if (this.currentSound != null || !this.sprite.inCamera) {
         return;
     }
+    // console.log(this.name + "is playing a sound");
     this.currentSound = sound_object;
     sound_object.play();
     sound_object.onStop.addOnce(function() { this.currentSound = null; }, this);
