@@ -388,6 +388,40 @@ yang.fun_.find_colliding_obj = function (object_in_array) {
  * @param {object} sound object created by game
  * @memberOf yang.fun_
  */
+yang.fun_.playsound = function (sound_object, privacy = false, is_continuous = false) {
+    if (typeof privacy != "undefined" && privacy 
+        && bots[currentBotIndex] != yang) {
+        //stop or pause or do not start to play
+        if (sound_object.isPlaying 
+            && typeof sound_object.is_playing_by_yang != "undefined"
+            && sound_object.is_playing_by_yang) {
+            if (typeof is_continuous != "undefined"
+                && is_continuous) {
+                if (sound_object.volume == 1) {
+                    sound_object.fadeTo(500, 0.2);
+                } else if (sound_object.volume <= 0.2) {
+                    sound_object.pause();
+                }
+            } else {
+                sound_object.stop();            
+            }
+        }     
+    } else if (typeof sound_object.is_playing_by_yang == "undefined"
+        || !sound_object.is_playing_by_yang) {
+        //resume or play
+        sound_object.is_playing_by_yang = true;
+        if (sound_object.paused) {
+            sound_object.resume();
+            sound_object.fadeTo(550, 1);
+        } else {
+            sound_object.play();        
+        }
+    } else if (!sound_object.isPlaying) {
+        //not private, not playing, then definitely not by me
+        sound_object.is_playing_by_yang = false;
+    }
+};
+/*backup
 yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
     if (typeof privacy != "undefined" && privacy 
         && bots[currentBotIndex] != yang) {
@@ -416,6 +450,8 @@ yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
         sound_object.is_playing_by_yang = false;
     }
 };
+
+
 /**
  * BGM Path
  * @return {[type]} [description]
