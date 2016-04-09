@@ -52,7 +52,7 @@ dylan.init = function() {
  */
 
 dylan.makeProductions = function() {
-    insanity = new Production("insane");
+    var insanity = new Production("insane");
     insanity.priority = Production.priority.Low;
     insanity.condition = function() {
         return (dylan.fuel.value > 90 && dylan.emotions.current === "Scared");
@@ -60,11 +60,12 @@ dylan.makeProductions = function() {
     insanity.action = function() {
         dylan.currentMotion = Motions.spazzing;
         dylan.productionText = "WE RIDE TO VALHALLA!"
+        dylan.play(sounds.attack1);
     };
 
 
 
-    curiosity = new Production("curious");
+    var curiosity = new Production("curious");
     curiosity.priority = Production.priority.Low;
     curiosity.condition = function() {
         return false; // <-- just forcing this production not to get triggered for now.  we can work together to reimplement this
@@ -80,29 +81,31 @@ dylan.makeProductions = function() {
         dylan.speak(this.sprite, "What's your story?", 10);
     };
 
-    revenge = new Production("seeking revenge");
+    var revenge = new Production("seeking revenge");
     revenge.priority = Production.priority.Medium;
     revenge.condition = function() {
         return (dylan.emotions.current === "Angry" && dylan.collisionCheck === true);
     };
     revenge.action = function() {
+        dylan.addMemory("Seeked revenge");
         dylan.currentMotion = Motions.running;
         dylan.productionText = "Whoever that was, I AM COMING FOR YOU!"
         dylan.pursueRandomObject();
     };
 
 
-    fleeing = new Production("fleeing");
+    var fleeing = new Production("fleeing");
     fleeing.priority = Production.priority.High;
         fleeing.condition = function() {
             return (dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
         };
     fleeing.action = function() {
+        dylan.addMemory("Fled from something");
         dylan.productionText = "MUST HIDE FROM EVERYONE!"
     };
 
     
-    delerium = new Production("delerious");
+        var delerium = new Production("delerious");
         delerium.priority = Production.priority.Low;
         delerium.condition = function() {
             return (dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
@@ -111,7 +114,7 @@ dylan.makeProductions = function() {
             dylan.productionText = "Everything's going fuzzy..."
         };
 
-    distracted = new Production("distracted");
+    var distracted = new Production("distracted");
     distracted.priority = Production.priority.Medium; 
     distracted.condition = function() {
         return (dylan.currentMotion = Motions.still);
@@ -123,18 +126,19 @@ dylan.makeProductions = function() {
         }
     };
 
-    pester = new Production("pester");
+    var pester = new Production("pester");
     pester.priority = Production.priority.Low;
     pester.condition = function() {
         return (dylan.emotions.currrent === "Playful" || dylan.emotions.current === "Happy");
     };
     pester.action = function() {
+        dylan.addMemory("Attempted to pester a bot");
         var randomBot = dylan.getRandomBot();
         dylan.pursue(randomBot, 500);
         dylan.makeSpeechBubble("Hey you! Come back!");
     };
 
-    irritated = new Production ("irritated");
+    var irritated = new Production ("irritated");
     irritated.priority = Production.priority.High;
     irritated.condition = function(){
         return (dylan.emotions.current === "Angry");
@@ -146,13 +150,14 @@ dylan.makeProductions = function() {
         // dylan.speak(overlappingObjects, "Get off me " + overlappingObjects.name + "!")
     };
 
-    idletalk = new Production ("idle talk");
+    var idletalk = new Production ("idle talk");
     idletalk.priority = Production.priority.Low;
     idletalk.condition = function() {
         return (dylan.emotions.current === "Calm");
 
     };
     idletalk.action = function() {
+        dylan.addMemory("Had a thought");
         dylan.makeSpeechBubble("I wonder what it's like having a heart");
         //I want to add several more speech bubbles with a random chance of using any one of them, not sure how yet
     };
@@ -307,6 +312,7 @@ dylan.eatObject = function(objectToEat) {
         objectToEat.eat();
         dylan.fuel.subtract(objectToEat.calories);
         dylan.speak(objectToEat, "Glorious " + objectToEat.description + "!");
+
     }
     /**
      * Reaction to hearing something
