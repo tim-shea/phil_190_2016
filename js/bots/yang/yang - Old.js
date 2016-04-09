@@ -104,11 +104,6 @@ yang["speed_node"] = yang.void_node;
 yang["acceleration_node"] = yang.void_node;
 yang["rotation_node"] = yang.void_node;
 /**
- * Path for BGM
- * @type {String}
- */
-yang.BGM = '';
-/**
  * initializor called by system
  * @override
  * @function yang.init
@@ -277,8 +272,6 @@ yang.basicUpdate = function() {//Update the velocity and angle of the bot to upd
  * @memberOf yang
  */
 yang.update = function() {
-    //play or pause BGM
-    yang.fun_.playsound(sounds.rand_BGM, true, true);
     //real updates
     yang.pre_update();
     if (yang.test_.test_ongoing) {
@@ -416,37 +409,6 @@ yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
         sound_object.is_playing_by_yang = false;
     }
 };
-/**
- * BGM Path
- * @return {[type]} [description]
- */
-yang.fun_.generate_BGM_path = function () {
-    var list_of_paths = [
-        'assets/A Magnificent Sight.mp3',
-        'assets/At the End of the Wait.mp3',
-        'assets/At the End of the Wait.mp3',
-        'assets/Belfast.mp3',
-        'assets/coockiecatinstrumental.m4a',
-        'assets/Counter-Attack of Light (Shadowy Requiem).mp3',
-        'assets/Do not Tease Me.mp3',
-        'assets/Friend of solitude and loneliness.mp3',
-        'assets/Mischievous Soul.mp3',
-        'assets/Nameless Tombstone.mp3',
-        'assets/okkusenman.mp3',
-        'assets/Old Heros Visage.mp3',
-        'assets/Shadow of Early Dawn.mp3',
-        'assets/Soul of Freedom.mp3',
-        'assets/Tale that was not told.mp3',
-        'assets/The Dance of Leaves.mp3',
-        'assets/The Final Stand.mp3',
-        'assets/The Star above Falias.mp3',
-        'assets/The Story of a White Deer.mp3',
-        'assets/Unspeakable Evil.mp3',
-        'assets/Viridian Emerald.mp3'
-    ];
-    return  list_of_paths[Math.round(Math.random() * list_of_paths.length)];
-}
-yang.BGM = yang.fun_.generate_BGM_path();//must declare befor load
 /**
  * collision
  * @param {Object}

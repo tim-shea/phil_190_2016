@@ -89,28 +89,7 @@ function preload() {
     game.load.audio('puuuu 00', 'assets/puuuu_00.mp3');
     game.load.audio('quote_batrider 00', 'assets/quote_batrider.mp3');
     game.load.audio('snore', 'assets/sleep_00.mp3');
-    /*
-    game.load.audio('BGM 00', 'assets/A Magnificent Sight.mp3');
-    game.load.audio('BGM 01', 'assets/At the End of the Wait.mp3');
-    game.load.audio('BGM 02', 'assets/Belfast.mp3');
-    game.load.audio('BGM 03', 'assets/coockiecatinstrumental.m4a');
-    game.load.audio('BGM 04', 'assets/Counter-Attack of Light (Shadowy Requiem).mp3');
-    game.load.audio('BGM 05', 'assets/Do not Tease Me.mp3');
-    game.load.audio('BGM 06', 'assets/Friend of solitude and loneliness.mp3');
-    game.load.audio('BGM 07', 'assets/Mischievous Soul.mp3');
-    game.load.audio('BGM 08', 'assets/Nameless Tombstone.mp3');
-    game.load.audio('BGM 09', 'assets/okkusenman.mp3');
-    game.load.audio('BGM 10', 'assets/Old Heros Visage.mp3');
-    game.load.audio('BGM 11', 'assets/Shadow of Early Dawn.mp3');
-    game.load.audio('BGM 12', 'assets/Soul of Freedom.mp3');
-    game.load.audio('BGM 13', 'assets/Tale that was not told.mp3');
-    game.load.audio('BGM 14', 'assets/The Dance of Leaves.mp3');
-    game.load.audio('BGM 15', 'assets/The Final Stand.mp3');
-    game.load.audio('BGM 16', 'assets/The Star above Falias.mp3');
-    game.load.audio('BGM 17', 'assets/The Story of a White Deer.mp3');
-    game.load.audio('BGM 18', 'assets/Unspeakable Evil.mp3');
-    game.load.audio('BGM 19', 'assets/Viridian Emerald.mp3');
-    */
+    game.load.audio(name = yang.BGM, path = yang.BGM);
 
     // Load speech bubble assets
     loadSpeechBubbleAssets();
@@ -209,29 +188,8 @@ function create() {
     sounds.puuuu_00 = game.add.audio('puuuu 00');
     sounds.quote_batrider_00 = game.add.audio('quote_batrider 00');
     sounds.snore = game.add.audio('snore');
-
-    /*
-    sounds.yang_BGM_00 = game.add.audio('BGM 00', undefined, true, undefined);
-    sounds.yang_BGM_01 = game.add.audio('BGM 01', undefined, true, undefined);
-    sounds.yang_BGM_02 = game.add.audio('BGM 02', undefined, true, undefined);
-    sounds.yang_BGM_03 = game.add.audio('BGM 03', undefined, true, undefined);
-    sounds.yang_BGM_04 = game.add.audio('BGM 04', undefined, true, undefined);
-    sounds.yang_BGM_05 = game.add.audio('BGM 05', undefined, true, undefined);
-    sounds.yang_BGM_06 = game.add.audio('BGM 06', undefined, true, undefined);
-    sounds.yang_BGM_07 = game.add.audio('BGM 07', undefined, true, undefined);
-    sounds.yang_BGM_08 = game.add.audio('BGM 08', undefined, true, undefined);
-    sounds.yang_BGM_09 = game.add.audio('BGM 09', undefined, true, undefined);
-    sounds.yang_BGM_10 = game.add.audio('BGM 10', undefined, true, undefined);
-    sounds.yang_BGM_11 = game.add.audio('BGM 11', undefined, true, undefined);
-    sounds.yang_BGM_12 = game.add.audio('BGM 12', undefined, true, undefined);
-    sounds.yang_BGM_13 = game.add.audio('BGM 13', undefined, true, undefined);
-    sounds.yang_BGM_14 = game.add.audio('BGM 14', undefined, true, undefined);
-    sounds.yang_BGM_15 = game.add.audio('BGM 15', undefined, true, undefined);
-    sounds.yang_BGM_16 = game.add.audio('BGM 16', undefined, true, undefined);
-    sounds.yang_BGM_17 = game.add.audio('BGM 17', undefined, true, undefined);
-    sounds.yang_BGM_18 = game.add.audio('BGM 18', undefined, true, undefined);
-    sounds.yang_BGM_19 = game.add.audio('BGM 19', undefined, true, undefined);
-    */
+    sounds.rand_BGM = game.add.audio(yang.BGM, undefined, true, undefined);
+    
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);
