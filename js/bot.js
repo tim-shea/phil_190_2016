@@ -420,15 +420,14 @@ Bot.prototype.getOverlappingEntities = function() {
 }
 
 /**
- * Returns a list of any objects the bot is overlapping
+ * Returns a list of any food the bot is overlapping
  * 
- * @return {array} overlapping objects
+ * @return {array} overlapping food
  */
 Bot.prototype.getOverlappingFoods = function() {
     let me = this.sprite;
     let overlappingObjects = [];
-
-    // Static foods
+    // foods
     foods.forEach(function(food) {
         if (Bot.objectsOverlap(me, food.sprite)) {
             overlappingObjects.push(food);
