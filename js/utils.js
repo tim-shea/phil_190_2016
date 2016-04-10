@@ -82,13 +82,23 @@ DecayVariable.prototype.add = function(amount) {
 DecayVariable.prototype.subtract = function(amount) {
     this.value = Math.max(this.minVal, this.value - amount);
 }
-DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10) {
+DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, slice_vallength = NaN) {
+    //prettify value string length
+    if (slice_vallength !== slice_vallength) {
+        if (this.minVal.toString().length >= this.maxVal.toString().length) {
+            slice_vallength = this.minVal.toString().length;
+        } else {
+            slice_vallength = this.maxVal.toString().length;            
+        }
+    }
+    var string_minVal = ("     " + this.minVal).slice(-slice_vallength);
+    var string_maxVal = ("     " + this.maxVal).slice(-slice_vallength);
     // Thanks to SharAI for this code idea!
     var bar = "";
     if(showVal) {
-        bar = prefix + ": " + this.value + "\t\t" + this.minVal + " ";
+        bar = prefix + ": " + this.value + "\t\t" + string_minVal + "\t";
     } else {
-        bar = prefix + ": " + this.minVal + " ";
+        bar = prefix + ": " + string_minVal + "\t";
     }
     let tick_size = (this.maxVal - this.minVal) / numTicks;
     let tick_location = Math.floor(this.value / tick_size);
@@ -98,7 +108,7 @@ DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks
     for (i = 0; i < (numTicks - tick_location); i++) {
         bar += "░"
     }
-    bar += " " + this.maxVal;
+    bar += " " + string_maxVal;
     return bar;
 }
 

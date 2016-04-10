@@ -55,6 +55,12 @@ yang.biomachine_ = {};
  */
 yang.mindmachine_ = {};
 /**
+ * Pleasure and Pain
+ * @memberOf yang
+ * @type {Object}
+ */
+yang.ultility_sum_ = {};
+/**
  * A node of nothing.
  * @memberOf yang
  * @type {Object}
@@ -191,6 +197,10 @@ yang.init_state = function() {
     //basic mind states of two spirits
     yang.mindmachine_.inspiration = 0; // accumulate through contact event
     yang.mindmachine_.emptyness = 0; // accumulate through time
+    //basic mind state
+    yang.ultility_sum_.ulti = new DecayVariable(0, 1, -200, 200); // pleasure - pain
+    yang.ultility_sum_.pleasure = new DecayVariable(0, 1, 0, 100); //decay variables
+    yang.ultility_sum_.pain = new DecayVariable(0, 1, 0, 100); //decay variables
     //state machines that uses nodes
     //mental nodes
     if (yang.test_.test_ongoing) {
@@ -218,6 +228,9 @@ yang.getStatus = function() {
             "Test Mode" + "\n" +
             yang.text_.testFeedBack + "\n" +
             "Test node Type: " + yang.test_.current_testnode.type + "\n" +
+            "Satisfy of Life\t" + yang.ultility_sum_.ulti.getBar(undefined, undefined, undefined, 5) + "\n" +
+            "Pleasure\t\t"  + yang.ultility_sum_.pleasure.getBar(undefined, undefined, undefined, 5) + "\n" +
+            "Pain\t\t\t" + yang.ultility_sum_.pain.getBar(undefined, undefined, undefined, 5) + "\n" +
             yang.text_.rotationText + "\n" +
             yang.text_.motionText + "\n" +
             "prime resources \t= " + yang.biomachine_.metaresources_prime + "\n" +
@@ -290,9 +303,6 @@ yang.update = function() {
     /*
     //TO DO redesign
     //temperory solution before rotation nodes are made
-    if (yang.atBoundary()) {
-        yang.incrementAngle(100);
-    }
     yang.chaosmachine_.chance = Math.random();
     if (yang.chaosmachine_.chance <= .10) {
         yang.incrementAngle(4);
@@ -480,7 +490,7 @@ yang.fun_.generate_BGM_path = function () {
         'assets/Unspeakable Evil.mp3',
         'assets/Viridian Emerald.mp3'
     ];
-    return  list_of_paths[Math.round(Math.random() * list_of_paths.length)];
+    return  list_of_paths[Math.round(Math.random() * (list_of_paths.length - 1))];
 }
 yang.BGM = yang.fun_.generate_BGM_path();//must declare befor load
 /**
