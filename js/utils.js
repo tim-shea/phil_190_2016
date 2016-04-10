@@ -90,23 +90,27 @@ DecayVariable.prototype.subtract = function(amount) {
     }
     this.value = Math.max(this.minVal, this.value - amount);
 }
-DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, slice_vallength = NaN) {
+DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, slice_length = undefined) {
+    var string_minVal = this.minVal.toString();
+    var string_maxVal = this.maxVal.toString();
     //prettify value string length
-    if (slice_vallength !== slice_vallength) {
-        if (this.minVal.toString().length >= this.maxVal.toString().length) {
-            slice_vallength = this.minVal.toString().length;
-        } else {
-            slice_vallength = this.maxVal.toString().length;            
+    if (typeof slice_length != "undefined") {
+        if (Number.isNaN(slice_length)) {
+            if (this.minVal.toString().length >= this.maxVal.toString().length) {
+                slice_length = this.minVal.toString().length;
+            } else {
+                slice_length = this.maxVal.toString().length;            
+            }
         }
+        string_minVal = (" ".repeat(slice_length) + this.minVal).slice(-slice_length) + "\t";
+        string_maxVal = "\t" + (" ".repeat(slice_length) + this.maxVal).slice(-slice_length);
     }
-    var string_minVal = ("     " + this.minVal).slice(-slice_vallength);
-    var string_maxVal = ("     " + this.maxVal).slice(-slice_vallength);
     // Thanks to SharAI for this code idea!
     var bar = "";
     if(showVal) {
-        bar = prefix + ": " + this.value + "\t\t" + string_minVal + "\t";
+        bar = prefix + ": " + this.value + "\t\t" + string_minVal;
     } else {
-        bar = prefix + ": " + string_minVal + "\t";
+        bar = prefix + ": " + string_minVal;
     }
     let tick_size = (this.maxVal - this.minVal) / numTicks;
     let tick_location = Math.floor(this.value / tick_size);
