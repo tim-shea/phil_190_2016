@@ -420,12 +420,32 @@ Bot.prototype.getOverlappingEntities = function() {
 }
 
 /**
+ * Returns a list of any objects the bot is overlapping
+ * 
+ * @return {array} overlapping objects
+ */
+Bot.prototype.getOverlappingFoods = function() {
+    let me = this.sprite;
+    let overlappingObjects = [];
+
+    // Static foods
+    foods.forEach(function(food) {
+        if (Bot.objectsOverlap(me, food.sprite)) {
+            overlappingObjects.push(food);
+        }   
+    });
+    return overlappingObjects;
+}
+
+/**
  * Check if overlapping an entity.
  *
  * @return {boolean} true if overlapping something, false otherwise
  */
 Bot.prototype.collisionCheck = function() {
-    let overlappingObjects = this.getOverlappingEntities().concat(this.getOverlappingBots());
+    let overlappingObjects = this.getOverlappingEntities()
+                         .concat(this.getOverlappingBots())
+                         .concat(this.getOverlappingFoods());
     if (overlappingObjects.length > 0) {
         this.collision(overlappingObjects[0]);
     }

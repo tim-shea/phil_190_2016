@@ -222,13 +222,17 @@ function setUpFood() {
 function addFoodItem(image_id, description, calories) {
     if (image_id != "") {
         let location = findEmptyLocation();
-        food = new Entity(location[0],location[1], image_id);
+        food = new Entity(location[0], location[1], image_id);
         food.description = description;
         food.calories = calories;
         food.isEdible = true;
         foods.push(food);
         food.eat = function() {
-            if(!this.sprite[0] || !this.sprite[1] || !this.sprite || !this) {
+            if( !this
+                || !this.sprite
+                || this.sprite.x != this.sprite.x 
+                || this.sprite.y != this.sprite.y
+                 ) {
                 console.log("Problem with " + this.name);
                 return;
             }
