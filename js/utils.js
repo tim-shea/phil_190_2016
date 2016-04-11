@@ -113,7 +113,7 @@ DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks
         bar = prefix + ": " + string_minVal;
     }
     let tick_size = (this.maxVal - this.minVal) / numTicks;
-    let tick_location = Math.floor(this.value / tick_size);
+    let tick_location = Math.floor((this.value - this.minVal) / tick_size);
     for (i = 0; i < tick_location; i++) {
         bar += "▓"
     }
