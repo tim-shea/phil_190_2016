@@ -297,26 +297,42 @@ Production.priority.Low = 1;
  * production in the list of ties is fired).
  *
  * @param  {Production[]} productions list of productions to check
+ * @return {Production[]} list of productions that were fired
  */
 function fireProductions(productions) {
-    activeProductions = productions.filter(function(production) {
+    var activeProductions = productions.filter(function(production) {
         return production.condition();
     });
     activeProductions = activeProductions.sort(
         function(a, b) {
             return (a.priorityLevel < b.priorityLevel);
         });
+    var retProductions = [];
     if (activeProductions.length > 0) {
         if (Math.random() < activeProductions[0].probNotFiring) {
-            return;
+            return retProductions; 
         }
         // Choose randomly among those tied for current priority level
         baselinePriority = activeProductions[0].priorityLevel;
         activeProductions = activeProductions.filter(function(production) {
             return production.priorityLevel === baselinePriority;
         });
-        activeProductions.randItem().action();
+        let prod = activeProductions.randItem();
+        prod.action();
+        retProductions.push(prod);
     }
+    return retProductions;
+}
+function getProductionString(productions) {
+    var retString = "Recently fired productions:\n";
+    if (Object.keys(productions).length === 0) {
+        retString += "\tNo productions fired.";
+        return retString;
+    }
+    for (prod_id in productions) {
+        retString += "\t" + productions[prod_id].name;
+    }
+    return retString;
 }
 
 /**
@@ -419,7 +435,7 @@ GoalSet.prototype.checkIfSatisfied = function(goalId) {
 GoalSet.prototype.toString = function() {
     var retString = "\nGoals:\n";
     if (Object.keys(this.goals).length === 0) {
-        retString += "\tNo active goals.";
+        retString += "\tNo active goals.\n";
         return retString;
     }
     for (goal_id in this.goals) {

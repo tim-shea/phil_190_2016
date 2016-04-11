@@ -7,6 +7,7 @@ var jeff = new Bot(570, 570, 'jeff', 'js/bots/jeff/person.png');
  * State variables
  */
 jeff.currentlyPursuing = "Nothing";
+jeff.productionString = "";
 jeff.currentMotion = Motions.still;
 
 /**
@@ -263,6 +264,7 @@ jeff.getStatus = function() {
     statusString += "\nMotion: " + (jeff.motionOverride ? "Override" : jeff.currentMotion.description);
     statusString += "\n" + jeff.hunger.getBar("Hunger");
     statusString += jeff.goals.toString();
+    statusString += jeff.productionString;
     return statusString;
 }
 
@@ -317,7 +319,8 @@ jeff.update1Sec = function() {
     jeff.hunger.increment();
     jeff.emotions.update();
     jeff.setMotion();
-    fireProductions(jeff.productions);
+    let firedProductions = fireProductions(jeff.productions);
+    jeff.productionString = getProductionString(firedProductions); 
 }
 
 /**
