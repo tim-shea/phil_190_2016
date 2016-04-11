@@ -43,13 +43,17 @@ sharAI.init = function() {
  * @return {boolean}        is this object edible?
  */
 sharAI.canEat = function(object) {
+    if (object instanceof Bot) {
+        return false;
+    }
+
     for (i = 0; i < sharAI.inedibles; i++) {
         if (object.name == sharAI.inedibles[i]) {
             return false;
         }
-
-        return object.isEdible;
     }
+
+    return object.isEdible;
 }
 
 sharAI.utilityFunction = function(object) {
@@ -94,6 +98,7 @@ sharAI.makeProductions = function() {
         sharAI.currentMotion = Motions.still;
         sharAI.motionText = "sharAI is sleeping";
         sharAI.makeSpeechBubble("Zzz...");
+        sharAI.play(sounds.snooze);
     }
 
     var returnHome = new Production("going home");
@@ -209,7 +214,7 @@ sharAI.health = new DecayVariable(100, 1, 0, 100);
  * @override
  */
 sharAI.getStatus = function() {
-    let statusString = sharAI.health.getBar("Health:") + "\n" + sharAI.hunger.getBar("Hunger:") + "\n" + sharAI.lethargy.getBar("Lethargy:") + "\n" + sharAI.exhaustion.getBar("Exhaustion:") + "\n" + sharAI.boredom.getBar("Boredom:") + "\n" + sharAI.motionText + "\n" + sharAI.ear;
+    let statusString = sharAI.health.getBar("Health") + "\n" + sharAI.hunger.getBar("Hunger") + "\n" + sharAI.lethargy.getBar("Lethargy") + "\n" + sharAI.exhaustion.getBar("Exhaustion") + "\n" + sharAI.boredom.getBar("Boredom") + "\n" + sharAI.motionText + "\n" + sharAI.ear;
     return statusString;
 }
 
@@ -364,7 +369,7 @@ sharAI.updateFiveSecs = function() {
  */
 sharAI.collision = function(object) {
 	sharAI.addMemory("Saw " + object.name);
-    if (sharAI.canEat(object)) {
+    if (sharAI.canEat(object) && sharAI.hunger.value > 25) {
         sharAI.eatObject(object);
     } else if (object instanceof Bot) {
         sharAI.speak(object, "How you doin\', " + object.name + "?");
@@ -385,7 +390,7 @@ sharAI.eatObject = function(objectToEat) {
     objectToEat.eat();
     sharAI.hunger.subtract(objectToEat.calories);
     sharAI.speak(objectToEat, "Om nom nom");
-    sounds.chomp.play();
+    sharAI.play(sounds.chomp);
 }
 
 /**
