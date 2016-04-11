@@ -27,6 +27,9 @@ jeff.init = function() {
     // Make productions
     this.makeProductions();
 
+    // Create the goal set
+    this.goals = new GoalSet();
+
     // Initialize edibility function
     jeff.canEat = function(object) {
         if (object.name == "jerry_can") {
@@ -57,24 +60,49 @@ jeff.init = function() {
  */
 jeff.makeProductions = function() {
 
-    var foodSeeking = new Production("find food when hungry");
-    foodSeeking.priority = Production.priority.High;
-    foodSeeking.condition = function() {
+
+    this.productions = []; // The production array
+
+    var foodSeekingGoal = new Production("desire food when hungry");
+    foodSeekingGoal.priority = Production.priority.High;
+    foodSeekingGoal.condition = function() {
         return (jeff.hunger.value > 50);
     };
-    foodSeeking.action = function() {
-        // jeff.currentMotion = Motions.tantrum;
+    foodSeekingGoal.action = function() {
+        jeff.addMemory("Added goal of finding food");
+        jeff.goals.add(new Goal("Find food", 8));
+    };
+    this.productions.push(foodSeekingGoal);
+
+    var getFood = new Production("fulfill food desire");
+    getFood.priority = Production.priority.High;
+    getFood.condition = function() {
+        return (jeff.goals.contains("Find food"));
+    };
+    getFood.action = function() {
         jeff.findFood(500, jeff.canEat);
         jeff.addMemory("Looked for food");
-        jeff.makeSpeechBubble("Ok I'm hunting!", 400);
+        jeff.makeSpeechBubble("Looking for food", 200);
+
+        // Wait a few seconds, then see if we succeeded
+        game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+            jeff.goals.checkIfSatisfied("Find food");
+        }, this);
+
     };
+    this.productions.push(getFood);
 
     var admireCar = new Production("admiring car");
     admireCar.priority = Production.priority.Medium;
     admireCar.condition = function() {
         let d = jeff.getDistanceTo(dylan);
         if ((d > 100) && (d < 300)) {
-            return true;
+            // Don't repeat it if I recently said it
+            if(jeff.containsRecentMemory("Said Nice Car", 1.01)) {
+                return false; 
+            } else {
+                return true;
+            }
         };
         return false;
     };
@@ -83,19 +111,21 @@ jeff.makeProductions = function() {
         jeff.addMemory("Said Nice Car");
         jeff.orientTowards(dylan);
     };
+    this.productions.push(admireCar);
 
-    var fight = new Production("pick a fight when grumpy");
-    fight.priority = Production.priority.Low;
-    fight.condition = function() {
-        return true; // (jeff.emotions.current === "Angry");
-    };
-    fight.action = function() {
-        jeff.makeSpeechBubble("Attack!", 2000);
-        jeff.addMemory("Attack mode");
-        jeff.attackNearbyBots();
-        jeff.play(sounds.attack1);
-    };
-    fight.probNotFiring = .7;
+    // var fight = new Production("pick a fight when grumpy");
+    // fight.priority = Production.priority.Low;
+    // fight.condition = function() {
+    //     return true; // (jeff.emotions.current === "Angry");
+    // };
+    // fight.action = function() {
+    //     jeff.makeSpeechBubble("Attack!", 2000);
+    //     jeff.addMemory("Attack mode");
+    //     jeff.attackNearbyBots();
+    //     jeff.play(sounds.attack1);
+    // };
+    // fight.probNotFiring = .7;
+    // production.push(fight);
 
     var irritable = new Production("irritable when hungry");
     irritable.priority = Production.priority.Medium;
@@ -108,6 +138,7 @@ jeff.makeProductions = function() {
         jeff.makeSpeechBubble("Need food!", 1000);
     };
     irritable.probNotFiring = .5;
+    this.productions.push(irritable);
 
     var chatty = new Production("talk to people when bored");
     chatty.priority = Production.priority.Medium;
@@ -123,6 +154,7 @@ jeff.makeProductions = function() {
         }
     };
     chatty.probNotFiring = .95;
+    this.productions.push(chatty);
 
     var commentOnGoodStuff = new Production("Comment on high utility items");
     commentOnGoodStuff.priority = Production.priority.High;
@@ -141,25 +173,46 @@ jeff.makeProductions = function() {
         jeff.makeSpeechBubble("Something good around here...!");
     };
     commentOnGoodStuff.probNotFiring = .9;
+    this.productions.push(commentOnGoodStuff);
 
-    var findNewFriends = new Production("Talk to random people when happy");
+    var findNewFriends = new Production("Find friends");
     findNewFriends.priority = Production.priority.Low;
     findNewFriends.condition = function() {
-        // jeff.addMemory("Looking for friends");
         return (jeff.emotions.current === "Happy");
     };
     findNewFriends.action = function() {
         jeff.addMemory("Looked for friends");
+        jeff.goals.add(new Goal("Get High Fived"));
         var randBot = jeff.getRandomBot();
         jeff.pursue(randBot, 700);
         jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
     };
     findNewFriends.probNotFiring = .8;
+    this.productions.push(findNewFriends);
 
-    var randStrings = ["Philosophy is good for the heart", 
-        "Please don't buy food during class", 
+    var getHighFivedGoal = new Production("Get High Fived");
+    getHighFivedGoal.priority = Production.priority.Low;
+    getHighFivedGoal.condition = function() {
+        return (jeff.goals.contains("Get High Fived"));
+    };
+    getHighFivedGoal.action = function() {
+        var randBot = jeff.getRandomBot();
+        jeff.pursue(randBot, 700);
+        randBot.highFive();
+        jeff.speak(randBot, "Come on " + randBot.name + ", high five me!", 2000);
+        // Wait a few seconds, then see if we succeeded
+        game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+            jeff.goals.checkIfSatisfied("Get High Fived");
+        }, this);
+    };
+    getHighFivedGoal.probNotFiring = .8;
+    this.productions.push(getHighFivedGoal);
+
+    var randStrings = ["Philosophy is good for the heart",
+        "Please don't buy food during class",
         "I can tell you are checking social media",
-        "Happy spouse happy house"];
+        "Happy spouse happy house"
+    ];
     var sayRandomStuffWhenCalm = new Production("Say random stuff when calm");
     sayRandomStuffWhenCalm.priority = Production.priority.High;
     sayRandomStuffWhenCalm.condition = function() {
@@ -170,11 +223,8 @@ jeff.makeProductions = function() {
         jeff.makeSpeechBubble(randStrings.randItem());
     };
     sayRandomStuffWhenCalm.probNotFiring = .9;
+    this.productions.push(sayRandomStuffWhenCalm);
 
-    // Populate production list
-    this.productions = [foodSeeking, admireCar, fight,
-        irritable, chatty, findNewFriends, commentOnGoodStuff, 
-        sayRandomStuffWhenCalm];
 }
 
 /**
@@ -211,7 +261,8 @@ jeff.hunger = new DecayVariable(0, 1, 0, 100);
 jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
     statusString += "\nMotion: " + (jeff.motionOverride ? "Override" : jeff.currentMotion.description);
-    statusString += "\n" + jeff.hunger.getBar("Hunger: ");
+    statusString += "\n" + jeff.hunger.getBar("Hunger");
+    statusString += jeff.goals.toString();
     return statusString;
 }
 
@@ -272,8 +323,7 @@ jeff.update1Sec = function() {
 /**
  * Called every ten seconds
  */
-jeff.updateTenSecs = function() {
-}
+jeff.updateTenSecs = function() {}
 
 /**
  *  Called every two minutes
@@ -295,7 +345,7 @@ jeff.update2min = function() {
 jeff.collision = function(object) {
     jeff.addMemory("Saw " + object.name);
     jeff.moveAwayFrom(object);
-    if (jeff.canEat(object)  && (jeff.hunger.value > 50)) {
+    if (jeff.canEat(object) && (jeff.hunger.value > 50)) {
         jeff.eatObject(object);
     }
 
@@ -312,6 +362,8 @@ jeff.eatObject = function(objectToEat) {
     jeff.hunger.subtract(objectToEat.calories);
     jeff.speak(objectToEat, "Yummy " + objectToEat.description + "!");
     jeff.play(sounds.chomp);
+    // If the find food goal was in there, remove it
+    jeff.goals.remove("Find food");
 }
 
 /**
@@ -328,6 +380,8 @@ jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
  * @override
  */
 jeff.highFived = function(botWhoHighFivedMe) {
-    jeff.addMemory("High Fived: " + object.name);
+    jeff.addMemory("High Fived by " + botWhoHighFivedMe.name);
     jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
+    jeff.goals.remove("Get High Fived");
+
 }

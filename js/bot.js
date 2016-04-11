@@ -48,8 +48,8 @@ function Bot(x, y, name, path) {
     this.currentMemory;
     this.currentTransition;
     this.setNetwork();
-    // If below true, show nodes and edges by their activation values (hides regular labels)
-    this.showActivations = false;
+    this.showNodeActivations = true; // If true, show node activations
+    this.showEdgeActivations = false; // If true, show edge activations
 };
 
 // DO NOT CHANGE.  Temporary variable to avoid errors on startup.    The 'real' variable is in botPlayground.js
@@ -136,8 +136,11 @@ Bot.prototype.defend = function() {
         this.shield = game.add.sprite(this.sprite.x - 45, this.sprite.y - 45, "shield");
     }
     timer = game.time.events.add(1000, function() {
-        if (this.shield) { this.shield.kill();
-            this.shield = null; } }, this);
+        if (this.shield) {
+            this.shield.kill();
+            this.shield = null;
+        }
+    }, this);
 }
 
 /**
@@ -431,7 +434,7 @@ Bot.prototype.getOverlappingFoods = function() {
     foods.forEach(function(food) {
         if (Bot.objectsOverlap(me, food.sprite)) {
             overlappingObjects.push(food);
-        }   
+        }
     });
     return overlappingObjects;
 }
@@ -443,8 +446,8 @@ Bot.prototype.getOverlappingFoods = function() {
  */
 Bot.prototype.collisionCheck = function() {
     let overlappingObjects = this.getOverlappingEntities()
-                         .concat(this.getOverlappingBots())
-                         .concat(this.getOverlappingFoods());
+        .concat(this.getOverlappingBots())
+        .concat(this.getOverlappingFoods());
     if (overlappingObjects.length > 0) {
         this.collision(overlappingObjects[0]);
     }
@@ -569,7 +572,6 @@ Bot.prototype.setNetwork = function() {
     };
 };
 
-
 /**
  * Get a memory.  "Recall" it.  Returns null if there is no such memory.
  *
@@ -588,6 +590,29 @@ Bot.prototype.getMemory = function(memoryToGet) {
  */
 Bot.prototype.containsMemory = function(memoryToCheck) {
     return (this.getMemory(memoryToCheck) != null);
+}
+
+/**
+ * Check if a memory has been recently added or activated, but seeing if it's
+ * in the network,and if so, if it's activation value suggests it was recently 
+ * added.  
+ *
+ * Values can range from 1-2.  Currently the threshold defaults to 1.01 (the lowest possible value) since 
+ * the dynamics decay fairly quckly.
+ * 
+ * @param  {String} memoryToCheck string id of memory to check
+ * @param  {Number} threshold if the value is above this, consider the memory "recent"
+ * @return {Boolean} true if the memory exists and is recent.
+ */
+Bot.prototype.containsRecentMemory = function(memoryToCheck, threshold = 1.01) {
+    var mem = this.getMemory(memoryToCheck)
+    if (mem === null) {
+        return false;
+    } else if (mem.value > threshold) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -685,7 +710,6 @@ Bot.prototype.forget = function(memory_id) {
     this.nodes.remove(memory_id);
 }
 
-
 /**
  * Update the memory network by decaying all node and edge activations
  */
@@ -698,8 +722,8 @@ Bot.prototype.updateNetwork = function() {
     this.nodes.forEach(function(node) {
         // Decay node
         let tempval = round(Math.min(2, Math.max(1, node.value - .01)), 2);
-        if (currentBot.showActivations) {
-            currentBot.nodes.update({ id: node.id, label: '' + tempval, value: tempval });
+        if (currentBot.showNodeActivations) {
+            currentBot.nodes.update({ id: node.id, label: node.id + ':' + tempval, value: tempval });
         } else {
             currentBot.nodes.update({ id: node.id, value: tempval });
         }
@@ -717,7 +741,7 @@ Bot.prototype.updateNetwork = function() {
     this.edges.forEach(function(edge) {
         let tempval = round(Math.min(2, Math.max(1, edge.value - .01)), 2);
         // Decay edge
-        if (currentBot.showActivations) {
+        if (currentBot.showEdgeActivations) {
             currentBot.edges.update({ id: edge.id, label: '' + tempval, value: tempval });
         } else {
             currentBot.edges.update({ id: edge.id, value: tempval });

@@ -77,15 +77,15 @@ DecayVariable.prototype.increment = function() {
     this.value = Math.min(this.maxVal, this.value + this.incrementAmount);
 }
 DecayVariable.prototype.add = function(amount) {
-    if(Number.isNaN(amount) || !amount) {
+    if (Number.isNaN(amount) || !amount) {
         console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
     this.value = Math.min(this.maxVal, this.value + amount);
 }
 DecayVariable.prototype.subtract = function(amount) {
-    if(Number.isNaN(amount) || !amount) {
-        console.log("You are probably trying to eat something that does not have calories defined!");
+    if (Number.isNaN(amount) || !amount) {
+        // console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
     this.value = Math.max(this.minVal, this.value - amount);
@@ -99,7 +99,7 @@ DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks
             if (this.minVal.toString().length >= this.maxVal.toString().length) {
                 slice_length = this.minVal.toString().length;
             } else {
-                slice_length = this.maxVal.toString().length;            
+                slice_length = this.maxVal.toString().length;
             }
         }
         string_minVal = (" ".repeat(slice_length) + this.minVal).slice(-slice_length) + "\t";
@@ -107,7 +107,7 @@ DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks
     }
     // Thanks to SharAI for this code idea!
     var bar = "";
-    if(showVal) {
+    if (showVal) {
         bar = prefix + ": " + this.value + "\t\t" + string_minVal;
     } else {
         bar = prefix + ": " + string_minVal;
@@ -136,19 +136,19 @@ DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks
  */
 function getBarWithTick(minVal, maxVal, value, prefix = "", showVal = false, numTicks = 10) {
     var bar = "";
-    if(showVal) {
+    if (showVal) {
         bar = prefix + ": " + value + "\t\t" + minVal + " ";
     } else {
         bar = prefix + ": " + minVal + " ";
     }
     let range = maxVal - minVal;
     let rescaledValue = -minVal + value;
-    let tick_location = Math.floor((rescaledValue/range)*numTicks);
+    let tick_location = Math.floor((rescaledValue / range) * numTicks);
     for (i = 0; i < numTicks; i++) {
         if (i === tick_location) {
             bar += "▓";
         } else {
-            bar += "░";           
+            bar += "░";
         }
     }
     bar += " " + maxVal;
@@ -179,14 +179,14 @@ function setUpFood() {
                 addFoodItem("cupCake", "cupCake", 130);
                 break;
             case 3:
-            	addFoodItem("diet_pepsi", "Diet Pepsi", 0);
-            	break;
+                addFoodItem("diet_pepsi", "Diet Pepsi", 0);
+                break;
             case 4:
                 addFoodItem("jerry_can", "Gasoline", 157500);
                 //31,500 cals in a gallon of gasoline, about 5 gallons in a jerry can  
                 break;
             case 5:
-                addFoodItem("Philoberry", "Organic Philosopher's Stone", 85); 
+                addFoodItem("Philoberry", "Organic Philosopher's Stone", 85);
                 break;
             case 6:
                 addFoodItem("Spicy_Poffin", "A very spicy pastry.", 90);
@@ -196,23 +196,23 @@ function setUpFood() {
                 addFoodItem("Cheri_berry", "Pokemon berry #01", 77);
                 break;
             case 8:
-                addFoodItem("Enigma_berry", "Pokemon berry #60", ((Math.random() - 0.5) * 200));//different every game
+                addFoodItem("Enigma_berry", "Pokemon berry #60", ((Math.random() - 0.5) * 200)); //different every game
                 break;
             case 9:
                 addFoodItem("Hondew_berry", "Pokemon berry #24", 64);
                 break;
             case 10:
                 addFoodItem("Passo_berry", "Pokemon berry #37", 229);
-                break;  
+                break;
             case 11:
                 addFoodItem("steak", "Fresh meat", 387);
-                break;  
+                break;
             case 12:
                 addFoodItem("pink_candy", "Yummy candy", 899);
                 //a tiny piece of candy barely has any calories <-- 899 is a "lot!"
                 break;
             case 13:
-                addFoodItem("Cream_Cake", "Ice Cream cake", 1,860);
+                addFoodItem("Cream_Cake", "Ice Cream cake", 1, 860);
                 //There is about 310 calories per slice of ice cream cake, so assuming there is roughly six slices, there would be 1,860 calories in the whole cake
                 break;
             default:
@@ -240,17 +240,13 @@ function addFoodItem(image_id, description, calories) {
         food.isEdible = true;
         foods.push(food);
         food.eat = function() {
-            if( !this
-                || !this.sprite
-                || this.sprite.x != this.sprite.x 
-                || this.sprite.y != this.sprite.y
-                 ) {
+            if (!this || !this.sprite) {
                 console.log("Problem with " + this.name);
                 return;
             }
             // console.log("Eating " + this.description + " with " + this.calories + " calories");
             var tempSprite = this.sprite;
-            tempSprite.reset(-10,-10);
+            tempSprite.reset(-10, -10);
             tempSprite.visible = false;
             // Respawn food in 5 seconds.
             //  TODO: Note that sprite.kill(), .exists, and body.   all failed...
@@ -269,6 +265,10 @@ function addFoodItem(image_id, description, calories) {
 /**
  * A production which, if its conditions are met, fires some actions.
  *
+ * TODO: There is currently no mechanism for making sure a production that 
+ * is being "fired" isn't triggered again.
+ * TODO: Produce some string status of productions and which are firing?
+ *
  * @param  {string} name name of this production
  * @param  {Number} priority value from 1 (lowest) to 10 (highest) 
  *                           indicating how important this production is
@@ -282,10 +282,11 @@ function Production(name, priorityLevel, condition, action) {
     this.action = action;
     // A probability of _not_ firing the action even if condition is met  
     // 0 is it always fires; 1 is it never fires; .2 is it fires with 20 percent chance.
-    this.probNotFiring = 0; 
+    this.probNotFiring = 0;
 
 };
 Production.priority = {};
+// Todo: rename below next time to just Priority.High, etc.  So it's not tied to productions.
 Production.priority.High = 10;
 Production.priority.Medium = 5;
 Production.priority.Low = 1;
@@ -298,16 +299,22 @@ Production.priority.Low = 1;
  * @param  {Production[]} productions list of productions to check
  */
 function fireProductions(productions) {
-    activeProductions = productions.filter(function(production) {return production.condition();});
+    activeProductions = productions.filter(function(production) {
+        return production.condition();
+    });
     activeProductions = activeProductions.sort(
-        function(a,b) {return (a.priorityLevel < b.priorityLevel);});
-    if(activeProductions.length > 0) {
-        if(Math.random() < activeProductions[0].probNotFiring) {
+        function(a, b) {
+            return (a.priorityLevel < b.priorityLevel);
+        });
+    if (activeProductions.length > 0) {
+        if (Math.random() < activeProductions[0].probNotFiring) {
             return;
         }
         // Choose randomly among those tied for current priority level
-        baselinePriority  = activeProductions[0].priorityLevel;
-        activeProductions = activeProductions.filter(function(production) {return production.priorityLevel === baselinePriority;});
+        baselinePriority = activeProductions[0].priorityLevel;
+        activeProductions = activeProductions.filter(function(production) {
+            return production.priorityLevel === baselinePriority;
+        });
         activeProductions.randItem().action();
     }
 }
@@ -334,8 +341,8 @@ function isChild(object, group) {
 /**
  * Get a random member of an array.
  */
-Array.prototype.randItem = function () {
-  return this[Math.floor((Math.random()*this.length))];
+Array.prototype.randItem = function() {
+    return this[Math.floor((Math.random() * this.length))];
 }
 
 /**
@@ -362,23 +369,61 @@ function round(num, dec) {
     return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
 }
 
+/**
+ * An object which represents goals and desires, and efforts to satisfy.
+ * Simple string ids.  The assumption is that most of the logic of pursuing goals
+ * occurs with productions.  
+ * 
+ * @param {String} id the name / id of the goal.  Also serves as a description now.
+ */
+function Goal(id) {
+    this.id = id;
+    this.failedSatisfactionAttempts = 0;
+    // Later may add priority system if needed
+};
+Goal.prototype.toString = function() {
+    return this.id + ". Failed attempts to satisfy: " +
+        +this.failedSatisfactionAttempts + "\n";
+}
 
 /**
- * A goal object.  (Incomplete thus far)
- * @param {String} name the name / id of the goal
- * @param {Priority} priorityLevel it's priority level
+ * A set of goals and tools for adding and retrieving them.
  */
-function Goal(name, priorityLevel) {
-    this.name = name;
-    this.priorityLevel = priorityLevel; // 1-1.  Reuse production priority levels?
-    this.satisfied = false; // Manually set to true when success
-    this.failedAttemptsToSatisfy = 0; // Manually update this when failed
-
+function GoalSet() {
+    this.goals = {};
 };
-
-// Update goal list
-//  pass in list
-//  rank by priority
-//  any that are satisfied, remove.
-//  or make a goal-list object, that returns a string status, and from which things can be removed
-
+GoalSet.prototype.contains = function(goalId) {
+    return this.goals.hasOwnProperty(goalId);
+}
+GoalSet.prototype.add = function(newGoal) {
+    if(!this.contains(newGoal.id)) {
+        this.goals[newGoal.id] = newGoal;        
+    }
+}
+GoalSet.prototype.get = function(goalId) {
+    return this.goals[goalId];
+}
+GoalSet.prototype.remove = function(goalId) {
+    delete this.goals[goalId];
+}
+/**
+ * Check if the goal has been satisfied (if it has been, it should not be in the set).
+ * If it has not been satisfied, increment the failed attempts counter.
+ */
+GoalSet.prototype.checkIfSatisfied = function(goalId) {
+    var goal = this.get(goalId);
+    if (goal) {
+        goal.failedSatisfactionAttempts++;
+    }
+}
+GoalSet.prototype.toString = function() {
+    var retString = "\nGoals:\n";
+    if (Object.keys(this.goals).length === 0) {
+        retString += "\tNo active goals.";
+        return retString;
+    }
+    for (goal_id in this.goals) {
+        retString += "\t" + this.goals[goal_id].toString();
+    }
+    return retString;
+}
