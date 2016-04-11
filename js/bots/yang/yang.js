@@ -868,7 +868,7 @@ yang.gotLicked = function(botWhoLickedMe) {
     yang.chaosmachine_.chance = Math.random();
     if (yang.chaosmachine_.chance <= .50) {
         yang.collision_ouch_flag = true;
-    } else if (yang.chaosmachine_.chance > .50) {
+    } else {
         yang.collision_nice_flag = true;;
     }
 };
@@ -882,9 +882,17 @@ yang.gotIgnored = function(botWhoIgnoredMe) {
     yang.chaosmachine_.chance = Math.random();
     if (yang.chaosmachine_.chance <= .50) {
         yang.collision_ouch_flag = true;
-    } else if (yang.chaosmachine_.chance > .50) {
+    } else {
         yang.collision_nice_flag = true;;
     }
+};
+/**
+ * Override to react to being eaten
+ * @memberOf yang
+ * @Override
+ */
+yang.eat = function() {
+    yang.collision_ouch_flag = true;
 };
 ///////////////
 //Nodes Zone //
