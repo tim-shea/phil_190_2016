@@ -21,6 +21,7 @@ maria.init = function() {
 
     // Create the goal set
     this.goals = new GoalSet();
+}
 
     // Initialize edibility function
     maria.canEat = function(object) {
@@ -28,7 +29,6 @@ maria.init = function() {
                 return false;
             } else {
                 return object.isEdible;
-            }
         }
         // Initialize utility function
     maria.utilityFunction = function(object) {
@@ -146,7 +146,7 @@ maria.makeProductions = function() {
      */
 
     maria.hunger = new DecayVariable(0, 1, 0, 100);
-    maria.hunger.toString = function() {
+    /*maria.hunger.toString = function() {
         var hungerLevel = "";
         if (this.value < 25) {
             hungerLevel = "Not hungry";
@@ -158,7 +158,7 @@ maria.makeProductions = function() {
             hungerLevel = "I NEED FOOD!";
         }
         return hungerLevel + " (Hunger = " + this.value + ")";
-    }
+    }*/
 
 
     /**
@@ -190,7 +190,6 @@ maria.makeProductions = function() {
     maria.getStatus = function() {
         var statusString = "Emotion: " + maria.emotions.current;
         statusString += "\nMotion: " + maria.currentMotion.description;
-        statusString += "\n" + maria.hunger.toString();
         statusString += "\nSpeech: " + maria.speechText;
         statusString += "\n" + maria.hunger.getBar("Hunger");
         statusString += maria.goals.toString();
