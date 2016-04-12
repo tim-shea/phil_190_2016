@@ -89,6 +89,7 @@ function preload() {
     game.load.audio('puuuu 00', 'assets/puuuu_00.mp3');
     game.load.audio('quote_batrider 00', 'assets/quote_batrider.mp3');
     game.load.audio('snore', 'assets/sleep_00.mp3');
+    game.load.audio('smack', 'assets/smack_forHighFive.wav');
     game.load.audio(name = yang.BGM, path = yang.BGM);
 
     // Load speech bubble assets
@@ -188,6 +189,7 @@ function create() {
     sounds.puuuu_00 = game.add.audio('puuuu 00');
     sounds.quote_batrider_00 = game.add.audio('quote_batrider 00');
     sounds.snore = game.add.audio('snore');
+    sounds.smack_forHighFive = game.add.audio('highFive');
     sounds.rand_BGM = game.add.audio(yang.BGM, undefined, true, undefined);
     
 
