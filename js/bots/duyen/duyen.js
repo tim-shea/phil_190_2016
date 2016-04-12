@@ -295,7 +295,7 @@ duyen.collision = function(object) {
 
 
 duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    duyen.hear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
+    //duyen.hear = botWhoSpokeToMe.name + " says: " + whatTheySaid; <- Danger!  This overrwrites bot.hear
     duyen.addMemory(botWhoSpokeToMe.name + " said " + whatTheySaid);
     if (!duyen.speechText.contains("Oh you")) {
         duyen.speechText += " Oh you just said " + whatTheySaid + ".";
@@ -305,9 +305,7 @@ duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
 
 duyen.highFive = function(botToHighFive) {
     duyen.addMemory("I highfived " + botToHighFive);
-    if (botToHighFive instanceof Bot) {
-        duyen.speak(botToHighFive, "Hey " + botToHighFive.description + "!");
-    }
+    duyen.speak(botToHighFive, "Hey " + botToHighFive.description + "!");
 }
 
 
