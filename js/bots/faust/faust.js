@@ -53,39 +53,40 @@ faust.init = function() {
 
 faust.makeProductions = function() {
 	var randBot = faust.getRandomBot();
-    eatingProduction = new Production("eating food",
+    let seekingFood = new Production("eating food",
         Production.priority.High,
         function() {
-            return (faust.hunger.value > 60);
+            return (faust.hunger.value > 30);
         },
         function() {
+            faust.addMemory("Began looking for food");
         	faust.findFood(500, faust.eatsFood);
-            faust.makeSpeechBubble("I have a craving only hands can satisfy");
+            faust.makeSpeechBubble("I must find food...");
         }
     );
-    sleepingProduction = new Production("no motion when energy is slow i.e. sleeping",
+    let restMode = new Production("no motion when energy is slow i.e. sleeping",
         Production.priority.High,
         function() {
-            return (
-                faust.hunger.value < 20 && faust.emotions.current === "Calm"
-            );
+            return (faust.hunger.value < 20 && faust.emotions.current === "Calm");
         },
         function() {
+            faust.addMemory("Earned a rest");
             faust.currentMotion = Motions.still;
             faust.makeSpeechBubble("So...tired...Zzzz");
             faust.play(sounds.snore);
         }
     );
-    singingProduction = new Production("singing",
+    let singingProduction = new Production("singing",
         Production.priority.Low,
         function() {
             return (faust.emotions.current === "Happy")
         },
         function() {
+            faust.addMemory("Felt happy");
             faust.makeSpeechBubble("Doh ray mee~!");
         }
     );
-    beingFriendly = new Production("making friends",
+    let beingFriendly = new Production("making friends",
         Production.priority.High,
         function() {
             let d = game.physics.arcade.distanceBetween(faust.sprite, randBot);
@@ -95,32 +96,35 @@ faust.makeProductions = function() {
             return false;
         },
         function() {
+            faust.addMemory("Attempted to make friends");
         	return (faust.orientTowards(randBot))
         }
     );
-    solitudeProduction = new Production("solitude",
+    let solitudeProduction = new Production("solitude",
         Production.priority.Medium,
         function() {
             return (faust.emotions.current === "Sad");
         },
         function() {
+            faust.addMemory("Needed some alone time");
             faust.moveAwayFrom(randBot);
             faust.makeSpeechBubble("I need some alone time...");
         }
     );
-    playChase = new Production("playing chase",
+    let playChase = new Production("playing chase",
     	Production.priority.Medium,
     	function() {
     		return (faust.emotions.current === "Happy" && faust.hunger.value < 30)
     	},
     	function() {
+            faust.addMemory("Felt like being silly");
     		faust.pursue(randBot),
     		faust.makeSpeechBubble("Let's play!");
     	}
     );
 
     // Populate production list
-    this.productions = [eatingProduction, sleepingProduction, singingProduction, beingFriendly, solitudeProduction, playChase];
+    this.productions = [seekingFood, restMode, singingProduction, beingFriendly, solitudeProduction, playChase];
 }
 
 
@@ -150,6 +154,25 @@ faust.emotions.add("Happy", [
 ]);
 
 /**
+ * Energy Variable
+ * @type {DecayVariable}
+ */
+faust.energy = new DecayVariable(150, 1, 0, 150)
+faust.energy.toString = function() {
+    var energyLevel = "";
+    if (this.value > 130) {
+        energyLevel = "energized";
+    } else if (this.value < 50) {
+        energyLevel = "near death";
+    } else {
+        energyLevel = "stable conditions"
+    }
+    return energyLevel + " (Energy = " + this.value + ")";
+}
+
+
+
+/**
  * Hunger Variable
  */
 faust.hunger = new DecayVariable(0, 1, 0, 100);
@@ -173,7 +196,8 @@ faust.hunger.toString = function() {
  * @override
  */
 faust.getStatus = function() {
-    var statusString = "Emotion: " + faust.emotions.current;
+    var statusString = "Energy: " + faust.energy.toString();
+    statusString += "\nEmotion: " + faust.emotions.current;
     statusString += "\nMotion: " + faust.currentMotion.description;
     statusString += "\n" + faust.hunger.toString();
     statusString += "\nMoving to: " + faust.currentlyPursuing;
@@ -240,6 +264,7 @@ faust.update = function() {
  */
 faust.update1Sec = function() {
 	faust.updateNetwork();
+    faust.energy.decrement();
     faust.hunger.increment();
     faust.emotions.update();
     faust.setMotion();
@@ -274,7 +299,7 @@ faust.update2min = function() {
 faust.collision = function(object) {
 	faust.moveAwayFrom(object);
 	faust.addMemory("Saw " + object.name);
-    if (faust.eatsFood(object) && (faust.hunger.value > 60)) {
+    if (faust.eatsFood(object) && (faust.hunger.value > 30)) {
     	faust.eatObject(object);
     }
 }
@@ -287,6 +312,7 @@ faust.collision = function(object) {
 faust.eatObject = function(objectToEat) {
     objectToEat.eat();
     faust.hunger.subtract(objectToEat.calories);
+    faust.energy.add(objectToEat.calories);
     faust.speak(objectToEat, "Yummy " + objectToEat.description + "!");
 
 }
