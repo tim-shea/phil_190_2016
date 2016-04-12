@@ -323,15 +323,21 @@ function fireProductions(productions) {
     }
     return retProductions;
 }
+/**
+ * Returns a string showing whatever prodution fired most recently, if any
+ *
+ * @param  {Production[]} productions the list of productions to check
+ * @return {String} the string deisplay of those productions
+ */
 function getProductionString(productions) {
     var retString = "Recently fired productions:\n";
     if (Object.keys(productions).length === 0) {
-        retString += "\tNo productions fired.";
+        retString += "\tNo productions fired.\n";
         return retString;
     }
-    for (prod_id in productions) {
-        retString += "\t" + productions[prod_id].name;
-    }
+    productions.forEach(function(prod) {
+        retString += "\t" + prod.name + "\n";
+    });
     return retString;
 }
 
@@ -399,7 +405,7 @@ function Goal(id) {
 };
 Goal.prototype.toString = function() {
     return this.id + ". Failed attempts to satisfy: " +
-        +this.failedSatisfactionAttempts + "\n";
+        +this.failedSatisfactionAttempts;
 }
 
 /**
@@ -439,7 +445,7 @@ GoalSet.prototype.toString = function() {
         return retString;
     }
     for (goal_id in this.goals) {
-        retString += "\t" + this.goals[goal_id].toString();
+        retString += "\t" + this.goals[goal_id].toString() + "\n";
     }
     return retString;
 }

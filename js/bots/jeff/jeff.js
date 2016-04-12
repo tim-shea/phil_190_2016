@@ -265,6 +265,7 @@ jeff.getStatus = function() {
     statusString += "\n" + jeff.hunger.getBar("Hunger");
     statusString += jeff.goals.toString();
     statusString += jeff.productionString;
+    statusString += jeff.getActiveMemoryString();
     return statusString;
 }
 

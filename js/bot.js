@@ -44,12 +44,15 @@ function Bot(x, y, name, path) {
     this.shield = null;
 
     // Network stuff
+    this.network; // This is set in botPlayground.js, botSelect()
     this.lastMemory;
     this.currentMemory;
     this.currentTransition;
-    this.setNetwork();
     this.showNodeActivations = true; // If true, show node activations
     this.showEdgeActivations = false; // If true, show edge activations
+
+    // Initialize the network
+    this.setNetwork();
 };
 
 // DO NOT CHANGE.  Temporary variable to avoid errors on startup.    The 'real' variable is in botPlayground.js
@@ -557,10 +560,10 @@ Bot.prototype.setNetwork = function() {
     this.nodes = new vis.DataSet(); // Main memory store
     this.edges = new vis.DataSet();
     this.options = {
-        // configurePhysics:true,  // Uncomment to fine-tune graph
+        // configurePhysics:true,  // Uncomment to fine-tune graph  
         nodes: {
             shape: 'dot',
-            smooth: false, // For better performance. Todo: does not seem to work...
+            // smooth: false, // For better performance. Todo: does not seem to work...
             // scaling: {
             //     customScalingFunction: function(min, max, total, value) {
             //         return value / total;
@@ -571,49 +574,6 @@ Bot.prototype.setNetwork = function() {
         }
     };
 };
-
-/**
- * Get a memory.  "Recall" it.  Returns null if there is no such memory.
- *
- * @param  {String} memoryToGet what to look for
- * @return a reference to the vis.js node
- */
-Bot.prototype.getMemory = function(memoryToGet) {
-    if (!memoryOn) {
-        return null;
-    }
-    return this.nodes.get(memoryToGet);
-}
-
-/**
- * Check if a specified memory is contained in the memory network.
- */
-Bot.prototype.containsMemory = function(memoryToCheck) {
-    return (this.getMemory(memoryToCheck) != null);
-}
-
-/**
- * Check if a memory has been recently added or activated, but seeing if it's
- * in the network,and if so, if it's activation value suggests it was recently 
- * added.  
- *
- * Values can range from 1-2.  Currently the threshold defaults to 1.01 (the lowest possible value) since 
- * the dynamics decay fairly quckly.
- * 
- * @param  {String} memoryToCheck string id of memory to check
- * @param  {Number} threshold if the value is above this, consider the memory "recent"
- * @return {Boolean} true if the memory exists and is recent.
- */
-Bot.prototype.containsRecentMemory = function(memoryToCheck, threshold = 1.01) {
-    var mem = this.getMemory(memoryToCheck)
-    if (mem === null) {
-        return false;
-    } else if (mem.value > threshold) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 /**
  * Add a memory to the network.  A memory is just  a string.
@@ -696,6 +656,99 @@ Bot.prototype.addMemory = function(memory) {
     if (this.lastMemory != memory) {
         this.lastMemory = memory;
     }
+}
+
+
+/**
+ * Get a memory.  "Recall" it.  Returns null if there is no such memory.
+ *
+ * @param  {String} memoryToGet what to look for
+ * @return a reference to the vis.js node
+ */
+Bot.prototype.getMemory = function(memoryToGet) {
+    if (!memoryOn) {
+        return null;
+    }
+    return this.nodes.get(memoryToGet);
+}
+
+/**
+ * Check if a specified memory is contained in the memory network.
+ */
+Bot.prototype.containsMemory = function(memoryToCheck) {
+    return (this.getMemory(memoryToCheck) != null);
+}
+
+/**
+ * Check if a memory has been recently added or activated, but seeing if it's
+ * in the network,and if so, if it's activation value suggests it was recently 
+ * added.  
+ *
+ * Values can range from 1-2.  Currently the threshold defaults to 1.01 (the lowest possible value) since 
+ * the dynamics decay fairly quckly.
+ * 
+ * @param  {String} memoryToCheck string id of memory to check
+ * @param  {Number} threshold if the value is above this, consider the memory "recent"
+ * @return {Boolean} true if the memory exists and is recent.
+ */
+Bot.prototype.containsRecentMemory = function(memoryToCheck, threshold = 1.01) {
+    var mem = this.getMemory(memoryToCheck)
+    if (mem === null) {
+        return false;
+    } else if (mem.value > threshold) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+/**
+ * Returns a list of all memories above a specified threshold
+ * 
+ * @param  {Number} threshold the threshold
+ * @return {Memory[]} memories above the threshold
+ */
+Bot.prototype.getMemoriesAboveThreshold = function(threshold = 1.25) {
+        var memories = this.nodes.get({
+            filter: function(item) {
+                return item.value > threshold;
+            }
+        });
+        return memories;
+    }
+    /**
+     * Returns a string representation of above-threshold memories.
+     */
+Bot.prototype.getActiveMemoryString = function(threshold = 1.5) {
+    var retString = "Active memories:\n";
+    var mems = this.getMemoriesAboveThreshold();
+    if (Object.keys(mems).length === 0) {
+        retString += "\tNo active memories.\n";
+        return retString;
+    }
+    mems.sort(
+        function(a, b) {
+            return (a.value < b.value);
+        });
+    for (var i = 0; i < mems.length; i++) {
+        retString += "\t" + mems[i].label + "\n";
+        // For most active, show connected "thematic field"
+        // if (i === 0) {
+        //     let thematicField = this.getConnectedMemories(mems[i]);
+        //     for (var j = 0; j < thematicField.length; j++) {
+        //         retString += "\t\t" + thematicField[j] + "\n";
+        //     }
+        // }
+    }
+    return retString;
+}
+
+/**
+ * Returns all memories connected to the given one.
+ */
+Bot.prototype.getConnectedMemories = function(memory) {
+    return this.network.getConnectedNodes(memory.id);
 }
 
 /**

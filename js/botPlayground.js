@@ -279,6 +279,7 @@ function botSelect() {
 
     if (document.getElementById('memoryVisible').checked) {
         currentNetwork = new vis.Network(document.getElementById('mynetwork'), memoryData, bots[currentBotIndex].options);
+        bots[currentBotIndex].network = currentNetwork;
     } else {
         var node = document.getElementById('mynetwork');
         while (node.hasChildNodes()) {
