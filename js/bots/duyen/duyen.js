@@ -5,6 +5,7 @@ duyen.speed = 100;
 duyen.stateText = "just flowing around";
 duyen.speechText = "";
 duyen.currentlyPursuing = "Nothing";
+duyen.currentMotion = Motions.still;
 
 duyen.init = function() {
     this.body = this.sprite.body;
@@ -88,7 +89,6 @@ duyen.makeProductions = function() {
         Production.priority.High,
         function() {
             return (
-                duyen.energy.value > 10 &&
                 duyen.emotions.current === "sad");
         },
         function() {
@@ -100,8 +100,7 @@ duyen.makeProductions = function() {
         function() {
             return (
                 duyen.emotions.current === "happy" &&
-                duyen.hunger.value > 30 &&
-                duyen.energy.value > 70);
+                duyen.hunger.value > 30);
         },
         function() {
             duyen.currentMotion = Motions.dancing;
@@ -123,8 +122,7 @@ duyen.makeProductions = function() {
         Production.priority.Low,
         function () {
             return (
-                duyen.emotions.current === "happy" &&
-                duyen.energy.value > 50);
+                duyen.emotions.current === "happy");
         },
         function() {
             duyen.currentMotion = Motions.dancing;
@@ -148,8 +146,7 @@ duyen.makeProductions = function() {
         Production.priority.Medium,
         function() {
             return (
-                duyen.emotions.current === "mad" &&
-                duyen.energy.value > 80);
+                duyen.emotions.current === "mad");
         },
         function() {
             duyen.attackMotion;
@@ -159,6 +156,25 @@ duyen.makeProductions = function() {
 
      this.productions = [eatingProduction, cleaningProduction, attackEnemy, fleeAway, dancingProduction, goHome, pursueFriend, findFood, defendResources];
 }
+
+
+duyen.emotions = new MarkovProcess("calm");
+duyen.emotions.add("calm", [
+    ["calm", "happy", "mad", "sad"],
+    [.7, .2, .05, .05]
+]);
+duyen.emotions.add("happy", [
+    ["happy", "calm"],
+    [.7, .3]
+]);
+duyen.emotions.add("mad", [
+    ["mad", "calm", "sad"],
+    [.7, .1, .2]
+]);
+duyen.emotions.add("sad", [
+    ["sad", "calm", "mad"],
+    [.6, .2, .2]
+]);
 
 
 // Hunger 
@@ -175,7 +191,7 @@ duyen.hunger.toString = function() {
         hungerLevel = "Feed Me!";
     }
 
-    return hungerLevel + " (Hunger = " + this.amount + ")";
+    return hungerLevel + " (Hunger = " + this.value + ")";
 }
 
 //Hygiene
@@ -189,7 +205,7 @@ duyen.hygiene.toString = function() {
     } else {
         hygieneLevel = "Filthy";
     }
-    return hygieneLevel + " (Dirtiness = " + this.amount + ")";
+    return hygieneLevel + " (Dirtiness = " + this.value + ")";
 }
 
 // (Override) Populate status field
@@ -221,16 +237,20 @@ duyen.setMotion = function() {
     }
 }
 
-// (Override) Main update.  On my machine this is called about 43 times per second
-duyen.pursuitCompleted = function() {
-    this.currentMotion.apply(duyen);
+
+duyen.update = function() {
     duyen.genericUpdate();
-}
+};
+
 
 // Called every second
 duyen.update1Sec = function() {
     duyen.speechText = "";
     duyen.updateNetwork();
+    duyen.hunger.increment();
+    duyen.hygiene.increment();
+    duyen.setMotion();
+    fireProductions(duyen.productions);
     //duyen.findFood(duyen.edibility);
     // <<<<<<< HEAD
     //     duyen.hunger.increment();
@@ -259,7 +279,7 @@ duyen.collision = function(object) {
     // duyen.pursue(object);
     duyen.addMemory("Saw " + object.name);
     duyen.moveAwayFrom(object);
-    if (duyen.isEdible(object) && (duyen.hunger.value > 60)) {
+    if (duyen.isEdible(object)) {
         duyen.eatObject(object);
     }
 }
