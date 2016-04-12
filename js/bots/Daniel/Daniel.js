@@ -80,21 +80,21 @@ Daniel.hunger = {
     update: function() {
         if (this.amount >= 100) {
             //do nothing
-        // working on this atm
-        // } else if (Daniel.currentMotion == motion.stop) {
-        //     this.amount += 1;
-        // } else if (Daniel.currentMotion == motion.still) {
-        //     this.amount += 1;
-        // } else if (Daniel.currentMotion == motion.walking) {
-        //     this.amount += 2;
-        // } else if (Daniel.currentMotion == motion.running) {
-        //     this.amount += 3;
-        // } else if (Daniel.currentMotion == motion.sonicSpeed) {
-        //     this.amount += 5;
-        // } else if (Daniel.currentMotion == motion.moping) {
-        //     this.amount += 1.5;
-        // } else if (Daniel.currentMotion == motion.tantrum) {
-        //     this.amount += 5;
+            // working on this atm
+            // } else if (Daniel.currentMotion == motion.stop) {
+            //     this.amount += 1;
+            // } else if (Daniel.currentMotion == motion.still) {
+            //     this.amount += 1;
+            // } else if (Daniel.currentMotion == motion.walking) {
+            //     this.amount += 2;
+            // } else if (Daniel.currentMotion == motion.running) {
+            //     this.amount += 3;
+            // } else if (Daniel.currentMotion == motion.sonicSpeed) {
+            //     this.amount += 5;
+            // } else if (Daniel.currentMotion == motion.moping) {
+            //     this.amount += 1.5;
+            // } else if (Daniel.currentMotion == motion.tantrum) {
+            //     this.amount += 5;
         } else {
             this.amount += 0.5;
         }
@@ -140,32 +140,46 @@ Daniel.setMotion = function() {
     if (Daniel.emotion.current === "Chill") {
         if (Math.random < .5) {
             Daniel.currentMotion = Motions.still;
+            Daniel.addMemory("Stayed still");
         } else {
             Daniel.currentMotion = Motions.walking;
+            Daniel.addMemory("Walked");
+
         }
     } else if (Daniel.emotion.current === "Enthusiastic") {
         if (Math.random < .95) {
             Daniel.currentMotion = Motions.running;
+            Daniel.addMemory("Ran");
         } else {
             Daniel.currentMotion = Motions.sonicSpeed;
+            Daniel.addMemory("Ran really fast");
+
         }
     } else if (Daniel.emotion.current === "Apathetic") {
         if (Math.random < .6) {
             Daniel.currentMotion = Motions.moping;
+            Daniel.addMemory("Moped");
+
         } else {
             Daniel.currentMotion = Motions.stop;
+            Daniel.addMemory("Stoped");
+
         }
     } else if (Daniel.emotion.current === "Irate") {
         if (Math.random < .7) {
             Daniel.currentMotion = Motions.running;
+            Daniel.addMemory("Ran");
+
         } else {
             Daniel.currentMotion = Motions.tantrum;
+            Daniel.addMemory("Threw a tantrum");
+
         }
     }
 }
 
 Daniel.getStatus = function() {
-    var statusString = "I am feeling " + Daniel.emotion.current;
+    var statusString = "Emotional State: " + Daniel.emotion.current;
     statusString += "\n>------<";
     statusString += "\nSpeed: " + Daniel.currentMotion.description;
     statusString += "\n" + Daniel.hunger.toString();
@@ -193,9 +207,22 @@ Daniel.updateMin = function() {
 
 Daniel.collision = function(object) {
     Daniel.addMemory("Saw " + object.name);
-    Daniel.moveAwayFrom(object);
     if (Daniel.isEdible(object)) {
         Daniel.eatObject(object);
+    } else {
+        Daniel.moveAwayFrom(object);
+        // var soundSelector = Daniel.getRandom(0, 3);
+        // console.log("soundselector " +soundSelector);
+        // if (soundSelector <= 1) {
+        //     console.log("2");
+        //     Daniel.play(sounds.collision_noise3);
+        // } else if (soundSelector > 1 && soundSelector <= 2) {
+        //     console.log("3");
+        //     Daniel.play(sounds.collision_noise4);
+        // } else if (soundSelector > 2) {
+        //     console.log("4");
+        //     Daniel.play(sounds.collision_noise5);
+        // }
     }
 }
 
@@ -203,4 +230,5 @@ Daniel.eatObject = function(objectToEat) {
     objectToEat.eat();
     Daniel.hunger.eatIt(objectToEat.calories);
     Daniel.speak(objectToEat, "Delicious " + objectToEat.description + "!");
+    Daniel.play(sounds.chomp);
 }
