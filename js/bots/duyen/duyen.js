@@ -1,3 +1,5 @@
+//add var 
+
 var duyen = new Bot(75, 1800, 'duyen', 'js/bots/duyen/duyen.png');
 duyen.angle = 90;
 duyen.speed = 100;
@@ -270,6 +272,7 @@ duyen.update2min = function() {}
 
 
 duyen.collision = function(object) {
+    duyen.addMemory("Just ran into " + object.name);
     // console.log("Object is edible: " + object.isEdible);
     if (!duyen.speechText.contains(object.name)) {
         duyen.speechText += "Hello " + object.name + ".";
@@ -287,7 +290,8 @@ duyen.collision = function(object) {
 
 
 duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
-    // 
+    duyen.hear = botWhoSpokeToMe.name + " says: " + whatTheySaid;
+    duyen.addMemory(botWhoSpokeToMe.name + " said " + whatTheySaid);
     if (!duyen.speechText.contains("Oh you")) {
         duyen.speechText += " Oh you just said " + whatTheySaid + ".";
     }
@@ -295,6 +299,7 @@ duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
 
 
 duyen.highFive = function(botToHighFive) {
+	duyen.addMemory("I highfived " + botToHighFive);
     if (botToHighFive instanceof Bot) {
         duyen.speak(botToHighFive, "Hey " + botToHighFive.description + "!");
     }
@@ -303,12 +308,16 @@ duyen.highFive = function(botToHighFive) {
 
 
 duyen.highFived = function(botWhoHighFivedMe) {
+	duyen.addMemory(botToHighFive + " highfived");
     duyen.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
 
 
 duyen.eatObject = function(objectToEat) {
     duyen.addMemory("Ate" + objectToEat.name);
+    objectToEat.eat();
+    duyen.hunger.subtract(objectToEat.calories);
+    duyen.play(sounds.chomp);
 /*    objectToEat.eat();
     duyen.hunger.eatIt(objectToEat.calories);
     duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
