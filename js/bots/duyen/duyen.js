@@ -54,109 +54,112 @@ duyen.init = function() {
 // Creating productions
 
 duyen.makeProductions = function() {
-    eatingProduction = new Production("eating",
-        Production.priority.High,
-        function() {
-            return (
-                duyen.hunger.value > 70 &&
-                duyen.emotions.current === "mad");
-        },
-        function() {
-            duyen.currentMotion = Motions.tanturm;
-            duyen.extraText = "I'm hungry!";
-        });
-    cleaningProduction = new Production("cleaning",
-        Production.priority.Medium,
-        function() {
-            return (
-                duyen.hygiene.value > 30 &&
-                duyen.emotions.current === "sad");
-        },
-        function() {
-            duyen.extraText = "I feel yucky";
-        });
-    attackEnemy = new Production("attack",
-        Production.priority.Medium,
-        function() {
-            return (
-                duyen.hunger.value > 70 &&
-                duyen.emotions.current === "mad" &&
-                duyen.hunger.value > 20);
-        },
-        function() {
-            duyen.currentMotion = Motions.attack;
-            duyen.extraText = "Lets duel!";
-        });
-    fleeAway = new Production("flee",
-        Production.priority.High,
-        function() {
-            return (
-                duyen.emotions.current === "sad");
-        },
-        function() {
-            duyen.currentMotion = Motions.flying;
-            duyen.extraText = "I'm outta here!";
-        });
-    dancingProduction = new Production("dancing",
-        Production.priority.Low,
-        function() {
-            return (
-                duyen.emotions.current === "happy" &&
-                duyen.hunger.value > 30);
-        },
-        function() {
-            duyen.currentMotion = Motions.dancing;
-        });
+
+    this.productions = [];
+
+    var eatingProduction = new Production("eating");
+    eatingProduction.priority = Production.priority.High;
+    eatingProduction.condition = function() {
+        return (
+            duyen.hunger.value > 70 &&
+            duyen.emotions.current === "mad");
+    };
+    eatingProduction.action = function() {
+        duyen.currentMotion = Motions.tanturm;
+        duyen.extraText = "I'm hungry!";
+    };
+    var cleaningProduction = new Production("cleaning");
+    cleaningProduction.priority = Production.priority.Medium;
+    cleaningProduction.condition = function() {
+        return (
+            duyen.hygiene.value > 30 &&
+            duyen.emotions.current === "sad");
+    };
+    cleaningProduction.action = function() {
+        duyen.extraText = "I feel yucky";
+    };
+    var attackEnemy = new Production("attack");
+    attackEnemy.priority = Production.priority.Medium;
+    attackEnemy.condition = function() {
+        return (
+            duyen.hunger.value > 70 &&
+            duyen.emotions.current === "mad" &&
+            duyen.hunger.value > 20);
+    };
+    attackEnemy.action = function() {
+        duyen.currentMotion = Motions.attack;
+        duyen.extraText = "Lets duel!";
+    };
+    var fleeAway = new Production("flee");
+    fleeAway.priority = Production.priority.High;
+    fleeAway.condition = function() {
+        return (
+            duyen.emotions.current === "sad");
+    };
+    fleeAway.action = function() {
+        duyen.currentMotion = Motions.flying;
+        duyen.extraText = "I'm outta here!";
+    };
+    var dancingProduction = new Production("dancing");
+    dancingProduction.priority = Production.priority.Low;
+    dancingProduction.condition = function() {
+        return (
+            duyen.emotions.current === "happy" &&
+            duyen.hunger.value > 30);
+    };
+    dancingProduction.action = function() {
+        duyen.currentMotion = Motions.dancing;
+    };
 
     // New productions
-    goHome = new Production("back to base",
-        Production.priority.Medium,
-        function() {
+    var goHome = new Production("back to base");
+    goHome.priority = Production.priority.Medium;
+    goHome.condition = function() {
+        return (
+            duyen.emotions.current === "mad");
+    };
+    goHome.action = function() {
+        duyen.currentMotion = Motions.floating;
+        duyen.productionText = "Peace out!";
+        duyen.orientTowards = pinkTree;
+    };
+    var pursueFriend = new Production("make new friend");
+    pursueFriend.priority = Production.priority.Low;
+    pursueFriend.condition = function() {
+        return (
+            duyen.emotions.current === "happy");
+    };
+    pursueFriend.action = function() {
+        duyen.currentMotion = Motions.dancing;
+        duyen.productionText = "Wow! You're cool!";
+        duyen.getRandomBot;
+    };
+    var findFood = new Production("find food");
+    findFood.priority = Production.priority.High;
+    findFood.condition = function() {
+        return (
+            duyen.emotions.current === "mad" &&
+            duyen.hunger.value > 60);
+    };
+    findFood.action = function() {
+        duyen.currentMotion = Motions.flying;
+        duyen.productionText = "I need food!";
+        duyen.getRandomObject;
+        duyen.getNearbyObjects;
+    };
+    var defendResources = new Production("sleeping");
+    defendResources.priority = Production.priority.Medium,
+        defendResources.condition = function() {
             return (
                 duyen.emotions.current === "mad");
-        },
-        function() {
-            duyen.currentMotion = Motions.floating;
-            duyen.productionText = "Peace out!";
-            duyen.orientTowards = pinkTree;
-        });
-    pursueFriend = new Production("make new friend",
-        Production.priority.Low,
-        function () {
-            return (
-                duyen.emotions.current === "happy");
-        },
-        function() {
-            duyen.currentMotion = Motions.dancing;
-            duyen.productionText = "Wow! You're cool!";
-            duyen.getRandomBot;
-        });
-    findFood = new Production("find food",
-        Production.priority.High,
-        function() {
-            return (
-                duyen.emotions.current === "mad" &&
-                duyen.hunger.value > 60);
-        },
-        function() {
-            duyen.currentMotion = Motions.flying;
-            duyen.productionText = "I need food!";
-            duyen.getRandomObject;
-            duyen.getNearbyObjects;
-        });
-    defendResources = new Production("sleeping",
-        Production.priority.Medium,
-        function() {
-            return (
-                duyen.emotions.current === "mad");
-        },
-        function() {
-            duyen.attackMotion;
-            duyen.ProductionText = "Back off!";
-            duyen.attackNearbyBots;
-        });
+        };
+    defendResources.action = function() {
+        duyen.attackMotion;
+        duyen.ProductionText = "Back off!";
+        duyen.attackNearbyBots;
+    };
 
-     this.productions = [eatingProduction, cleaningProduction, attackEnemy, fleeAway, dancingProduction, goHome, pursueFriend, findFood, defendResources];
+    this.productions = [eatingProduction, cleaningProduction, attackEnemy, fleeAway, dancingProduction, goHome, pursueFriend, findFood, defendResources];
 }
 
 
@@ -299,7 +302,7 @@ duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
 
 
 duyen.highFive = function(botToHighFive) {
-	duyen.addMemory("I highfived " + botToHighFive);
+    duyen.addMemory("I highfived " + botToHighFive);
     if (botToHighFive instanceof Bot) {
         duyen.speak(botToHighFive, "Hey " + botToHighFive.description + "!");
     }
@@ -308,7 +311,7 @@ duyen.highFive = function(botToHighFive) {
 
 
 duyen.highFived = function(botWhoHighFivedMe) {
-	duyen.addMemory(botToHighFive + " highfived");
+    duyen.addMemory(botToHighFive + " highfived");
     duyen.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
 
@@ -318,8 +321,8 @@ duyen.eatObject = function(objectToEat) {
     objectToEat.eat();
     duyen.hunger.subtract(objectToEat.calories);
     duyen.play(sounds.chomp);
-/*    objectToEat.eat();
-    duyen.hunger.eatIt(objectToEat.calories);
-    duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
-    sound.chomp.play();*/
+    /*    objectToEat.eat();
+        duyen.hunger.eatIt(objectToEat.calories);
+        duyen.speak(objectToEat, "Yummy " + objectToEat.description + "!");
+        sound.chomp.play();*/
 }
