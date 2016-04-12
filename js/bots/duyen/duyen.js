@@ -280,7 +280,9 @@ duyen.collision = function(object) {
     if (!duyen.speechText.contains(object.name)) {
         duyen.speechText += "Hello " + object.name + ".";
     }
-    duyen.speak(object, "Hello " + object.name);
+    if(object instanceof Bot) {
+        duyen.speak(object, "Hello " + object.name);        
+    }
     // duyen.flee(object);
     // duyen.pursue(object);
     duyen.addMemory("Saw " + object.name);
