@@ -39,7 +39,7 @@ rey.utilityFunction = function(object) {
 }
 
 rey.makeProductions = function() {
-    eatingProduction1 = new Production("eating",
+   var eatingProduction1 = new Production("eating",
         Production.priority.High,
         function() {
             return (rey.hunger.value > 10 && rey.hunger.value < 20);
@@ -48,7 +48,7 @@ rey.makeProductions = function() {
             rey.makeSpeechBubble("Yum!");
         });
 
-    fleeingProduction = new Production("fleeing",
+   var fleeingProduction = new Production("fleeing",
         Production.priority.High,
         function() {
             return (rey.emotions.current == "Not in the mood");
@@ -58,7 +58,7 @@ rey.makeProductions = function() {
             rey.makeSpeechBubble("Get away from meee!");
         });
 
-    dancingProduction = new Production("dancing",
+   var dancingProduction = new Production("dancing",
         Production.priority.High,
         function() {
             return (rey.currentMotion == Motions.dancing);
@@ -67,7 +67,7 @@ rey.makeProductions = function() {
             rey.makeSpeechBubble("Someone come dance with me pls!");
         });
 
-    lookingforfoodProduction = new Production("scavaging",
+   var lookingforfoodProduction = new Production("scavaging",
         Production.priority.Low,
         function() {
             return (rey.hunger.value > 30 && rey.emotions.current !== "Sleepy");
@@ -76,7 +76,7 @@ rey.makeProductions = function() {
             rey.makeSpeechBubble("I need to find me some food..");
         });
 
-    playingProduction = new Production("playing",
+   var playingProduction = new Production("playing",
         Production.priority.Low,
         function() {
             return (rey.emotions.current == "Hyper");
@@ -85,7 +85,7 @@ rey.makeProductions = function() {
             rey.pursue(nearbyBots[0], 1000);
             rey.makeSpeechBubble("Play with me!!");
         });
-    sleepingProduction = new Production("sleeping",
+   var sleepingProduction = new Production("sleeping",
         Production.priority.Low,
         function() {
             return (rey.emotions.current == "Sleepy" && rey.hunger.value > 40);
@@ -97,7 +97,7 @@ rey.makeProductions = function() {
 
     //five new productions
 
-    fight = new Production("fighting"); ///this production still needs some work 
+   var fight = new Production("fighting"); ///this production still needs some work 
     fight.priority = Production.priority.High;
     fight.condition = function() {
         return (rey.emotions.current == "Not in the mood");
@@ -108,7 +108,7 @@ rey.makeProductions = function() {
     };
     fight.probNotFiring = .5;
 
-    seekFood = new Production("starving",
+   var seekFood = new Production("starving",
         Production.priority.High,
         function() {
             return (
@@ -121,7 +121,7 @@ rey.makeProductions = function() {
             rey.getNearbyObjects;
         });
 
-    goHome = new Production("need to rest at home",
+  var goHome = new Production("need to rest at home",
         Production.priority.High,
         function() {
             return (
@@ -133,7 +133,7 @@ rey.makeProductions = function() {
             // rey.orientTowards("stray dog"); <-- Does not take a string but an object.  We can fix together.
         });
 
-    avoidance = new Production("please leave me alone for now",
+  var avoidance = new Production("please leave me alone for now",
         Production.priority.Medium,
         function() {
             return (
@@ -144,7 +144,7 @@ rey.makeProductions = function() {
             rey.makeSpeechBubble("No one will get close to me if I am close to sharAI");
         });
 
-    social = new Production("Does anyone want to talk?",
+   var social = new Production("Does anyone want to talk?",
         Production.priority.High,
         function() {
             return (
@@ -221,6 +221,7 @@ rey.setMotion = function() {
         }
     } else if (rey.emotions.current === "Sleepy") {
         let rnd = Math.random();
+        rey.play(sounds.snore);
         if (rnd < .5) {
             rey.currentMotion = Motions.still;
         } else {
