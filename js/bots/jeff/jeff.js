@@ -56,6 +56,34 @@ jeff.init = function() {
 
 }
 
+
+/**
+ * Markov process controlling emotions
+ */
+jeff.emotions = new MarkovProcess("Calm");
+jeff.emotions.add("Calm", [
+    ["Calm", "Happy", "Angry", "Sad"],
+    [.8, .1, .05, .05]
+]);
+jeff.emotions.add("Sad", [
+    ["Sad", "Calm"],
+    [.7, .3]
+]);
+jeff.emotions.add("Angry", [
+    ["Angry", "Calm"],
+    [.7, .3]
+]);
+jeff.emotions.add("Happy", [
+    ["Happy", "Calm"],
+    [.7, .3]
+]);
+
+/**
+ * Decay Variables
+ */
+jeff.hunger = new DecayVariable(0, 1, 0, 100);
+jeff.energy = new DecayVariable(95, 1, 0, 100);
+
 /**
  * Create the list of productions for this agent.
  */
@@ -229,32 +257,6 @@ jeff.makeProductions = function() {
 }
 
 /**
- * Markov process controlling emotions
- */
-jeff.emotions = new MarkovProcess("Calm");
-jeff.emotions.add("Calm", [
-    ["Calm", "Happy", "Angry", "Sad"],
-    [.8, .1, .05, .05]
-]);
-jeff.emotions.add("Sad", [
-    ["Sad", "Calm"],
-    [.7, .3]
-]);
-jeff.emotions.add("Angry", [
-    ["Angry", "Calm"],
-    [.7, .3]
-]);
-jeff.emotions.add("Happy", [
-    ["Happy", "Calm"],
-    [.7, .3]
-]);
-
-/**
- * Hunger Variable
- */
-jeff.hunger = new DecayVariable(0, 1, 0, 100);
-
-/**
  * Populate the status field
  *
  * @override
@@ -263,6 +265,8 @@ jeff.getStatus = function() {
     var statusString = "Emotion: " + jeff.emotions.current;
     statusString += "\nMotion: " + (jeff.motionOverride ? "Override" : jeff.currentMotion.description);
     statusString += "\n" + jeff.hunger.getBar("Hunger");
+    statusString += "\n" + jeff.energy.getBar("Energy");
+    statusString += jeff.getPerceptionString();
     statusString += jeff.goals.toString();
     statusString += jeff.productionString;
     statusString += jeff.getActiveMemoryString();
@@ -302,7 +306,7 @@ jeff.setMotion = function() {
  * @override
  */
 jeff.update = function() {
-    this.currentMotion.apply(jeff);
+    jeff.currentMotion.apply(jeff);
     jeff.genericUpdate();
 };
 
@@ -311,13 +315,9 @@ jeff.update = function() {
  */
 jeff.update1Sec = function() {
     jeff.updateNetwork();
-    // if(jeff.containsMemory("Was bored")) {
-    //     console.log(jeff.getMemory("Was bored").value);
-    //     // TODO: Give a sense of how values are related to recency
-    // }
-    // jeff.play(sounds.beepbeep_00);
-    // TODO: Depending on power output of motions increment hunger in different degrees
+    // TODO: Depending on power output of motions increment hunger / energy in different degrees
     jeff.hunger.increment();
+    jeff.energy.decrement();
     jeff.emotions.update();
     jeff.setMotion();
     let firedProductions = fireProductions(jeff.productions);
@@ -337,24 +337,6 @@ jeff.update2min = function() {
     // jeff.hunger.setValue(0);
 }
 
-///////////////////////////
-// Interaction Functions //
-///////////////////////////
-
-/**
- * React to a collision.
- *
- * @override
- */
-jeff.collision = function(object) {
-    jeff.addMemory("Saw " + object.name);
-    jeff.moveAwayFrom(object);
-    if (jeff.canEat(object) && (jeff.hunger.value > 50)) {
-        jeff.eatObject(object);
-    }
-
-}
-
 /**
  * Call this when eating something.  
  *
@@ -370,19 +352,27 @@ jeff.eatObject = function(objectToEat) {
     jeff.goals.remove("Find food");
 }
 
+//////////////////////////////////////
+// Overridden Interaction Functions //
+//////////////////////////////////////
+
 /**
+ * React to a collision.
+ *
  * @override
  */
+jeff.collision = function(object) {
+    jeff.addMemory("Saw " + object.name);
+    jeff.moveAwayFrom(object);
+    if (jeff.canEat(object) && (jeff.hunger.value > 50)) {
+        jeff.eatObject(object);
+    }
+
+}
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
     jeff.addMemory(botWhoSpokeToMe.name + " said \"" + whatTheySaid + "\"");
     // jeff.speak(botWhoSpokeToMe, "Right on " + botWhoSpokeToMe.name); 
 }
-
-/**
- * React when someone high fives me.
- *
- * @override
- */
 jeff.highFived = function(botWhoHighFivedMe) {
     jeff.addMemory("High Fived by " + botWhoHighFivedMe.name);
     jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");

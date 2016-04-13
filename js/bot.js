@@ -367,6 +367,51 @@ Bot.prototype.getNearbyBots = function(radius = 250) {
 }
 
 /**
+ * Returns a reference to the closest object in a specified radius, and 
+ * considers that to be the current perception of this bot.
+ *
+ * TODO: Take heading in to consideration!
+ *
+ * @param  {Number} radius the radius in pixels to consider
+ * @return {Object} the "perceived entity"
+ */
+Bot.prototype.getPerception = function(radius = 250) {
+    var nearbyStuff = this.getNearbyObjects(radius);
+    if(nearbyStuff.length > 0) {
+        return nearbyStuff[0];
+    } else {
+        return null;
+    }
+
+}
+
+
+/**
+ * Returns a string describing the "current perceptual field",
+ * an list of nearby objects ordered by distance (closest first).
+ *
+ * E.g. "Perceiving: Oak Tree, Dylan"
+ *
+ * @param  {Number} radius the radius in pixels to consider
+ * @return {String} the perception string
+ */
+Bot.prototype.getPerceptionString = function(radius = 250) {
+    var retString = "\nPerceiving:";
+    var nearbyStuff = this.getNearbyObjects(radius);
+    if (nearbyStuff.length == 0) {
+        return retString + "nothing";
+    }
+    for (var i = 0; i < nearbyStuff.length; i++) {
+        if (i == nearbyStuff.length - 1) {
+            retString += nearbyStuff[i].name;
+        } else {
+            retString += nearbyStuff[i].name + ",";
+        }
+    }
+    return retString;
+}
+
+/**
  * Returns a random object (bot or static entity)
  *
  * @return {Object} the random entity
@@ -503,7 +548,7 @@ Bot.prototype.speak = function(botToTalkTo, whatToSay, howLong = 2000) {
     // Call the listeners "hear" function
     this.makeSpeechBubble(whatToSay, howLong);
     if (game.physics.arcade.distanceBetween(this.sprite, botToTalkTo.sprite) < 100) {
-        botToTalkTo.hear(this, whatToSay);
+        botToTalkTo.hear(this, whatToSay);            
     }
 }
 
@@ -733,22 +778,34 @@ Bot.prototype.getActiveMemoryString = function(threshold = 1.5) {
         });
     for (var i = 0; i < mems.length; i++) {
         retString += "\t" + mems[i].label + "\n";
-        // For most active, show connected "thematic field"
-        // if (i === 0) {
-        //     let thematicField = this.getConnectedMemories(mems[i]);
-        //     for (var j = 0; j < thematicField.length; j++) {
-        //         retString += "\t\t" + thematicField[j] + "\n";
-        //     }
-        // }
     }
     return retString;
 }
 
 /**
+ * Returns a string description of memories connected to the provided memory id.
+ *
+ * @param  {String} memory_name id of the memory to start with
+ * @return {String} The formatted string
+ */
+Bot.prototype.getConnectedMemoryString = function(memory_name) {
+    let retString = "";
+    let thematicField = this.getConnectedMemories(memory_name);
+    if(thematicField.length == 0) {
+        return retString;
+    }
+    for (var j = 0; j < thematicField.length; j++) {
+        retString += "\n\t" + thematicField[j];
+    }
+    return retString;
+}
+
+
+/**
  * Returns all memories connected to the given one.
  */
-Bot.prototype.getConnectedMemories = function(memory) {
-    return this.network.getConnectedNodes(memory.id);
+Bot.prototype.getConnectedMemories = function(memory_id) {
+    return this.network.getConnectedNodes(memory_id);
 }
 
 /**
