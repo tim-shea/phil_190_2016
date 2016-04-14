@@ -24,7 +24,7 @@ duyen.init = function() {
 
     // Setting up edibility function
 
-    duyen.isEdible = function(object) {
+    duyen.canEat = function(object) {
         if (object.name == "jerry_can" || object.name == "Spice_Poffin" || object.name == "Devil_Fruit_rubber") {
             return false;
         } else {
@@ -276,7 +276,6 @@ duyen.update2min = function() {}
 
 duyen.collision = function(object) {
     duyen.addMemory("Just ran into " + object.name);
-    // console.log("Object is edible: " + object.isEdible);
     if (!duyen.speechText.contains(object.name)) {
         duyen.speechText += "Hello " + object.name + ".";
     }
@@ -287,7 +286,7 @@ duyen.collision = function(object) {
     // duyen.pursue(object);
     duyen.addMemory("Saw " + object.name);
     duyen.moveAwayFrom(object);
-    if (duyen.isEdible(object)) {
+    if (duyen.canEat(object)) {
         duyen.eatObject(object);
     }
 }
@@ -304,7 +303,6 @@ duyen.highFived = function(botWhoHighFivedMe) {
     duyen.addMemory(botToHighFive + " highfived");
     duyen.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
 }
-
 
 duyen.eatObject = function(objectToEat) {
     duyen.addMemory("Ate" + objectToEat.name);

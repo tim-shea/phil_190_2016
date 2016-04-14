@@ -12,7 +12,7 @@ Daniel.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 60, Daniel.updateMin, this);
 }
 
-Daniel.isEdible = function(object) {
+Daniel.canEat = function(object) {
     if (object.name == "jerry_can") {
         return false;
     } else {
@@ -207,7 +207,7 @@ Daniel.updateMin = function() {
 
 Daniel.collision = function(object) {
     Daniel.addMemory("Saw " + object.name);
-    if (Daniel.isEdible(object)) {
+    if (Daniel.canEat(object)) {
         Daniel.eatObject(object);
     } else {
         Daniel.moveAwayFrom(object);

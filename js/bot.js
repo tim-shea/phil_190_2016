@@ -25,7 +25,10 @@ function Bot(x, y, name, path) {
     // See http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.Body.html 
     this.body;
 
-    // Eating each other is not yet supported.
+    // Eating each other is not yet supported.  
+    //   Todo: Note that this name overlaps an obvious choice for the 
+    //   edibility function name, which has led some people to overrwrite this,
+    //   leading to hard-to-track-down bugs
     this.isEdible = false;
 
     // Override motion when in pursuit, etc.
