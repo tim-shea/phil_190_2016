@@ -90,20 +90,20 @@ DecayVariable.prototype.subtract = function(amount) {
     }
     this.value = Math.max(this.minVal, this.value - amount);
 }
-DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, slice_length = undefined) {
+DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, minCharLengthOfMinMaxText = undefined) {
     var string_minVal = this.minVal.toString();
     var string_maxVal = this.maxVal.toString();
     //prettify value string length
-    if (typeof slice_length != "undefined") {
-        if (Number.isNaN(slice_length)) {
+    if (typeof minCharLengthOfMinMaxText != "undefined") {
+        if (Number.isNaN(minCharLengthOfMinMaxText)) {
             if (this.minVal.toString().length >= this.maxVal.toString().length) {
-                slice_length = this.minVal.toString().length;
+                minCharLengthOfMinMaxText = this.minVal.toString().length;
             } else {
-                slice_length = this.maxVal.toString().length;
+                minCharLengthOfMinMaxText = this.maxVal.toString().length;
             }
         }
-        string_minVal = (" ".repeat(slice_length) + this.minVal).slice(-slice_length) + "\t";
-        string_maxVal = "\t" + (" ".repeat(slice_length) + this.maxVal).slice(-slice_length);
+        string_minVal = (" ".repeat(minCharLengthOfMinMaxText) + this.minVal).slice(-minCharLengthOfMinMaxText) + "\t";
+        string_maxVal = "\t" + (" ".repeat(minCharLengthOfMinMaxText) + this.maxVal).slice(-minCharLengthOfMinMaxText);
     }
     // Thanks to SharAI for this code idea!
     var bar = "";
@@ -415,6 +415,7 @@ function GoalSet() {
     this.goals = {};
 };
 GoalSet.prototype.contains = function(goalId) {
+    console.log(this.goals + "---" + goalId);
     return this.goals.hasOwnProperty(goalId);
 }
 GoalSet.prototype.add = function(newGoal) {

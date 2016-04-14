@@ -28,12 +28,11 @@ Bot.prototype.highFive = function(botToHighFive) {
 /**
  * Ignore specified bot.
  */
-Bot.prototype.ignore = function (annoyingBot) {
+Bot.prototype.ignore = function(annoyingBot) {
     this.incrementAngle(180);
     this.body.speed = 250;
     annoyingBot.gotIgnored(this);
 }
-
 
 /**
  * Bite a specified bot
@@ -41,7 +40,7 @@ Bot.prototype.ignore = function (annoyingBot) {
  * @param {Bot} botToAttack The bot to bite
  * @param {Number} damage Strength of the bite
  */
-Bot.prototype.bite = function(botToAttack, damage=100) {
+Bot.prototype.bite = function(botToAttack, damage = 100) {
     if (botToAttack instanceof Bot) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
             botToAttack.gotBit(this, damage);
@@ -55,8 +54,8 @@ Bot.prototype.bite = function(botToAttack, damage=100) {
  * @param {Bot} target bot
  * @param {String} message
  */
-Bot.prototype.antler_caress = function(botTocaress, message) {
-    // console.log(botTocaress.name + message);
+Bot.prototype.antler_caress = function(botToCaress, message) {
+    botToCaress.antler_caressed(this, message);
 };
 
 /**
@@ -67,7 +66,7 @@ Bot.prototype.antler_caress = function(botTocaress, message) {
  */
 Bot.prototype.crush = function(botToCrush, damage) {
     if (botToCrush instanceof Bot) {
-        if(game.physics.arcade.distanceBetween(this.sprite, botToCrush.sprite) < 10) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToCrush.sprite) < 10) {
             botToCrush.gotCrushed(this, damage);
         }
     }
@@ -79,7 +78,7 @@ Bot.prototype.crush = function(botToCrush, damage) {
  */
 Bot.prototype.bow = function(botToBow) {
     if (botToBow instanceof Bot) {
-        if(game.physics.arcade.distanceBetween(this.sprite, botToBow.sprite) < 15) {
+        if (game.physics.arcade.distanceBetween(this.sprite, botToBow.sprite) < 15) {
             botToBow.gotBow(this);
         }
     }
@@ -100,7 +99,7 @@ Bot.prototype.lick = function(botTolick) {
 
 
 ////////////////////////////////////////////////////////////////////////////
-// Bottom Half of this file contains "reactoins" that you should override //
+// Bottom Half of this file contains "reactions" that you should override //
 ////////////////////////////////////////////////////////////////////////////
 
 
@@ -113,15 +112,13 @@ Bot.prototype.gotLicked = function(botWhoLickedMe) {
     // console.log(botWhoLickedMe.name + " licked " + this.name);
 };
 
-
 /**
  * Override to react when ignored
  *
  * @param  {Bot} botWhoIgnoredToMe who ignored me
  */
 Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
-    this.body.speed = 0;
-    this.pursue(botWhoIgnoredMe, 350);
+    console.log(botWhoIgnoredMe.name + " ignored " + this.name);
 }
 
 /**
@@ -143,7 +140,6 @@ Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
     console.log(botWhoAttackedMe.name + "attacked me!");
 };
 
-
 /**
  * Override to react when bowed down to
  * 
@@ -151,7 +147,7 @@ Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
  * 
  */
 Bot.prototype.gotBow = function(botWhoBowed) {
-    // console.log(botWhoBowed.name + "bowed down to " + this.name);
+    console.log(botWhoBowed.name + "bowed down to " + this.name);
 };
 
 /**
@@ -159,21 +155,16 @@ Bot.prototype.gotBow = function(botWhoBowed) {
  * @param {Bot} target bot
  * @param {String} message
  */
-Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
-    // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
+Bot.prototype.antler_caressed = function(botWhoCaressedMe, message) {
+    console.log(botWhoCaressedMe.name + " says: " 
+        + "If you stroke this antler, you will be blessed " 
+        + "by the wisps that lives on them, to " + this.name + " "
+        + "and said " + message);
 };
-
-
-Bot.prototype.gotCrushed = function(botToCrush) {
-    //console.log(botToCrush.name + " got crushed by dylan.");
-};
-
 
 /**
- * Override to react when someone tries to eat you!
- *
- * TODO: Rename to "gotEaten" or something to make it clear that this is the "receiving" interaction
+ * Override to react to crush attemps.
  */
-Bot.prototype.eat = function() {
-    console.log("Warning: " + this.name + " is trying to eat bot: " + this.name);
+Bot.prototype.gotCrushed = function(botThatIsCrushing) {
+    console.log(botThatIsCrushing.name + " is crushing " + this.name);
 };
