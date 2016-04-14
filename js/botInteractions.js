@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////////////////////
+// Top Half of this file contains "actions" that you should not override //
+////////////////////////////////////////////////////////////////////////////
+
 /**
  * Override to react when hearing something
  *
@@ -22,13 +26,14 @@ Bot.prototype.highFive = function(botToHighFive) {
 }
 
 /**
- * Override to react when high fived
- *
- * @param  {Bot} botWhoSpokeToMe who talked to me
+ * Ignore specified bot.
  */
-Bot.prototype.highFived = function(botWhoHighFivedMe) {
-    console.log(botWhoHighFivedMe.name + " high fived " + this.name);
+Bot.prototype.ignore = function (annoyingBot) {
+    this.incrementAngle(180);
+    this.body.speed = 250;
+    annoyingBot.gotIgnored(this);
 }
+
 
 /**
  * Bite a specified bot
@@ -36,7 +41,7 @@ Bot.prototype.highFived = function(botWhoHighFivedMe) {
  * @param {Bot} botToAttack The bot to bite
  * @param {Number} damage Strength of the bite
  */
-Bot.prototype.bite = function(botToAttack, damage) {
+Bot.prototype.bite = function(botToAttack, damage=100) {
     if (botToAttack instanceof Bot) {
         if (game.physics.arcade.distanceBetween(this.sprite, botToAttack.sprite) < 50) {
             botToAttack.gotBit(this, damage);
@@ -46,30 +51,12 @@ Bot.prototype.bite = function(botToAttack, damage) {
 };
 
 /**
- * Override to react when attacked
- *
- * @param {Bot} botWhoAttackedMe The bot that bit me
- * @param {Number} damage The amount of damage done
- */
-Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
-    console.log(botWhoAttackedMe.name + "attacked me!");
-};
-
-/**
  * caress with antler
  * @param {Bot} target bot
  * @param {String} message
  */
 Bot.prototype.antler_caress = function(botTocaress, message) {
     // console.log(botTocaress.name + message);
-};
-/**
- * Override to react when caressed
- * @param {Bot} target bot
- * @param {String} message
- */
-Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
-    // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
 };
 
 /**
@@ -86,10 +73,6 @@ Bot.prototype.crush = function(botToCrush, damage) {
     }
 }
 
-Bot.prototype.gotCrushed = function(botToCrush) {
-    //console.log(botToCrush.name + " got crushed by dylan.");
-};
-
 /**
  * Bow down to bot
  * @param {Bot} botToBow the bot that is being bowed down to
@@ -101,16 +84,6 @@ Bot.prototype.bow = function(botToBow) {
         }
     }
 };
-/**
- * Override to react when bowed down to
- * 
- * @param {Bot} botWhoBowed bot who bowed down to me
- * 
- */
-Bot.prototype.gotBow = function(botWhoBowed) {
-    // console.log(botWhoBowed.name + "bowed down to " + this.name);
-};
-
 
 /**
  * Lick a specified bot
@@ -126,6 +99,11 @@ Bot.prototype.lick = function(botTolick) {
 };
 
 
+////////////////////////////////////////////////////////////////////////////
+// Bottom Half of this file contains "reactoins" that you should override //
+////////////////////////////////////////////////////////////////////////////
+
+
 /**
  * Override to react when licked
  *
@@ -135,12 +113,6 @@ Bot.prototype.gotLicked = function(botWhoLickedMe) {
     // console.log(botWhoLickedMe.name + " licked " + this.name);
 };
 
-
-Bot.prototype.ignore = function (annoyingBot) {
-    this.incrementAngle(180);
-    this.body.speed = 250;
-    annoyingBot.gotIgnored(this);
-}
 
 /**
  * Override to react when ignored
@@ -153,7 +125,54 @@ Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
 }
 
 /**
+ * Override to react when high fived
+ *
+ * @param  {Bot} botWhoSpokeToMe who talked to me
+ */
+Bot.prototype.highFived = function(botWhoHighFivedMe) {
+    console.log(botWhoHighFivedMe.name + " high fived " + this.name);
+}
+
+/**
+ * Override to react when attacked
+ *
+ * @param {Bot} botWhoAttackedMe The bot that bit me
+ * @param {Number} damage The amount of damage done
+ */
+Bot.prototype.gotBit = function(botWhoAttackedMe, damage) {
+    console.log(botWhoAttackedMe.name + "attacked me!");
+};
+
+
+/**
+ * Override to react when bowed down to
+ * 
+ * @param {Bot} botWhoBowed bot who bowed down to me
+ * 
+ */
+Bot.prototype.gotBow = function(botWhoBowed) {
+    // console.log(botWhoBowed.name + "bowed down to " + this.name);
+};
+
+/**
+ * Override to react when caressed
+ * @param {Bot} target bot
+ * @param {String} message
+ */
+Bot.prototype.antler_caressed = function(botWhocaresedMe, message) {
+    // console.log(botWhocaresedMe.name + "If you stroke this antler, you will be blessed by the wisps that lives on them.");
+};
+
+
+Bot.prototype.gotCrushed = function(botToCrush) {
+    //console.log(botToCrush.name + " got crushed by dylan.");
+};
+
+
+/**
  * Override to react when someone tries to eat you!
+ *
+ * TODO: Rename to "gotEaten" or something to make it clear that this is the "receiving" interaction
  */
 Bot.prototype.eat = function() {
     console.log("Warning: " + this.name + " is trying to eat bot: " + this.name);

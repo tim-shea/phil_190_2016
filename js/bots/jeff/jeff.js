@@ -9,6 +9,7 @@ var jeff = new Bot(570, 570, 'jeff', 'js/bots/jeff/person.png');
 jeff.currentlyPursuing = "Nothing";
 jeff.productionString = "";
 jeff.currentMotion = Motions.still;
+jeff.stopMotion = false;
 
 /**
  * Initialize bot
@@ -56,7 +57,6 @@ jeff.init = function() {
 
 }
 
-
 /**
  * Markov process controlling emotions
  */
@@ -92,6 +92,7 @@ jeff.makeProductions = function() {
 
     this.productions = []; // The production array
 
+    // Make finding food a goal
     var foodSeekingGoal = new Production("desire food when hungry");
     foodSeekingGoal.priority = Production.priority.High;
     foodSeekingGoal.condition = function() {
@@ -103,6 +104,7 @@ jeff.makeProductions = function() {
     };
     this.productions.push(foodSeekingGoal);
 
+    // Act on the food goal
     var getFood = new Production("fulfill food desire");
     getFood.priority = Production.priority.High;
     getFood.condition = function() {
@@ -142,19 +144,19 @@ jeff.makeProductions = function() {
     };
     this.productions.push(admireCar);
 
-    // var fight = new Production("pick a fight when grumpy");
-    // fight.priority = Production.priority.Low;
-    // fight.condition = function() {
-    //     return true; // (jeff.emotions.current === "Angry");
-    // };
-    // fight.action = function() {
-    //     jeff.makeSpeechBubble("Attack!", 2000);
-    //     jeff.addMemory("Attack mode");
-    //     jeff.attackNearbyBots();
-    //     jeff.play(sounds.attack1);
-    // };
-    // fight.probNotFiring = .7;
-    // production.push(fight);
+    var fight = new Production("pick a fight when grumpy");
+    fight.priority = Production.priority.Low;
+    fight.condition = function() {
+        return true; // (jeff.emotions.current === "Angry");
+    };
+    fight.action = function() {
+        jeff.makeSpeechBubble("Attack!", 2000);
+        jeff.addMemory("Attack mode");
+        jeff.attackNearbyBots();
+        jeff.play(sounds.attack1);
+    };
+    fight.probNotFiring = .7;
+    this.productions.push(fight);
 
     var irritable = new Production("irritable when hungry");
     irritable.priority = Production.priority.Medium;
@@ -204,6 +206,7 @@ jeff.makeProductions = function() {
     commentOnGoodStuff.probNotFiring = .9;
     this.productions.push(commentOnGoodStuff);
 
+    // Adds a goal
     var findNewFriends = new Production("Find friends");
     findNewFriends.priority = Production.priority.Low;
     findNewFriends.condition = function() {
@@ -219,6 +222,7 @@ jeff.makeProductions = function() {
     findNewFriends.probNotFiring = .8;
     this.productions.push(findNewFriends);
 
+    // Acts on a goal
     var getHighFivedGoal = new Production("Get High Fived");
     getHighFivedGoal.priority = Production.priority.Low;
     getHighFivedGoal.condition = function() {
@@ -267,9 +271,9 @@ jeff.getStatus = function() {
     statusString += "\n" + jeff.hunger.getBar("Hunger");
     statusString += "\n" + jeff.energy.getBar("Energy");
     statusString += jeff.getPerceptionString();
-    statusString += jeff.goals.toString();
+    statusString += jeff.goals.toString(); 
     statusString += jeff.productionString;
-    statusString += jeff.getActiveMemoryString();
+    statusString += jeff.getActiveMemoryString(); 
     return statusString;
 }
 
@@ -306,8 +310,10 @@ jeff.setMotion = function() {
  * @override
  */
 jeff.update = function() {
-    jeff.currentMotion.apply(jeff);
-    jeff.genericUpdate();
+    if(!jeff.stopMotion) {
+        jeff.currentMotion.apply(jeff);
+        jeff.genericUpdate();
+    }
 };
 
 /**
@@ -319,7 +325,9 @@ jeff.update1Sec = function() {
     jeff.hunger.increment();
     jeff.energy.decrement();
     jeff.emotions.update();
-    jeff.setMotion();
+    if(!jeff.stopMotion) {
+        jeff.setMotion();        
+    }
     let firedProductions = fireProductions(jeff.productions);
     jeff.productionString = getProductionString(firedProductions); 
 }
@@ -379,3 +387,30 @@ jeff.highFived = function(botWhoHighFivedMe) {
     jeff.goals.remove("Get High Fived");
 
 }
+jeff.highFived = function(botWhoHighFivedMe) {
+    jeff.addMemory("High Fived by " + botWhoHighFivedMe.name);
+    jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
+    jeff.goals.remove("Get High Fived");
+
+}
+// jeff.gotIgnored = function(botWhoIgnoredMe) {
+//     jeff.addMemory(botWhoIgnoredMe.name + "  ignored me!");
+//     jeff.speak(botWhoIgnoredMe, "I see how it is,  " + botWhoIgnoredMe.name + ".");
+// }
+// jeff.gotBit = function(botWhoAttackedMe, damage) {
+//     // TODO: Test
+//     jeff.addMemory("Attacked by " + botWhoAttackedMe.name);
+//     jeff.goals.add("Get revenge on " + botWhoAttackedMe.name);
+    
+//     // Todo: Only add it if not already in.   Add a helper for that?
+//     var revenge = new Production("Get revenge");
+//     revenge.priority = Production.priority.Medium;
+//     revenge.condition = function() {
+//         return jeff.goals.contains("Get revenge on " + botWhoAttackedMe.name)
+//     };
+//     revenge.action = function() {
+//         jeff.pursue(botWhoAttackedMe);
+//         jeff.bite(botWhoAttackedMe);
+//     };
+//     this.productions.push(revenge);
+// }

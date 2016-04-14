@@ -710,6 +710,8 @@ Bot.prototype.addMemory = function(memory) {
 /**
  * Get a memory.  "Recall" it.  Returns null if there is no such memory.
  *
+ * TODO: Get a memory based on a fragment of it? 
+ *
  * @param  {String} memoryToGet what to look for
  * @return a reference to the vis.js node
  */
