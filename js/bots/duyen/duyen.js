@@ -292,8 +292,6 @@ duyen.collision = function(object) {
     }
 }
 
-
-
 duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
     //duyen.hear = botWhoSpokeToMe.name + " says: " + whatTheySaid; <- Danger!  This overrwrites bot.hear
     duyen.addMemory(botWhoSpokeToMe.name + " said " + whatTheySaid);
@@ -301,14 +299,6 @@ duyen.hear = function(botWhoSpokeToMe, whatTheySaid) {
         duyen.speechText += " Oh you just said " + whatTheySaid + ".";
     }
 }
-
-
-duyen.highFive = function(botToHighFive) {
-    duyen.addMemory("I highfived " + botToHighFive);
-    duyen.speak(botToHighFive, "Hey " + botToHighFive.description + "!");
-}
-
-
 
 duyen.highFived = function(botWhoHighFivedMe) {
     duyen.addMemory(botToHighFive + " highfived");

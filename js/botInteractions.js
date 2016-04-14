@@ -156,5 +156,5 @@ Bot.prototype.gotIgnored = function(botWhoIgnoredMe) {
  * Override to react when someone tries to eat you!
  */
 Bot.prototype.eat = function() {
-    console.log("Someone tried to eat " + this.name);
+    console.log("Warning: " + this.name + " is trying to eat bot: " + this.name);
 };

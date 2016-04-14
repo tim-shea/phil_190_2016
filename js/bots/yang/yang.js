@@ -399,8 +399,8 @@ yang.onesec_timedEvend = function() {
     yang.MRGPRB4.update();
     //ultility
     yang.ultility_sum_.ulti.value = yang.ultility_sum_.ulti.value * 0.9;
-    yang.ultility_sum_.ulti.add(yang.ultility_sum_.pleasure.value);
-    yang.ultility_sum_.ulti.subtract(yang.ultility_sum_.pain.value);
+    // yang.ultility_sum_.ulti.add(yang.ultility_sum_.pleasure.value);
+    // yang.ultility_sum_.ulti.subtract(yang.ultility_sum_.pain.value);
     yang.ultility_sum_.pleasure.value = yang.ultility_sum_.pleasure.value * 0.7;
     yang.ultility_sum_.pain.value = yang.ultility_sum_.pain.value * 0.7;
     //TODO : redesign//Motions.zeleport.apply(yang)
@@ -1171,9 +1171,9 @@ yang.node_.superego_drain_focus.always_fun = function() { //control sensitive
         yang.node_.id_secondary_focus.switch_to_this_node();
     } else {
         //increase pleasure
-        yang.ultility_sum_.pleasure.add(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
+        // yang.ultility_sum_.pleasure.add(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
         //also increase pain
-        yang.ultility_sum_.pain.add(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
+        // yang.ultility_sum_.pain.add(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
     }
 };
 /**
