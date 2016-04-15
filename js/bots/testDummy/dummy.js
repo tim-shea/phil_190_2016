@@ -15,3 +15,5 @@ dummy.update = function() {
     dummy.genericUpdate();
 };
 
+dummy.collision = function(object) {
+}

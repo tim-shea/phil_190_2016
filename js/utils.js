@@ -85,7 +85,7 @@ DecayVariable.prototype.add = function(amount) {
 }
 DecayVariable.prototype.subtract = function(amount) {
     if (Number.isNaN(amount) || !amount) {
-        // console.log("You are probably trying to eat something that does not have calories defined!");
+        console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
     this.value = Math.max(this.minVal, this.value - amount);
@@ -415,12 +415,12 @@ function GoalSet() {
     this.goals = {};
 };
 GoalSet.prototype.contains = function(goalId) {
-    console.log(this.goals + "---" + goalId);
     return this.goals.hasOwnProperty(goalId);
 }
-GoalSet.prototype.add = function(newGoal) {
-    if(!this.contains(newGoal.id)) {
-        this.goals[newGoal.id] = newGoal;        
+GoalSet.prototype.add = function(newGoal_id) {
+    if(!this.contains(newGoal_id)) {
+        let newGoal = new Goal(newGoal_id);
+        this.goals[newGoal_id] = newGoal;        
     }
 }
 GoalSet.prototype.get = function(goalId) {
@@ -438,6 +438,13 @@ GoalSet.prototype.checkIfSatisfied = function(goalId) {
     if (goal) {
         goal.failedSatisfactionAttempts++;
     }
+}
+GoalSet.prototype.getArray = function() {
+    let retArray = [];
+    for(var key in this.goals) {
+        retArray.push(this.goals[key])
+    }
+    return retArray;
 }
 GoalSet.prototype.toString = function() {
     var retString = "\nGoals:\n";

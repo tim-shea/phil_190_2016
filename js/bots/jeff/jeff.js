@@ -89,7 +89,6 @@ jeff.energy = new DecayVariable(95, 1, 0, 100);
  */
 jeff.makeProductions = function() {
 
-
     this.productions = []; // The production array
 
     // Make finding food a goal
@@ -100,7 +99,7 @@ jeff.makeProductions = function() {
     };
     foodSeekingGoal.action = function() {
         jeff.addMemory("Added goal of finding food");
-        jeff.goals.add(new Goal("Find food", 8));
+        jeff.goals.add("Find food");
     };
     this.productions.push(foodSeekingGoal);
 
@@ -142,6 +141,7 @@ jeff.makeProductions = function() {
         jeff.addMemory("Said Nice Car");
         jeff.orientTowards(dylan);
     };
+    admireCar.probNotFiring = .7;
     this.productions.push(admireCar);
 
     var fight = new Production("pick a fight when grumpy");
@@ -156,7 +156,10 @@ jeff.makeProductions = function() {
         jeff.play(sounds.attack1);
     };
     fight.probNotFiring = .7;
-    this.productions.push(fight);
+    if(!jeff.stopMotion) {
+        this.productions.push(fight);        
+    }
+
 
     var irritable = new Production("irritable when hungry");
     irritable.priority = Production.priority.Medium;
@@ -185,7 +188,9 @@ jeff.makeProductions = function() {
         }
     };
     chatty.probNotFiring = .95;
-    this.productions.push(chatty);
+    if(!jeff.stopMotion) {
+        this.productions.push(chatty);
+    }
 
     var commentOnGoodStuff = new Production("Comment on high utility items");
     commentOnGoodStuff.priority = Production.priority.High;
@@ -204,7 +209,9 @@ jeff.makeProductions = function() {
         jeff.makeSpeechBubble("Something good around here...!");
     };
     commentOnGoodStuff.probNotFiring = .9;
-    this.productions.push(commentOnGoodStuff);
+    if(!jeff.stopMotion) {
+        this.productions.push(commentOnGoodStuff);
+    }
 
     // Adds a goal
     var findNewFriends = new Production("Find friends");
@@ -214,13 +221,15 @@ jeff.makeProductions = function() {
     };
     findNewFriends.action = function() {
         jeff.addMemory("Looked for friends");
-        jeff.goals.add(new Goal("Get High Fived"));
+        jeff.goals.add("Get High Fived");
         var randBot = jeff.getRandomBot();
         jeff.pursue(randBot, 700);
         jeff.speak(randBot, "Hey " + randBot.name + ", let's talk!", 2000);
     };
     findNewFriends.probNotFiring = .8;
-    this.productions.push(findNewFriends);
+    if(!jeff.stopMotion) {
+        this.productions.push(findNewFriends);
+    }
 
     // Acts on a goal
     var getHighFivedGoal = new Production("Get High Fived");
@@ -375,6 +384,13 @@ jeff.collision = function(object) {
     if (jeff.canEat(object) && (jeff.hunger.value > 50)) {
         jeff.eatObject(object);
     }
+    if (object.name === "dylan") {
+        for(goal of jeff.goals.getArray()) {
+            if(goal.id.startsWith("Report")) {
+                jeff.goals.remove(goal.id);
+            }
+        }
+    }
 
 }
 jeff.hear = function(botWhoSpokeToMe, whatTheySaid) {
@@ -393,24 +409,34 @@ jeff.highFived = function(botWhoHighFivedMe) {
     jeff.goals.remove("Get High Fived");
 
 }
-// jeff.gotIgnored = function(botWhoIgnoredMe) {
-//     jeff.addMemory(botWhoIgnoredMe.name + "  ignored me!");
-//     jeff.speak(botWhoIgnoredMe, "I see how it is,  " + botWhoIgnoredMe.name + ".");
-// }
-// jeff.gotBit = function(botWhoAttackedMe, damage) {
-//     // TODO: Test
-//     jeff.addMemory("Attacked by " + botWhoAttackedMe.name);
-//     jeff.goals.add("Get revenge on " + botWhoAttackedMe.name);
-    
-//     // Todo: Only add it if not already in.   Add a helper for that?
-//     var revenge = new Production("Get revenge");
-//     revenge.priority = Production.priority.Medium;
-//     revenge.condition = function() {
-//         return jeff.goals.contains("Get revenge on " + botWhoAttackedMe.name)
-//     };
-//     revenge.action = function() {
-//         jeff.pursue(botWhoAttackedMe);
-//         jeff.bite(botWhoAttackedMe);
-//     };
-//     this.productions.push(revenge);
-// }
+jeff.gotIgnored = function(botWhoIgnoredMe) {
+    jeff.addMemory(botWhoIgnoredMe.name + "  ignored me!");
+    jeff.makeSpeechBubble("I see how it is, " + botWhoIgnoredMe.name);
+}
+
+jeff.antler_caressed = function(botWhoCaressedMe, message) {
+    jeff.addMemory(botWhoCaressedMe.name + "  caressed me");
+    var reportHarrasmentGoalId = "Report " + botWhoCaressedMe.name + " to authorities";
+    if(botWhoCaressedMe.name=="yang" || botWhoCaressedMe.name=="rey") {
+        jeff.makeSpeechBubble("I love wildlife.");
+    } else {
+        jeff.goals.add(reportHarrasmentGoalId);
+    }
+
+    var reportHarrasment = new Production("fulfill food desire");
+    reportHarrasment.priority = Production.priority.High;
+    reportHarrasment.condition = function() {
+        return (jeff.goals.contains(reportHarrasmentGoalId));
+    };
+    reportHarrasment.action = function() {
+        jeff.pursue(dylan) // We've decided to deputize Dylan...
+        jeff.speak(dylan, "Reporting an unwelcome caress");
+        // Wait a few seconds, then see if we succeeded
+        game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+              jeff.goals.checkIfSatisfied(reportHarrasmentGoalId);
+        }, this);
+
+    };
+    this.productions.push(reportHarrasment);
+
+};
