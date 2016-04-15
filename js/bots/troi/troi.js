@@ -449,7 +449,8 @@ troi.amuse = {
     },
     update: function() {
         if (this.time <= 0) {
-            troi.emotion = troi.agitated; //0 playtime = upset troi
+            troi.emotion.current = "agitated"; //0 playtime = upset troi
+
         } else {
             this.time -= 5; //time spent playing
         }
