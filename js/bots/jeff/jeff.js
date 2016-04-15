@@ -3,8 +3,6 @@
  */
 var jeff = new Bot(570, 570, 'jeff', 'js/bots/jeff/person.png');
 
-// Small test change.  Figuring out what's up with merging on Troi's machine.
-// 
 /**
  * State variables
  */
