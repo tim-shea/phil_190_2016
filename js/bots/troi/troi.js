@@ -128,7 +128,7 @@ troi.makeProductions = function() {
     homeward.condition = function() {
         return (!troi.home &&
             troi.stamina > 100 &&
-            troi.hunger < 400
+            troi.hunger.amount < 400
         );
     };
     homeward.action = function() {
@@ -142,7 +142,7 @@ troi.makeProductions = function() {
     nap.condition = function() {
         return (
             (troi.stamina > 0 && troi.stamina < 500) &&
-            (troi.hunger > 200 && troi.hunger < 400) &&
+            (troi.hunger.amount > 200 && troi.hunger.amount < 400) &&
             troi.emotion.current === "neutral"
         );
     };
@@ -156,7 +156,7 @@ troi.makeProductions = function() {
     eating.priority = Production.priority.High;
     eating.condition = function() {
         return (
-            troi.hunger > 400
+            troi.hunger.amount > 400
         );
     }
     eating.action = function() {
@@ -171,7 +171,7 @@ troi.makeProductions = function() {
         return (
             (troi.emotion.current === "euphoric" || troi.emotion.current === "happy") &&
             (troi.stamina > 3000 && troi.stamina < 15000) &&
-            troi.hunger < 200
+            troi.hunger.amount < 200
         );
     };
     tinkering.action = function() {
@@ -191,7 +191,7 @@ troi.makeProductions = function() {
         return (
             troi.health < 20 ||
             (troi.emotion.current === "agitated" || troi.emotion.current === "neutral") &&
-            troi.hunger < 300 &&
+            troi.hunger.amount < 300 &&
             Math.random < 0.23
         );
     };
@@ -208,7 +208,7 @@ troi.makeProductions = function() {
             troi.health > 55 &&
             (troi.emotion.current === "agitated" || troi.emotion.current === "neutral" || troi.emotion.current === "happy") &&
             troi.stamina > 12000 &&
-            troi.hunger < 300
+            troi.hunger.amount < 300
         );
     };
     tailing.action = function() {
@@ -230,7 +230,7 @@ troi.makeProductions = function() {
             if (localBots[i].name === "jeff") {
                 return (
                     (troi.emotion.current === "neutral" || troi.emotion.current === "happy") &&
-                    troi.hunger < 200 &&
+                    troi.hunger.amount < 200 &&
                     troi.stamina > 4321
                 )
             }
@@ -247,7 +247,7 @@ troi.makeProductions = function() {
     research.priority = Production.priority.Low;
     research.condition = function() {
         return (!(troi.emotion.current === "angry" || troi.emotion.current === "agitated") &&
-            troi.hunger < 250 &&
+            troi.hunger.amount < 250 &&
             troi.stamina > 2100
         );
     };
