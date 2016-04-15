@@ -225,42 +225,58 @@ function setUpFood() {
 }
 
 /**
- * Add one item of food
+ * Add food item and random empty location.  Forwards to addFood.
+ */
+function addFoodItem(image_id, description, calories) {
+    if (image_id == "") {
+        return;
+    }
+    let location = findEmptyLocation();
+    addFood(image_id, location, description, calories);
+}
+
+
+/**
+ * Add food at a specified location. Useful to call directly for testing food.
+ *
+ * Ex:   addFood("cupCake", "Cupcake", 899, [600,600]);
  *
  * @param {string} id id of the food asset
  * @param {string} description description of the food item
  * @param {string} calories how many calories it has
+ * @param {location} array with (x,y) position
  */
-function addFoodItem(image_id, description, calories) {
-    if (image_id != "") {
-        let location = findEmptyLocation();
-        food = new Entity(location[0], location[1], image_id);
-        food.description = description;
-        food.calories = calories;
-        food.isEdible = true;
-        foods.push(food);
-        food.eat = function() {
-            if (!this || !this.sprite) {
-                console.log("Problem with " + this.name);
-                return;
-            }
-            // console.log("Eating " + this.description + " with " + this.calories + " calories");
-            var tempSprite = this.sprite;
-            tempSprite.reset(-10, -10);
-            tempSprite.visible = false;
-            // Respawn food in 5 seconds.
-            //  TODO: Note that sprite.kill(), .exists, and body.   all failed...
-            //   So I place the sprite off screen then bring it back
-            if (!tempSprite.visible) {
-                game.time.events.add(Phaser.Timer.SECOND * 1, function() {
-                    let location = findEmptyLocation();
-                    tempSprite.reset(location[0], location[1]);
-                    tempSprite.visible = true;
-                });
-            }
+function addFood(image_id, description, calories, location) {
+    if (image_id == "") {
+        return;
+    }
+    food = new Entity(location[0], location[1], image_id);
+    food.description = description;
+    food.calories = calories;
+    food.isEdible = true;
+    foods.push(food);
+    food.eat = function() {
+        if (!this || !this.sprite) {
+            console.log("Problem with " + this.name);
+            return;
+        }
+        // console.log("Eating " + this.description + " with " + this.calories + " calories");
+        var tempSprite = this.sprite;
+        tempSprite.reset(-10, -10);
+        tempSprite.visible = false;
+        // Respawn food in 5 seconds.
+        //  TODO: Note that sprite.kill(), .exists, and body.   all failed...
+        //   So I place the sprite off screen then bring it back
+        if (!tempSprite.visible) {
+            game.time.events.add(Phaser.Timer.SECOND * 1, function() {
+                let location = findEmptyLocation();
+                tempSprite.reset(location[0], location[1]);
+                tempSprite.visible = true;
+            });
         }
     }
 }
+
 
 /**
  * A production which, if its conditions are met, fires some actions.
@@ -310,7 +326,7 @@ function fireProductions(productions) {
     var retProductions = [];
     if (activeProductions.length > 0) {
         if (Math.random() < activeProductions[0].probNotFiring) {
-            return retProductions; 
+            return retProductions;
         }
         // Choose randomly among those tied for current priority level
         baselinePriority = activeProductions[0].priorityLevel;
@@ -418,21 +434,21 @@ GoalSet.prototype.contains = function(goalId) {
     return this.goals.hasOwnProperty(goalId);
 }
 GoalSet.prototype.add = function(newGoal_id) {
-    if(!this.contains(newGoal_id)) {
+    if (!this.contains(newGoal_id)) {
         let newGoal = new Goal(newGoal_id);
-        this.goals[newGoal_id] = newGoal;        
+        this.goals[newGoal_id] = newGoal;
     }
 }
 GoalSet.prototype.get = function(goalId) {
     return this.goals[goalId];
 }
 GoalSet.prototype.remove = function(goalId) {
-    delete this.goals[goalId];
-}
-/**
- * Check if the goal has been satisfied (if it has been, it should not be in the set).
- * If it has not been satisfied, increment the failed attempts counter.
- */
+        delete this.goals[goalId];
+    }
+    /**
+     * Check if the goal has been satisfied (if it has been, it should not be in the set).
+     * If it has not been satisfied, increment the failed attempts counter.
+     */
 GoalSet.prototype.checkIfSatisfied = function(goalId) {
     var goal = this.get(goalId);
     if (goal) {
@@ -441,7 +457,7 @@ GoalSet.prototype.checkIfSatisfied = function(goalId) {
 }
 GoalSet.prototype.getArray = function() {
     let retArray = [];
-    for(var key in this.goals) {
+    for (var key in this.goals) {
         retArray.push(this.goals[key])
     }
     return retArray;
