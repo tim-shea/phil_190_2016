@@ -1,4 +1,4 @@
-var troi = new Bot(0, 3000, 'troi', 'js/bots/troi/umbreon_2.0.png');
+var troi = new Bot(1000, 2700, 'troi', 'js/bots/troi/umbreon_2.0.png');
 
 /**
  *@author Troi Chua
@@ -38,7 +38,7 @@ troi.init = function() {
     troi.grimoire = [];
 
 
-
+    addFood("cupCake", "Cupcake", 899, [900,2700]);
 
 
     //////////////////////////////
@@ -98,7 +98,7 @@ troi.init = function() {
         }
     }
 }
-troi.motionMode = Motions.walking;
+troi.motionMode = Motions.still;
 troi.extraText = "";
 
 
@@ -535,8 +535,8 @@ troi.update10Sec = function() {
 
 }
 troi.update_1_30_sec = function() {
-    troi.hunger.eat(501); //food for troi
-    troi.amuse.play(500); //playtime increment
+    //troi.hunger.eat(501); //food for troi
+    //troi.amuse.play(500); //playtime increment
     troi.stamina = troi.STAMINA_MAX;
 }
 
@@ -549,7 +549,7 @@ troi.collision = function(object) {
     // console.log("Object is edible: " + object.isEdible);
     troi.addMemory("Observed " + object.name);
     if (object.isEdible) {
-        if (troi.hunger > 100) {
+        if (troi.hunger.amount > 100) {
             troi.eatObject(object);
         }
     } else {
@@ -568,6 +568,7 @@ troi.eatObject = function(objectToEat) {
     troi.hunger.eat(objectToEat.calories);
     troi.speak(objectToEat, "Yay, food. " + objectToEat.description + "!");
     troi.play(sounds.chomp);
+    console.log("eating");
 }
 
 troi.hear = function(botWhoSpokeToMe, whatTheySaid) {
