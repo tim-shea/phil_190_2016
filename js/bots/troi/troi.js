@@ -1,4 +1,4 @@
-var troi = new Bot(1000, 2700, 'troi', 'js/bots/troi/umbreon_2.0.png');
+var troi = new Bot(0, 2700, 'troi', 'js/bots/troi/umbreon_2.0.png');
 
 /**
  *@author Troi Chua
@@ -37,8 +37,6 @@ troi.init = function() {
     troi.health = 100;
     troi.grimoire = [];
 
-
-    addFood("cupCake", "Cupcake", 899, [900,2700]);
 
 
     //////////////////////////////
@@ -568,7 +566,7 @@ troi.eatObject = function(objectToEat) {
     troi.hunger.eat(objectToEat.calories);
     troi.speak(objectToEat, "Yay, food. " + objectToEat.description + "!");
     troi.play(sounds.chomp);
-    console.log("eating");
+    
 }
 
 troi.hear = function(botWhoSpokeToMe, whatTheySaid) {
