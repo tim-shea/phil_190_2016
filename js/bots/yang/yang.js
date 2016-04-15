@@ -1144,9 +1144,9 @@ yang.node_.superego_brood_focus.always_fun = function() { //control sensitive
         yang.node_.superego_drain_focus.switch_to_this_node();
     } else {//if can't switch
         //decrease pleasure
-        yang.ultility_sum_.pleasure.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
+        // yang.ultility_sum_.pleasure.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
         //also decrease pain
-        yang.ultility_sum_.pain.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
+        // yang.ultility_sum_.pain.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
     } 
 };
 /**

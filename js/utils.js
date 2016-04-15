@@ -85,25 +85,25 @@ DecayVariable.prototype.add = function(amount) {
 }
 DecayVariable.prototype.subtract = function(amount) {
     if (Number.isNaN(amount) || !amount) {
-        // console.log("You are probably trying to eat something that does not have calories defined!");
+        console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
     this.value = Math.max(this.minVal, this.value - amount);
 }
-DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, slice_length = undefined) {
+DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, minCharLengthOfMinMaxText = undefined) {
     var string_minVal = this.minVal.toString();
     var string_maxVal = this.maxVal.toString();
     //prettify value string length
-    if (typeof slice_length != "undefined") {
-        if (Number.isNaN(slice_length)) {
+    if (typeof minCharLengthOfMinMaxText != "undefined") {
+        if (Number.isNaN(minCharLengthOfMinMaxText)) {
             if (this.minVal.toString().length >= this.maxVal.toString().length) {
-                slice_length = this.minVal.toString().length;
+                minCharLengthOfMinMaxText = this.minVal.toString().length;
             } else {
-                slice_length = this.maxVal.toString().length;
+                minCharLengthOfMinMaxText = this.maxVal.toString().length;
             }
         }
-        string_minVal = (" ".repeat(slice_length) + this.minVal).slice(-slice_length) + "\t";
-        string_maxVal = "\t" + (" ".repeat(slice_length) + this.maxVal).slice(-slice_length);
+        string_minVal = (" ".repeat(minCharLengthOfMinMaxText) + this.minVal).slice(-minCharLengthOfMinMaxText) + "\t";
+        string_maxVal = "\t" + (" ".repeat(minCharLengthOfMinMaxText) + this.maxVal).slice(-minCharLengthOfMinMaxText);
     }
     // Thanks to SharAI for this code idea!
     var bar = "";
@@ -417,9 +417,10 @@ function GoalSet() {
 GoalSet.prototype.contains = function(goalId) {
     return this.goals.hasOwnProperty(goalId);
 }
-GoalSet.prototype.add = function(newGoal) {
-    if(!this.contains(newGoal.id)) {
-        this.goals[newGoal.id] = newGoal;        
+GoalSet.prototype.add = function(newGoal_id) {
+    if(!this.contains(newGoal_id)) {
+        let newGoal = new Goal(newGoal_id);
+        this.goals[newGoal_id] = newGoal;        
     }
 }
 GoalSet.prototype.get = function(goalId) {
@@ -437,6 +438,13 @@ GoalSet.prototype.checkIfSatisfied = function(goalId) {
     if (goal) {
         goal.failedSatisfactionAttempts++;
     }
+}
+GoalSet.prototype.getArray = function() {
+    let retArray = [];
+    for(var key in this.goals) {
+        retArray.push(this.goals[key])
+    }
+    return retArray;
 }
 GoalSet.prototype.toString = function() {
     var retString = "\nGoals:\n";
