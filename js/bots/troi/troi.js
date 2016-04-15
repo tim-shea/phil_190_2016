@@ -9,7 +9,7 @@ var troi = new Bot(0, 3000, 'troi', 'js/bots/troi/umbreon_2.0.png');
 // troi.treasure.y = 2930;
 // troi.home.x = 25;
 // troi.home.y = 2700;
-
+// test commit
 troi.treasure = {
     x: 10,
     y: 2930554
