@@ -1,10 +1,13 @@
 var Daniel = new Bot(240, 220, 'Daniel', 'js/bots/Daniel/espeon.png');
 Daniel.currentMotion = Motions.walking;
+Daniel.productionString = "";
 
 Daniel.init = function() {
     this.body = this.sprite.body;
     this.body.angle = 100; // Initial Angle
     this.body.speed = 0; // Initial Speed
+    this.makeProductions();
+    this.goals = new GoalSet();
     //this.sprite.scale.setTo(3,3);
     // ^ this is how you scale things.  Use this for the shield.
     //Initialized timed events
@@ -26,7 +29,7 @@ Daniel.utilityFunction = function(object) {
     } else if (object.name == "jerry_can") {
         return -90;
     } else if (object.name == "steak") {
-        return -40;
+        return 15;
     } else if (object.isEdible) {
         return object.calories;
     } else {
@@ -35,83 +38,40 @@ Daniel.utilityFunction = function(object) {
 }
 
 //
-// Fear State
+//Decay Variables
 //
-Daniel.fear = {
-    amount: 0,
-    reassure: function(ease_amount) {
-        this.amount -= ease_amount;
-        this.amount = Math.max(-25, this.amount);
-    },
-    update: function() {
-        if (this.amount >= 100) {
-            //cry alot
-        } else {
-            this.amount++;
-        }
-    },
-    toString: function() {
-        var fearLevel = "Fear Level: ";
-        if (this.amount < 0) {
-            fearLevel += "No Fear/Maximum Overconfidence!";
-        } else if (this.amount < 30) {
-            fearLevel += "I'm not afraid!";
-        } else if (this.amount < 50) {
-            fearLevel += "Getting scared now...";
-        } else if (this.amount < 70) {
-            fearLevel += "Now I'm actually scared";
-        } else if (this.amount < 90) {
-            fearLevel += "Now I am TERRIFIED TIME TO GO HOME";
-        }
-        return fearLevel + " (Fear = " + this.amount + "%)";
-    }
-}
 
+Daniel.satiated = new DecayVariable(50, 1, 0, 100);
+Daniel.stamina = new DecayVariable(95, 1, 0, 100);
 
 //
-// Hunger State
+// Productions! (finally)
 //
-Daniel.hunger = {
-    amount: 0,
-    eatIt: function(food_amount) {
-        this.amount -= food_amount;
-        this.amount = Math.max(0, this.amount);
-    },
-    update: function() {
-        if (this.amount >= 100) {
-            //do nothing
-            // working on this atm
-            // } else if (Daniel.currentMotion == motion.stop) {
-            //     this.amount += 1;
-            // } else if (Daniel.currentMotion == motion.still) {
-            //     this.amount += 1;
-            // } else if (Daniel.currentMotion == motion.walking) {
-            //     this.amount += 2;
-            // } else if (Daniel.currentMotion == motion.running) {
-            //     this.amount += 3;
-            // } else if (Daniel.currentMotion == motion.sonicSpeed) {
-            //     this.amount += 5;
-            // } else if (Daniel.currentMotion == motion.moping) {
-            //     this.amount += 1.5;
-            // } else if (Daniel.currentMotion == motion.tantrum) {
-            //     this.amount += 5;
-        } else {
-            this.amount += 0.5;
-        }
-    },
-    toString: function() {
-        var hungerLevel = "Hunger Level: ";
-        if (this.amount < 20) {
-            hungerLevel += "Not hungry";
-        } else if (this.amount < 60) {
-            hungerLevel += "Hungry";
-        } else if (this.amount < 80) {
-            hungerLevel += "Starving!!";
-        } else {
-            hungerLevel += "FEED ME!";
-        }
-        return hungerLevel + " (Hunger = " + this.amount + "%)";
+
+Daniel.makeProductions = function() {
+
+    this.productions = [];
+
+    var eatFood = new Production("Look for food");
+    eatFood.priority = Production.priority.High;
+    eatFood.condition = function() {
+        return (Daniel.satiated.value < 40);
     }
+    eatFood.action = function() {
+        Daniel.findFood(500, Daniel.canEat);
+    }
+    this.productions.push(eatFood);
+
+    var sleep = new Production("Sleeping");
+    sleep.priority = Production.priority.Medium;
+    sleep.condition = function() {
+        return (Daniel.stamina.value < 25 && Daniel.satiated.value > 50);
+    }
+    sleep.action = function() {
+        Daniel.currentMotion = Motions.stop;
+        Daniel.play(sounds.snooze);
+    }
+    this.productions.push(sleep);
 }
 
 //
@@ -140,39 +100,39 @@ Daniel.setMotion = function() {
     if (Daniel.emotion.current === "Chill") {
         if (Math.random < .5) {
             Daniel.currentMotion = Motions.still;
-            Daniel.addMemory("Stayed still");
+            //Daniel.addMemory("Stayed still");
         } else {
             Daniel.currentMotion = Motions.walking;
-            Daniel.addMemory("Walked");
+            //Daniel.addMemory("Walked");
 
         }
     } else if (Daniel.emotion.current === "Enthusiastic") {
         if (Math.random < .95) {
             Daniel.currentMotion = Motions.running;
-            Daniel.addMemory("Ran");
+            //Daniel.addMemory("Ran");
         } else {
             Daniel.currentMotion = Motions.sonicSpeed;
-            Daniel.addMemory("Ran really fast");
+            //Daniel.addMemory("Ran really fast");
 
         }
     } else if (Daniel.emotion.current === "Apathetic") {
         if (Math.random < .6) {
             Daniel.currentMotion = Motions.moping;
-            Daniel.addMemory("Moped");
+            //Daniel.addMemory("Moped");
 
         } else {
             Daniel.currentMotion = Motions.stop;
-            Daniel.addMemory("Stoped");
+            //Daniel.addMemory("Stopped");
 
         }
     } else if (Daniel.emotion.current === "Irate") {
         if (Math.random < .7) {
             Daniel.currentMotion = Motions.running;
-            Daniel.addMemory("Ran");
+            //Daniel.addMemory("Ran");
 
         } else {
             Daniel.currentMotion = Motions.tantrum;
-            Daniel.addMemory("Threw a tantrum");
+            //Daniel.addMemory("Threw a tantrum");
 
         }
     }
@@ -181,9 +141,11 @@ Daniel.setMotion = function() {
 Daniel.getStatus = function() {
     var statusString = "Emotional State: " + Daniel.emotion.current;
     statusString += "\n>------<";
-    statusString += "\nSpeed: " + Daniel.currentMotion.description;
-    statusString += "\n" + Daniel.hunger.toString();
-    statusString += "\n" + Daniel.fear.toString();
+    statusString += "\nMotion type: " + Daniel.currentMotion.description;
+    statusString += "\n" + Daniel.satiated.getBar("Hunger 	");
+    statusString += "\n" + Daniel.stamina.getBar("Stamina 	");
+    statusString += Daniel.goals.toString();
+    statusString += Daniel.productionString;
     return statusString;
 }
 
@@ -194,15 +156,23 @@ Daniel.update = function() {
 
 Daniel.updateOneSecond = function() {
     Daniel.updateNetwork();
-    Daniel.hunger.update();
-    Daniel.fear.update();
+    Daniel.satiated.decrement();
+    if (Daniel.satiated > 50) {
+        Daniel.stamina.increment();
+    } else if (Daniel.productionString == "Sleeping") {
+        Daniel.stamina.increment();
+        Daniel.stamina.increment();
+    } else {
+        Daniel.stamina.decrement();
+    }
     Daniel.emotion.update();
     Daniel.setMotion();
+    let firedProductions = fireProductions(Daniel.productions);
+    Daniel.productionString = getProductionString(firedProductions);
 }
 
 Daniel.updateMin = function() {
-    Daniel.hunger.eatIt(75);
-    Daniel.fear.reassure(100);
+    // Daniel.hunger.eatIt(75);
 }
 
 Daniel.collision = function(object) {
@@ -228,7 +198,7 @@ Daniel.collision = function(object) {
 
 Daniel.eatObject = function(objectToEat) {
     objectToEat.eat();
-    Daniel.hunger.eatIt(objectToEat.calories);
+    Daniel.satiated.add(objectToEat.calories);
     Daniel.speak(objectToEat, "Delicious " + objectToEat.description + "!");
     Daniel.play(sounds.chomp);
 }

@@ -213,7 +213,7 @@ troi.makeProductions = function() {
     };
     tailing.action = function() {
         var localBots = troi.getNearbyBots(500);
-        if (nearbyBots.length > 0) {
+        if (localBots.length > 0) {
             troi.body.speed = 75;
             troi.pursue(localBots[0], 20000);
             troi.makeSpeechBubble("* que MGS OST ", 6315);
