@@ -71,7 +71,7 @@ jeff.emotions.add("Sad", [
 ]);
 jeff.emotions.add("Angry", [
     ["Angry", "Calm"],
-    [.7, .3]
+    [.8, .2]
 ]);
 jeff.emotions.add("Happy", [
     ["Happy", "Calm"],
@@ -155,7 +155,7 @@ jeff.makeProductions = function() {
         jeff.attackNearbyBots();
         jeff.play(sounds.attack1);
     };
-    fight.probNotFiring = .7;
+    fight.probNotFiring = .98;
     if(!jeff.stopMotion) {
         this.productions.push(fight);        
     }
@@ -403,12 +403,6 @@ jeff.highFived = function(botWhoHighFivedMe) {
     jeff.goals.remove("Get High Fived");
 
 }
-jeff.highFived = function(botWhoHighFivedMe) {
-    jeff.addMemory("High Fived by " + botWhoHighFivedMe.name);
-    jeff.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
-    jeff.goals.remove("Get High Fived");
-
-}
 jeff.gotIgnored = function(botWhoIgnoredMe) {
     jeff.addMemory(botWhoIgnoredMe.name + "  ignored me!");
     jeff.makeSpeechBubble("I see how it is, " + botWhoIgnoredMe.name);
@@ -423,7 +417,7 @@ jeff.antler_caressed = function(botWhoCaressedMe, message) {
         jeff.goals.add(reportHarrasmentGoalId);
     }
 
-    var reportHarrasment = new Production("fulfill food desire");
+    var reportHarrasment = new Production("report harrasment");
     reportHarrasment.priority = Production.priority.High;
     reportHarrasment.condition = function() {
         return (jeff.goals.contains(reportHarrasmentGoalId));

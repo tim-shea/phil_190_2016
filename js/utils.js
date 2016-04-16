@@ -225,7 +225,7 @@ function setUpFood() {
 }
 
 /**
- * Add food item and random empty location.  Forwards to addFood.
+ * Add food item at a random empty location.  Forwards to addFood.
  */
 function addFoodItem(image_id, description, calories) {
     if (image_id == "") {

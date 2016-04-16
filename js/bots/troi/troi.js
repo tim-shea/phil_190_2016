@@ -237,6 +237,7 @@ troi.makeProductions = function() {
         }
     };
     politicking.action = function() {
+        var localBots = troi.getNearbyBots(1000);
         troi.orientTowards(localBots, 1000);
         troi.pursue(localBots, 25000);
         troi.speak(localBots, "Politically correct statements", 7000)
@@ -529,7 +530,7 @@ troi.update10Sec = function() {
     troi.setMotion();
     troi.amuse.update();
     troi.hunger.update();
-    fireProductions(troi.productions);
+    // fireProductions(troi.productions);
 
 }
 troi.update_1_30_sec = function() {
