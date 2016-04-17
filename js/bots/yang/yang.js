@@ -96,6 +96,12 @@ yang.production_.direction = [];
  */
 yang.memory_ = {};
 /**
+ * yang's goal set
+ * @memberOf yang
+ * @type {Object}
+ */
+yang.goal_ = new GoalSet();
+/**
  * major node reference, those index names are magic
  * @memberOf yang
  * @type {Object}
@@ -120,7 +126,7 @@ yang.init = function() {
     this.body = this.sprite.body;
     //Body
     yang.body.rotation = 0;
-    yang.body.speed = 100;
+    yang.body.speed = 0;
     yang.temp_speed = 0;//for special movements
     yang.urgency_multiplier = 1;
     //other basic variables
@@ -168,6 +174,8 @@ yang.init_plus = function() { //object related initialization
     yang.collision_bene_flag = false;
     yang.collision_ouch_flag = false;
     yang.collision_nice_flag = false;
+    //goal
+    yang.goal_.add(new Goal("No Goal")); 
     //berry
     yang.berry = new yang.node_.id_prime_focus.berry_game_obj(); //see node
     //additional possiblity
