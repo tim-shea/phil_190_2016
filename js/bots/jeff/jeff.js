@@ -26,6 +26,12 @@ jeff.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 10, jeff.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, jeff.update2min, this);
 
+    // // Testing neural net
+    // this.neural_net = new NeuralNetwork();
+    // jeff.neural_net.inputs = [1,1];
+    // jeff.neural_net.update();
+    // console.log(jeff.neural_net.outputs);
+
     // Make productions
     this.makeProductions();
 
