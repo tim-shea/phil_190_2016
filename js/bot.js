@@ -56,6 +56,10 @@ function Bot(x, y, name, path) {
 
     // Initialize the network
     this.setNetwork();
+
+    // Sensor locations in polar coordiantes to "left" and "right"
+    this.sensorRadius = 45;
+    this.sensorAngle = Math.PI/5;
 };
 
 // DO NOT CHANGE.  Temporary variable to avoid errors on startup.    The 'real' variable is in botPlayground.js
@@ -403,6 +407,39 @@ Bot.prototype.getPerceptionString = function(radius = 200) {
         }
     }
     return retString;
+}
+
+
+/**
+ * Returns sensor values.  Summed utilities of nearby objects scaled by distance.
+ * @return {Number} [left sensor val, right sensor val]
+ */
+Bot.prototype.getSensorValues = function(utilityFunction, radius = 250) {
+    var nearbyStuff = this.getNearbyObjects(radius);
+    var sensorValues = [0,0];
+
+    // Below found experimentally. Worried that the subtraction of width  / height
+    // is throwing everythign off
+    var leftSensor_x = this.body.x - this.body.width + this.sensorRadius * Math.cos(this.sprite.rotation - this.sensorAngle);
+    var leftSensor_y = this.body.y - this.body.height + this.sensorRadius * Math.sin(this.sprite.rotation - this.sensorAngle);
+    var rightSensor_x = this.body.x - this.body.width +  this.sensorRadius * Math.cos(this.sprite.rotation + this.sensorAngle);
+    var rightSensor_y = this.body.y - this.body.height + this.sensorRadius * Math.sin(this.sprite.rotation + this.sensorAngle);
+    
+    // Draw a test shape to show where sensors are
+    // console.log(leftSensor_x + "," + leftSensor_y + "," + rightSensor_x + "," + rightSensor_y);
+    // graphics.beginFill(0xFF3300);
+    // graphics.lineStyle(10, 0xffd900, 20);
+    // graphics.moveTo(leftSensor_x,leftSensor_y);
+    // graphics.lineTo(rightSensor_x, rightSensor_y);
+    // graphics.endFill();
+
+    for (var i = 0; i < nearbyStuff.length; i++) {
+        let distance_left = Phaser.Math.distance(leftSensor_x, leftSensor_y, nearbyStuff[i].x, nearbyStuff[i].y);
+        let distance_right = Phaser.Math.distance(rightSensor_x, rightSensor_y, nearbyStuff[i].x, nearbyStuff[i].y);
+        sensorValues[0] = utilityFunction(nearbyStuff[i])/distance_left;
+        sensorValues[1] = utilityFunction(nearbyStuff[i])/distance_right;
+    }
+    return sensorValues;
 }
 
 /**

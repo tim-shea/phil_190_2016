@@ -5,8 +5,8 @@ function NeuralNetwork() {
     this.inputs = [0, 0];
     this.outputs = [0, 0];
     this.weights = [
-        [1.5, 1],
-        [1, 1]
+        [1, 0],
+        [0, 1]
     ];
 };
 

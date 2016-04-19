@@ -26,17 +26,14 @@ jeff.init = function() {
     game.time.events.loop(Phaser.Timer.SECOND * 10, jeff.updateTenSecs, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, jeff.update2min, this);
 
-    // // Testing neural net
-    // this.neural_net = new NeuralNetwork();
-    // jeff.neural_net.inputs = [1,1];
-    // jeff.neural_net.update();
-    // console.log(jeff.neural_net.outputs);
-
     // Make productions
     this.makeProductions();
 
     // Create the goal set
     this.goals = new GoalSet();
+
+    // Create a neural network object for this bot
+    this.neural_net = new NeuralNetwork();
 
     // Initialize edibility function
     jeff.canEat = function(object) {
@@ -335,6 +332,12 @@ jeff.update = function() {
  * Called every second
  */
 jeff.update1Sec = function() {
+
+    // Braitenberg like test code
+    // jeff.neural_net.inputs = this.getSensorValues(jeff.utilityFunction);
+    // jeff.neural_net.update();
+    // jeff.incrementAngle(jeff.neural_net.outputs[0]-jeff.neural_net.outputs[1]);
+
     jeff.updateNetwork();
     // TODO: Depending on power output of motions increment hunger / energy in different degrees
     jeff.hunger.increment();
@@ -386,7 +389,7 @@ jeff.eatObject = function(objectToEat) {
  */
 jeff.collision = function(object) {
     jeff.addMemory("Saw " + object.name);
-    jeff.moveAwayFrom(object);
+    // jeff.moveAwayFrom(object);
     if (jeff.canEat(object) && (jeff.hunger.value > 50)) {
         jeff.eatObject(object);
     }
