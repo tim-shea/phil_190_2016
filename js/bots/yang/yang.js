@@ -85,6 +85,11 @@ yang.production_ = {};
 yang.production_.inter_action = [];
 yang.production_.inter_reaction = [];
 /**
+ * fire in every reaction, because flag
+ * @memberOf yang.production_
+ */
+yang.production_.inter_reactivememorization = [];
+/**
  * goal related directional adjustment
  * @memberOf yang.production_
  */
@@ -134,7 +139,7 @@ yang.init = function() {
     yang.basicupdate_disable = false;
     yang.unstable = false;
     yang.watch_time = 0;
-    yang.BGM_is_on = true;
+    yang.BGM_is_allowed = true;
     //non state machine objects
     yang.init_plus();
     //state machines objects
@@ -170,6 +175,7 @@ yang.init_plus = function() { //object related initialization
     yang.memory_.friendly_bots = [];
     yang.memory_.unfriendly_bots = [];
     yang.memory_.bene_bots = [];
+    yang.memory_.antler_caressed_bots = []; //blessed bots
     //collision flags
     yang.collision_bene_flag = false;
     yang.collision_ouch_flag = false;
@@ -293,6 +299,16 @@ yang.basicUpdate = function() {
     yang.pre_update();    
     //trigger collision events first before doing any calculation
     yang.genericUpdate();//yang.collisionCheck() are included
+    //Update Goal here
+    //
+    //
+    //
+    // yang.goal_.add(new Goal("No Goal")); 
+    // yang.production_.direction = [];
+    //
+    //
+    //
+    //
     //update non motion related parts of state machine
     if (!yang.test_.test_ongoing) {
         yang["mental_task_node"].always_fun();
@@ -312,17 +328,23 @@ yang.basicUpdate = function() {
     } else {
         yang.basicupdate_disable = false;
     }
-    //
-    if (yang.BGM_is_on) {
-        //play or pause BGM
-        yang.fun_.playsound(sounds.rand_BGM, true, true);
+    //music
+    if (yang.BGM_is_allowed) {
+        //play or pause BGM depend on if bot is selected
+        if (typeof yang.memory_.antler_caressed_bots.find(
+                function (object) {
+                    return object == bots[currentBotIndex]; //condition
+                }
+            ) != "undefined") {
+            yang.fun_.playsound(sounds.rand_BGM, false, true);
+        } else {
+            yang.fun_.playsound(sounds.rand_BGM, true, true);
+        }
     }
     yang.wrapup_update();
     //TO DO:
     //declare death
-    //playmusic
     //reset bot
-    //change mood
 };
 /**
  * game system manipulator
@@ -336,7 +358,8 @@ yang.update = function() {
         yang.test_.node_test();
     } else {
         yang["mental_task_node"].current_fun();
-        yang.fun_.AImotion_current_fun(); //Main Cycle of movement statemachines
+        yang.fun_.AImotion_current_fun(); //Main Cycle of movement
+        //fire production for rotation
     }
     /*
     //TO DO redesign
@@ -373,9 +396,7 @@ yang.pre_update = function() { // a reoccouring event...
  * @memberOf yang
  */
 yang.wrapup_update = function() { // a reoccouring event...
-    yang.collision_bene_flag = false;
-    yang.collision_ouch_flag = false;
-    yang.collision_nice_flag = false;
+
 };
 /**
  * game system manipulator
@@ -407,8 +428,8 @@ yang.onesec_timedEvend = function() {
     yang.MRGPRB4.update();
     //ultility
     yang.ultility_sum_.ulti.value = yang.ultility_sum_.ulti.value * 0.9;
-    // yang.ultility_sum_.ulti.add(yang.ultility_sum_.pleasure.value);
-    // yang.ultility_sum_.ulti.subtract(yang.ultility_sum_.pain.value);
+    yang.ultility_sum_.ulti.add(yang.ultility_sum_.pleasure.value);
+    yang.ultility_sum_.ulti.subtract(yang.ultility_sum_.pain.value);
     yang.ultility_sum_.pleasure.value = yang.ultility_sum_.pleasure.value * 0.7;
     yang.ultility_sum_.pain.value = yang.ultility_sum_.pain.value * 0.7;
     //TODO : redesign//Motions.zeleport.apply(yang)
@@ -427,7 +448,6 @@ yang.onemin_timedEvend = function () { //TODO do not setup event here. setup as 
         yang.memory_.unfriendly_bots = [yang.memory_.unfriendly_bots[yang.memory_.unfriendly_bots.length-1]]; 
     }
 };
-
 /**
  * remembered object and etc
  * @memberOf yang.fun_
@@ -439,7 +459,17 @@ yang.fun_.distance_between_us = function (encounteredobject) {
         return game.physics.arcade.distanceBetween(encounteredobject.sprite, yang.sprite); 
     }
     return undefined;
-}
+};
+/**
+ * called in every reaction
+ * @memberOf yang.fun_
+ */
+yang.fun_.reactive_wrapup = function () {
+    fireProductions(yang.production_.inter_reactivememorization);
+    yang.collision_bene_flag = false;
+    yang.collision_ouch_flag = false;
+    yang.collision_nice_flag = false;
+};
 /**
  * sort condition
  * @memberOf yang.fun_
@@ -447,14 +477,14 @@ yang.fun_.distance_between_us = function (encounteredobject) {
 yang.fun_.sort_by_shorter_distance = function (a,b) { 
     //a has shorter distance than b, then return a negative number, a will have a smaller index
     return yang.fun_.distance_between_us(a) - yang.fun_.distance_between_us(b);
-}
+};
 /**
  * sort condition
  * @memberOf yang.fun_
  */
 yang.fun_.sort_by_greater_distance = function (a,b) { 
     return yang.fun_.distance_between_us(b) - yang.fun_.distance_between_us(a);
-}
+};
 /**
  * condition of find
  * @memberOf yang.fun_
@@ -501,40 +531,31 @@ yang.fun_.playsound = function (sound_object, privacy = false, is_continuous = f
         sound_object.is_playing_by_yang = false;
     }
 };
-/*backup
-yang.fun_.playsound = function (sound_object, privacy, is_continuous) {
-    if (typeof privacy != "undefined" && privacy 
-        && bots[currentBotIndex] != yang) {
-        //stop or pause or do not start to play
-        if (sound_object.isPlaying 
-            && typeof sound_object.is_playing_by_yang != "undefined"
-            && sound_object.is_playing_by_yang) {
-            if (typeof is_continuous != "undefined"
-                && is_continuous) {
-                sound_object.pause();
-            } else {
-                sound_object.stop();            
-            }
-        }     
-    } else if (typeof sound_object.is_playing_by_yang == "undefined"
-        || !sound_object.is_playing_by_yang) {
-        //resume or play
-        sound_object.is_playing_by_yang = true;
-        if (sound_object.paused) {
-            sound_object.resume();
-        } else {
-            sound_object.play();        
-        }
-    } else if (!sound_object.isPlaying) {
-        //not private, not playing, then definitely not by me
-        sound_object.is_playing_by_yang = false;
+/**
+ * pause, play sounds to player, stop after a while
+ * @param  {Bot}
+ */
+yang.fun_.audienceadd_BGM_antlerblessing = function (blessedbot) {
+    var whattosay = "I grant you a temporary premission of the spiritual connection. Is it a curse, or a blessing?";
+    yang.speak(blessedbot, whattosay);
+    if (bots[currentBotIndex] == blessedbot ) {
+        yang.memory_.antler_caressed_bots.push(blessedbot);
+        //last 1 minute in max
+        game.time.events.add(
+            Phaser.Timer.SECOND * 10, 
+            function() {
+                yang.memory_.antler_caressed_bots = 
+                yang.memory_.antler_caressed_bots.filter(function (object) {
+                    return object !== blessedbot; 
+                });//make sure its not there
+            }, 
+            yang);
     }
 };
 
-
 /**
  * BGM Path
- * @return {[type]} [description]
+ * @return {String} [path of file]
  */
 yang.fun_.generate_BGM_path = function () {
     var list_of_paths = [
@@ -634,6 +655,14 @@ yang.fun_.makeProductions = function() {
                 yang.node_.memorize_uneaten_food.action
         ),
         new Production(
+                yang.node_.recognization.name,
+                yang.node_.recognization.priority,
+                yang.node_.recognization.condition,
+                yang.node_.recognization.action
+        )
+    );
+    yang.production_.inter_reactivememorization.push(
+        new Production(
                 yang.node_.memorize_friendly_bot.name,
                 yang.node_.memorize_friendly_bot.priority,
                 yang.node_.memorize_friendly_bot.condition,
@@ -650,12 +679,6 @@ yang.fun_.makeProductions = function() {
                 yang.node_.memorize_benefactor_bot.priority,
                 yang.node_.memorize_benefactor_bot.condition,
                 yang.node_.memorize_benefactor_bot.action
-        ),
-        new Production(
-                yang.node_.recognization.name,
-                yang.node_.recognization.priority,
-                yang.node_.recognization.condition,
-                yang.node_.recognization.action
         )
     );
     yang.production_.inter_reaction.push(
@@ -675,6 +698,12 @@ yang.fun_.makeProductions = function() {
         )
     );
     yang.test_.test_production.push(
+        new Production(//example
+                yang.def_node.name,
+                yang.def_node.priority,
+                yang.def_node.condition,
+                yang.def_node.action
+        )
     );
 };
 /**
@@ -749,6 +778,7 @@ yang.highFived = function(botWhoHighFivedMe) {
     yang.collision_nice_flag = true;
     yang.addMemory("highFived with" + botWhoHighFivedMe.name);
     yang.ultility_sum_.pleasure.add(yang.fun_.utility_value_calculate(10));
+    yang.fun_.reactive_wrapup();
 }
 /**
  * Override to bitten reaction 
@@ -762,6 +792,7 @@ yang.gotBit = function(botWhoBitedMe, damage) {
     yang.collision_ouch_flag = true;
     yang.addMemory("biten by" + botWhoBitedMe.name);
     yang.ultility_sum_.pain.add(yang.fun_.utility_value_calculate(10));
+    yang.fun_.reactive_wrapup();
 };
 /**
  * Override to antler_caressed reaction 
@@ -773,6 +804,7 @@ yang.gotBit = function(botWhoBitedMe, damage) {
 yang.antler_caressed = function(botWhocaresedMe, message) {
     // whoelse would do this?
     yang.collision_bene_flag = true;
+    yang.fun_.reactive_wrapup();
 };
 /**
  * Override to gotCrushed reaction
@@ -787,6 +819,7 @@ yang.gotCrushed = function(botWhoCrushMe) {
     yang.collision_ouch_flag = true;
     yang.addMemory("crushed by" + botWhoCrushMe.name);
     yang.ultility_sum_.pain.add(yang.fun_.utility_value_calculate(200));
+    yang.fun_.reactive_wrapup();
 };
 /**
  * Override to react when bowed down to 
@@ -800,6 +833,7 @@ yang.gotBow = function(botWhoBowed) {
     yang.collision_nice_flag = true;
     yang.addMemory("bowed with" + botWhoBowed.name);
     yang.ultility_sum_.pleasure.add(yang.fun_.utility_value_calculate());
+    yang.fun_.reactive_wrapup();
 };
 /**
  * Override to react when got Licked
@@ -817,6 +851,7 @@ yang.gotLicked = function(botWhoLickedMe) {
         yang.ultility_sum_.pleasure.add(yang.fun_.utility_value_calculate());
     }
     yang.addMemory("licked by" + botWhoLickedMe.name);
+    yang.fun_.reactive_wrapup();
 };
 /**
  * Override to react when ignored
@@ -834,6 +869,7 @@ yang.gotIgnored = function(botWhoIgnoredMe) {
         yang.ultility_sum_.pleasure.add(yang.fun_.utility_value_calculate());
     }
     yang.addMemory("ignored by" + botWhoIgnoredMe.name);
+    yang.fun_.reactive_wrapup();
 };
 ///////////////
 //Nodes Zone //
@@ -1152,9 +1188,9 @@ yang.node_.superego_brood_focus.always_fun = function() { //control sensitive
         yang.node_.superego_drain_focus.switch_to_this_node();
     } else {//if can't switch
         //decrease pleasure
-        // yang.ultility_sum_.pleasure.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
+        yang.ultility_sum_.pleasure.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
         //also decrease pain
-        // yang.ultility_sum_.pain.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
+        yang.ultility_sum_.pain.subtract(yang.biomachine_.metaresources_secondary * yang.ultility_sum_.translator);
     } 
 };
 /**
@@ -1202,7 +1238,7 @@ yang.node_.id_secondary_focus.current_fun = function() {
 yang.node_.id_secondary_focus.always_fun = function() { //control sensitive
     if (yang.fun_.distance_between_us(yang.node_.id_secondary_focus.new_task.target) < 50) {
         yang.biomachine_.metaresources_secondary += yang.chaosmachine_.randomness;
-        if (typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) != "undefined") { 
+        if (typeof yang.memory_.friendly_bots.find(yang.fun_.find_colliding_obj) != "undefined") {
             //if its a friend, then bonus 50%       
             yang.biomachine_.metaresources_secondary += yang.chaosmachine_.randomness / 2;
         }
@@ -1233,6 +1269,15 @@ yang.node_.run_away
 yang.node_.bumpinto
 yang.node_.
 */
+
+//////////////////////////
+//Inter-action Override //
+//////////////////////////
+yang.antler_caress = function (botTocaress, message = "Thou are Caressed by mystical antler, thus blessed by the wisps that lives on them.") {
+    yang.fun_.audienceadd_BGM_antlerblessing(botTocaress);    
+    botTocaress.antler_caressed();
+};
+
 
 ////////////////////////////
 //Inter-action Production //
@@ -1353,6 +1398,11 @@ yang.node_.recognization.action = function () {
 //Inter-reaction Production //
 //////////////////////////////
 
+//primary
+//
+//recency
+
+
 /////////////////////////////////////////////////////
 //TODO : RECycle   NBGMusic Production             //
 /////////////////////////////////////////////////////
@@ -1373,348 +1423,6 @@ yang.node_.play_BGM_04.condition = function () {
 };
 yang.node_.play_BGM_04.action = function () {
     yang.fun_.playsound(sounds.yang_BGM_04, true, true);
-};
-/**
- * Play
- * id_prime_focus X alert
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_08 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_08.name = "Nameless Tombstone";
-yang.node_.play_BGM_08.priority = Production.priority.high;
-yang.node_.play_BGM_08.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.id_prime_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_08.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_08.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_08, true, true);
-};
-/**
- * Play
- * id_prime_focus X demanding
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_03 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_03.name = "coockiecat - Steven Universe";
-yang.node_.play_BGM_03.priority = Production.priority.high;
-yang.node_.play_BGM_03.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.id_prime_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_03.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_03.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_03, true, true);
-};
-/**
- * Play
- * id_prime_focus X empathetic
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_13 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_13.name = "Tale that was not told";
-yang.node_.play_BGM_13.priority = Production.priority.high;
-yang.node_.play_BGM_13.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.id_prime_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_13.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_13.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_13, true, true);
-};
-/**
- * Play
- * id_prime_focus X annoyed
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_15 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_15.name = "The Final Stand";
-yang.node_.play_BGM_15.priority = Production.priority.high;
-yang.node_.play_BGM_15.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.id_prime_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_15.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_15.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_15, true, true);
-};
-/**
- * Play
- * id_secondary_focus X wary
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_02 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_02.name = "Belfast";
-yang.node_.play_BGM_02.priority = Production.priority.high;
-yang.node_.play_BGM_02.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_02.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_02.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_02, true, true);
-};
-/**
- * Play
- * id_secondary_focus X alert
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_01 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_01.name = "At the End of the Wait";
-yang.node_.play_BGM_01.priority = Production.priority.high;
-yang.node_.play_BGM_01.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_01.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_01.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_01, true, true);
-};
-/**
- * Play
- * id_secondary_focus X demanding
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_00 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_00.name = "A Magnificent Sight";
-yang.node_.play_BGM_00.priority = Production.priority.high;
-yang.node_.play_BGM_00.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_00.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_00.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_00, true, true);
-};
-/**
- * Play
- * id_secondary_focus X empathetic
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_06 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_06.name = "Friend of solitude and loneliness";
-yang.node_.play_BGM_06.priority = Production.priority.high;
-yang.node_.play_BGM_06.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_06.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_06.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_06, true, true);
-};
-/**
- * Play
- * id_secondary_focus X annoyed
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_05 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_05.name = "Do not Tease Me";
-yang.node_.play_BGM_05.priority = Production.priority.high;
-yang.node_.play_BGM_05.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.id_secondary_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_05.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_05.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_05, true, true);
-};
-/**
- * Play
- * superego_drain_focus X wary
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_07 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_07.name = "Mischievous Soul";
-yang.node_.play_BGM_07.priority = Production.priority.high;
-yang.node_.play_BGM_07.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_07.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_07.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_07, true, true);
-};
-/**
- * Play
- * superego_drain_focus X alert
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_14 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_14.name = "The Dance of Leaves";
-yang.node_.play_BGM_14.priority = Production.priority.high;
-yang.node_.play_BGM_14.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_14.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_14.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_14, true, true);
-};
-/**
- * Play
- * superego_drain_focus X demanding
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_09 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_09.name = "okkusenman";
-yang.node_.play_BGM_09.priority = Production.priority.high;
-yang.node_.play_BGM_09.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_09.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_09.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_09, true, true);
-};
-/**
- * Play
- * superego_drain_focus X empathetic
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_12 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_12.name = "Soul of Freedom";
-yang.node_.play_BGM_12.priority = Production.priority.high;
-yang.node_.play_BGM_12.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_12.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_12.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_12, true, true);
-};
-/**
- * Play
- * superego_drain_focus X annoyed
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_16 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_16.name = "The Star above Falias";
-yang.node_.play_BGM_16.priority = Production.priority.high;
-yang.node_.play_BGM_16.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.superego_drain_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_16.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_16.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_16, true, true);
-};
-/**
- * Play
- * superego_brood_focus X wary
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_10 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_10.name = "Old Heros Visage";
-yang.node_.play_BGM_10.priority = Production.priority.high;
-yang.node_.play_BGM_10.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "wary" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_10.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_10.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_10, true, true);
-};
-/**
- * Play
- * superego_brood_focus X alert
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_11 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_11.name = "Shadow of Early Dawn";
-yang.node_.play_BGM_11.priority = Production.priority.high;
-yang.node_.play_BGM_11.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "alert" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_11.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_11.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_11, true, true);
-};
-/**
- * Play
- * superego_brood_focus X demanding
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_19 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_19.name = "Battle";
-yang.node_.play_BGM_19.priority = Production.priority.high;
-yang.node_.play_BGM_19.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "demanding" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_19.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_19.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_19, true, true);
-};
-/**
- * Play
- * superego_brood_focus X empathetic
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_17 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_17.name = "Final Stand";
-yang.node_.play_BGM_17.priority = Production.priority.high;
-yang.node_.play_BGM_17.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "empathetic" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_17.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_17.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_17, true, true);
-};
-/**
- * Play
- * superego_brood_focus X annoyed
- * @type {yang.fun_.def_node_construct}
- */
-yang.node_.play_BGM_18 = new yang.fun_.def_node_construct("production_node");
-yang.node_.play_BGM_18.name = "Impulsive Philosopher";
-yang.node_.play_BGM_18.priority = Production.priority.high;
-yang.node_.play_BGM_18.condition = function () {
-    var condition_bool = yang.MRGPRB4.current == "annoyed" && yang["mental_task_node"] == yang.node_.superego_brood_focus;
-    if (!condition_bool) {
-        sounds.yang_BGM_18.stop();
-    }
-    return condition_bool;
-};
-yang.node_.play_BGM_18.action = function () {
-    yang.fun_.playsound(sounds.yang_BGM_18, true, true);
 };
 //////////////
 //Test Zone //
