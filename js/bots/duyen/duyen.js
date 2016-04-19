@@ -220,7 +220,7 @@ duyen.makeProductions = function() {
         duyen.attackNearbyBots;
     };
 
-    this.productions = [eatingProduction, cleaningProduction, attackEnemy, fleeAway, dancingProduction, goHome, makeFriend, findFood, defendResources];
+    // this.productions = [eatingProduction, cleaningProduction, attackEnemy, fleeAway, dancingProduction, goHome, makeFriend, findFood, defendResources];
 }
 
 
