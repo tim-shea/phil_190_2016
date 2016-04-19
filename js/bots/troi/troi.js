@@ -43,12 +43,20 @@ troi.init = function() {
     // Initialize Timed Updates //
     //////////////////////////////
     game.time.events.loop(Phaser.Timer.SECOND * 10, troi.update10Sec, this); //main loop (1/sec) for status
+    game.time.events.loop(Phaser.Timer.SECOND * 15, troi.update15Sec, this); //loop every 15 secs for status
     game.time.events.loop(Phaser.Timer.SECOND * .1, troi.updateTenthSec, this); //loops (10/sec) for updating the stamina
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, troi.update_1_30_sec, this); //loops every 2 minutes to update for hunger
 
 
-
+    //////////////////////
+    // Make Productions //
+    //////////////////////
     this.makeProductions();
+
+    ////////////////
+    // Make Goals //
+    ////////////////
+    this.goals = new GoalSet();
 
     ///////////////////////////////////////
     // edibitlity function initization// //
@@ -98,6 +106,8 @@ troi.init = function() {
 }
 troi.motionMode = Motions.still;
 troi.extraText = "";
+troi.currentlyPursuing = "Nothing";
+troi.stopMotion = false;
 
 
 
@@ -105,6 +115,9 @@ troi.extraText = "";
 // Productions //
 /////////////////
 troi.makeProductions = function() {
+    this.productions = [];
+
+
     var treasureHunting = new Production("Treasure hunting");
     treasureHunting.priority = Production.priority.Medium;
     treasureHunting.condition = function() {
@@ -117,11 +130,16 @@ troi.makeProductions = function() {
             /* && (world.time > sunrise && world.time < sunset) */
         );
     };
+
     treasureHunting.action = function() {
         troi.body.speed = 150; //&&
         troi.goto(troi.treasure.x, troi.treasure.y, 3000);
         troi.addMemory("Searched for treasure.");
+        troi.goals.add("Treasure Hunting.");
     };
+    this.productions.push(treasureHunting);
+
+
     var homeward = new Production("To Home");
     homeward.priority = Production.priority.High;
     homeward.condition = function() {
@@ -134,7 +152,13 @@ troi.makeProductions = function() {
         troi.goto(troi.home.x, troi.home.y, 2000);
         troi.body.speed = 100;
         troi.addMemory("The journey home...");
+        troi.goals.add("To home.");
+
+        game.time.events.add(Phaser.Timer.SECOND * 150, function() {
+            troi.goals.checkIfSatisfied("To home.");
+        }, this);
     };
+    this.productions.push(homeward);
 
     var nap = new Production("Naptime");
     nap.priority = Production.priority.Low;
@@ -151,6 +175,8 @@ troi.makeProductions = function() {
         troi.play(sounds.snooze);
         troi.addMemory("Took a nap.");
     };
+    this.productions.push(nap);
+
     var eating = new Production("Eating");
     eating.priority = Production.priority.High;
     eating.condition = function() {
@@ -164,17 +190,21 @@ troi.makeProductions = function() {
         troi.play(sounds.chomp);
         troi.addMemory("Starving, time to procure food.");
     };
+    this.productions.push(eating);
+
+
     var tinkering = new Production("Tinkering");
     tinkering.priority = Production.priority.Medium;
     tinkering.condition = function() {
         return (
             (troi.emotion.current === "euphoric" || troi.emotion.current === "happy") &&
             (troi.stamina > 3000 && troi.stamina < 15000) &&
-            troi.hunger.amount < 200
+            troi.hunger.amount < 200 &&
+            (troi.x === troi.home.x && troi.y === troi.home.y)
         );
     };
     tinkering.action = function() {
-
+        troi.stopMotion = true;
         for (i = 0; i < troi.inventory.length; i++) {
             if (Math.random > .5 && troi.inventory[i] == 0) {
                 troi.inventory[i] += 1;
@@ -183,6 +213,8 @@ troi.makeProductions = function() {
         troi.addMemory("Tinkered with stuff");
 
     };
+    this.productions.push(tinkering);
+
 
     var flee = new Production("Flee");
     flee.priorit = Production.priority.High;
@@ -199,6 +231,8 @@ troi.makeProductions = function() {
         troi.makeSpeechBubble("Run, run away!    TxT   ", 2500);
         troi.addMemory("Fled from threat.");
     };
+    this.productions.push(flee);
+
 
     var tailing = new Production("Sneak-tailing");
     tailing.priority = Production.priority.Medium;
@@ -216,10 +250,16 @@ troi.makeProductions = function() {
             troi.body.speed = 75;
             troi.pursue(localBots[0], 20000);
             troi.makeSpeechBubble("* que MGS OST ", 6315);
-            troi.addMemory("Tailed somebody.");
+            if (!troi.containsMemory("Tailed " + localBots.name + ".")) {
+                troi.addMemory("Tailed " + localBots.name + ".");
+            } else {
+                troi.addMemory("Tailed " + localBots.name + " again.")
+            }
         }
 
     };
+    this.productions.push(tailing);
+
 
     var politicking = new Production("Political answering");
     politicking.priority = Production.priority.Medium;
@@ -240,8 +280,15 @@ troi.makeProductions = function() {
         var localBots = troi.getNearbyBots(1000);
         troi.orientTowards(localBots, 1000);
         troi.pursue(localBots, 25000);
-        troi.speak(localBots, "Politically correct statements", 7000)
+        troi.speak(localBots, "Politically correct statements", 7000);
+        if (troi.containsRecentMemory("Politically engaged " + localBots.name + ".")) {
+            troi.addMemory("Further Networking with " + localBots.name + ".");
+        } else {
+            troi.addMemory("Politically engaged " + localBots.name + ".");
+        }
     };
+    this.productions.push(politicking);
+
 
     var research = new Production("Research");
     research.priority = Production.priority.Low;
@@ -257,16 +304,19 @@ troi.makeProductions = function() {
 
             for (var i = 0; i < localObj.length; i++) {
                 localObj[i] = localObj.name;
+                if (troi.containsMemory("Catalogged " + localObj[i] + " in Grimoire.")) {
+                    troi.addMemory("Redundant catalogging " + localObj[i] + ".");
+                }else{
+                    troi.grimoire.add(localObj[i]);
+                    troi.addMemory("Catalogged " + localObj[i] + " in Grimoire.");
+                }
             }
 
         }
 
     };
+    this.productions.push(research);
 
-
-    this.productions = [treasureHunting, homeward, nap, eating, tinkering,
-        flee, tailing, politicking, research
-    ];
 
 };
 
@@ -362,6 +412,7 @@ troi.resting = {
     update: function() {
         // Standing still
         troi.body.speed = 0;
+        troi.stopMotion = true;
         troi.stamina += 700; //energy recharging while walking
     }
 }
@@ -487,6 +538,8 @@ troi.getStatus = function() {
     statusString += "\n-------";
     statusString += "\nMotion mode: " + troi.motionMode.description + "\nEmotion mode: " + troi.emotion.current;
     statusString += "\nStamina : " + troi.stamina + "\n" + troi.hunger.toString() + "\n" + troi.amuse.toString();
+    statusString += troi.productionString;
+    statusString += troi.getActiveMemoryString();
     return statusString;
 }
 
@@ -496,6 +549,12 @@ troi.getStatus = function() {
 troi.update = function() {
     if (troi.atBoundary() === true) {
         troi.incrementAngle(45);
+    }
+    if (troi.x === troi.home.x && troi.y === troi.home.y) {
+        troi.goals.remove("To home.")
+    }
+    if (troi.x === troi.treasure.x && troi.y === troi.treasure.y) {
+        troi.goals.remove("Treasure hunting.");
     }
     this.basicUpdate();
 
@@ -518,6 +577,7 @@ troi.updateTenthSec = function() {
         troi.stamina = troi.STAMINA_MAX;
     }
 
+
 }
 
 
@@ -525,18 +585,25 @@ troi.updateTenthSec = function() {
 // Called every second //
 //updates status       //
 /////////////////////////
-troi.update10Sec = function() {
+troi.update1Sec = function() {
 
-    troi.setMotion();
-    troi.amuse.update();
-    troi.hunger.update();
-    // fireProductions(troi.productions);
+        troi.setMotion();
+        troi.amuse.update();
+        troi.hunger.update();
 
+
+    }
+    // updates every 15 seconds
+troi.update15sec = function() {
+    fireProductions(troi.productions);
+    troi.productionString = getProductionString(fireProductions(troi.productions));
 }
+
+
 troi.update_1_30_sec = function() {
     //troi.hunger.eat(501); //food for troi
     //troi.amuse.play(500); //playtime increment
-    troi.stamina = troi.STAMINA_MAX;
+    //troi.stamina = troi.STAMINA_MAX;
 }
 
 /**
@@ -567,28 +634,21 @@ troi.eatObject = function(objectToEat) {
     troi.hunger.eat(objectToEat.calories);
     troi.speak(objectToEat, "Yay, food. " + objectToEat.description + "!");
     troi.play(sounds.chomp);
-    
+
 }
 
 troi.hear = function(botWhoSpokeToMe, whatTheySaid) {
     troi.speak(botWhoSpokeToMe, "...Sure " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
 }
 
-troi.highFive = function(botToHighFive) {
-    if (botToHighFive instanceof Bot) {
-        if (game.physics.arcade.distanceBetween(this.sprite, botToHighFive.sprite) < 100) {
-            botToHighFive.highFived(this);
-        }
-    }
-}
 
 troi.highFived = function(botWhoHighFivedMe) {
     troi.addMemory("High Fived: " + object.name);
     troi.speak(botWhoHighFivedMe, "Yo, wasuuuup? " + botWhoHighFivedMe.name + ".");
 }
 
-troi.ignore = function(annoyingBot) {
-    troi.addMemory("\'Walk away slowly an ignore the wierdo.\'" + object.names);
+troi.gotBow = function(wierdBot) {
+    troi.addMemory("\'Walk away slowly and ignore the wierdo.\'" + wierdBot.name);
     this.incrementAngle(180);
     this.body.speed = 250;
 }
