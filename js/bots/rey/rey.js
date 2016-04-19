@@ -292,13 +292,12 @@ rey.setMotion = function() {
     }
 }
 
-
 rey.update = function() {
-
-    this.currentMotion.apply(rey);
-    rey.genericUpdate();
+ if(!rey.stopMotion) {
+        rey.currentMotion.apply(rey);
+        rey.genericUpdate();
 };
-
+}
 
 rey.update1Sec = function() {
     rey.updateNetwork();
