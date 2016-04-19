@@ -22,6 +22,9 @@ duyen.init = function() {
     // Make productions
     this.makeProductions();
 
+    //Create the gol set
+    this.goals = new GoalSet();
+
     // Setting up edibility function
 
     duyen.canEat = function(object) {
