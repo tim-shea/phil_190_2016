@@ -331,23 +331,22 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
     var centerPoint = new Phaser.Point(50, 50);
     var triggerDistance = 100;
     var nearbyObjects = [];
-    var theBot = this.sprite;
     bots.forEach(function(bot) {
-        let distance = Phaser.Math.distance(bot.sprite.x, bot.sprite.y, theBot.x, theBot.y);
+        let distance = Phaser.Math.distance(bot.sprite.x, bot.sprite.y, this.sprite.x, this.sprite.y);
         if (distance <= radius) {
-            if (bot.sprite != theBot) {
+            if (bot.sprite != this.sprite) {
                 bot.temp_distance = distance;
                 nearbyObjects.push(bot);
             }
         }
-    });
+    }, this);
     entities.forEach(function(entity) {
-        let distance = Phaser.Math.distance(entity.sprite.x, entity.sprite.y, theBot.x, theBot.y);
+        let distance = Phaser.Math.distance(entity.sprite.x, entity.sprite.y, this.sprite.x, this.sprite.y);
         if (distance <= radius) {
             entity.temp_distance = distance;
             nearbyObjects.push(entity);
         }
-    });
+    }, this);
     nearbyObjects = nearbyObjects.sort(
         function(a, b) {
             return (a.temp_distance < b.temp_distance);
@@ -364,30 +363,18 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
  * To get nearest object: getNearbyObjects[0]
  */
 Bot.prototype.getNearbyBots = function(radius = 250) {
-    return this.getNearbyObjects(radius).filter(function(object) {
-        return object instanceof Bot;
-    });
+    var nearbyBots = [];
+    bots.forEach(function(bot) {
+        let distance = Phaser.Math.distance(bot.sprite.x, bot.sprite.y, this.sprite.x, this.sprite.y);
+        if (distance <= radius) {
+            if (bot.sprite != this.sprite) {
+                bot.temp_distance = distance;
+                nearbyBots.push(bot);
+            }
+        }
+    }, this);    
+    return nearbyBots;
 }
-
-/**
- * Returns a reference to the closest object in a specified radius, and 
- * considers that to be the current perception of this bot.
- *
- * TODO: Take heading in to consideration!
- *
- * @param  {Number} radius the radius in pixels to consider
- * @return {Object} the "perceived entity"
- */
-Bot.prototype.getPerception = function(radius = 250) {
-    var nearbyStuff = this.getNearbyObjects(radius);
-    if(nearbyStuff.length > 0) {
-        return nearbyStuff[0];
-    } else {
-        return null;
-    }
-
-}
-
 
 /**
  * Returns a string describing the "current perceptual field",
@@ -398,9 +385,13 @@ Bot.prototype.getPerception = function(radius = 250) {
  * @param  {Number} radius the radius in pixels to consider
  * @return {String} the perception string
  */
-Bot.prototype.getPerceptionString = function(radius = 250) {
+Bot.prototype.getPerceptionString = function(radius = 200) {
     var retString = "\nPerceiving:";
     var nearbyStuff = this.getNearbyObjects(radius);
+    nearbyStuff = nearbyStuff.filter(function(object) {
+        let rad = game.physics.arcade.angleBetween(this.sprite, object.sprite);
+        return Math.abs(Phaser.Math.radToDeg(this.sprite.rotation - rad)) < 150;
+    }, this);
     if (nearbyStuff.length == 0) {
         return retString + "nothing";
     }
