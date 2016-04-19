@@ -1,7 +1,7 @@
 /**
  * Dummy bot.  Feel free to adjust / add functionality as needed.
  */
-var dummy = new Bot(650, 650, 'dummy', 'js/bots/testDummy/dummy.png');
+var dummy = new Bot(1750, 1750, 'dummy', 'js/bots/testDummy/dummy.png');
 
 
 dummy.init = function() {
