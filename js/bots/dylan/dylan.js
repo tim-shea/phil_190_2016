@@ -9,6 +9,7 @@ var dylan = new Bot(1021, 1000, 'dylan', 'js/bots/dylan/player_car.png');
  */
 dylan.currentMotion = Motions.still;
 dylan.productionText = "";
+dylan.stopMotion = false;
 
 /**
  * Initialize bot
@@ -25,33 +26,53 @@ dylan.init = function() {
 
     this.makeProductions();
 }
+this.goals = new GoalSet();
 
-    dylan.canEat = function(object) {
+dylan.canEat = function(object) {
         if (object.name !== "jerry_can") {
             return false;
         } else {
             return object.isEdible;
-    }
+        }
 
 
-    dylan.utilityFunction = function(object) {
-        if (object instanceof Bot) {
-            return 10
-        } else if (object.name !== "jerry_can") {
-            return -80;
-        } else if (object.isEdible) {
-            return object.calories;
-        } else {
-            return 1;
+        dylan.utilityFunction = function(object) {
+            if (object instanceof Bot) {
+                return 10
+            } else if (object.name !== "jerry_can") {
+                return -80;
+            } else if (object.isEdible) {
+                return object.calories;
+            } else {
+                return 1;
+            }
         }
     }
- } 
-/**
- * Create 5 productions from list
- *
- */
+    /**
+     * Create 5 productions from list
+     *
+     */
 
 dylan.makeProductions = function() {
+    var authorityResponseGoal = new Production("respond to a report");
+    authorityResponseGoal.priority = Production.priority.High;
+    authorityResponseGoal.condition = function() {
+        let d = dylan.getDistanceTo(jeff);
+        if ((d > 100) && (d < 300)) {
+            if (jeff.containsRecentMemory("  caressed me")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+    authorityResponseGoal.action = function() {
+        dylan.addMemory("Added goal of responding to a report");
+        dylan.goals.add("Respond to report");
+    }
+
+
+
     var insanity = new Production("insane");
     insanity.priority = Production.priority.Low;
     insanity.condition = function() {
@@ -68,14 +89,16 @@ dylan.makeProductions = function() {
     var curiosity = new Production("curious");
     curiosity.priority = Production.priority.Low;
     curiosity.condition = function() {
-        return false; // <-- just forcing this production not to get triggered for now.  we can work together to reimplement this
-        // dylan.emotions.current === "Happy" || dylan.emotions.current === "Playful");
-        // let d = game.physics.arcade.distanceBetween(dylan.sprite, this.sprite);
-        // if ((d > 100) && (d < 350)) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+    /* return (dylan.goals.contains("Respond to report"));
+    };
+    curiosity.action = function() {
+        dylan.addMemory("Was curious about something");
+        dylan.makeSpeechBubble("I'm curious");
+        game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+            dylan.goals.checkIfSatisfied("Respond to report");
+        }, this);
+       */
+        
     };
     curiosity.action = function() {
         dylan.speak(this.sprite, "What's your story?", 10);
@@ -96,32 +119,32 @@ dylan.makeProductions = function() {
 
     var fleeing = new Production("fleeing");
     fleeing.priority = Production.priority.High;
-        fleeing.condition = function() {
-            return (dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
-        };
+    fleeing.condition = function() {
+        return (dylan.currentMotion = Motions.speeding && dylan.emotions.current === "Scared");
+    };
     fleeing.action = function() {
         dylan.addMemory("Fled from something");
         dylan.productionText = "MUST HIDE FROM EVERYONE!"
     };
 
-    
-        var delerium = new Production("delerious");
-        delerium.priority = Production.priority.Low;
-        delerium.condition = function() {
-            return (dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
-        };
-        delerium.action = function() {
-            dylan.productionText = "Everything's going fuzzy..."
-        };
+
+    var delerium = new Production("delerious");
+    delerium.priority = Production.priority.Low;
+    delerium.condition = function() {
+        return (dylan.currentMotion = Motions.moping && dylan.fuel.value > 90);
+    };
+    delerium.action = function() {
+        dylan.productionText = "Everything's going fuzzy..."
+    };
 
     var distracted = new Production("distracted");
-    distracted.priority = Production.priority.Medium; 
+    distracted.priority = Production.priority.Medium;
     distracted.condition = function() {
         return (dylan.currentMotion = Motions.still);
-    };   
+    };
     distracted.action = function() {
         var nearbyBots = dylan.getNearbyBots(100);
-        if (nearbyBots.length <=100) {
+        if (nearbyBots.length <= 100) {
             dylan.orientTowards(nearbyBots[100], 1000);
         }
     };
@@ -138,9 +161,9 @@ dylan.makeProductions = function() {
         dylan.makeSpeechBubble("Hey you! Come back!");
     };
 
-    var irritated = new Production ("irritated");
+    var irritated = new Production("irritated");
     irritated.priority = Production.priority.High;
-    irritated.condition = function(){
+    irritated.condition = function() {
         return (dylan.emotions.current === "Angry");
     };
     irritated.action = function() {
@@ -150,18 +173,32 @@ dylan.makeProductions = function() {
         // dylan.speak(overlappingObjects, "Get off me " + overlappingObjects.name + "!")
     };
 
-    var idletalk = new Production ("idle talk");
+    var randThoughts = ["I wonder what it's like having a heart",
+        "What on earth is going on?!",
+        "Pity. You seemed like an intelligent lifeform a few seconds ago",
+        "This place is strange",
+        "I'm having some emotional problems right now",
+        "I've got 99 problems and you are every single one of them"
+    ];
+
+    var idletalk = new Production("idle talk");
     idletalk.priority = Production.priority.Low;
     idletalk.condition = function() {
-        return (dylan.emotions.current === "Calm");
+        return dylan.emotions.current === "Calm";
+        if (dylan.containsRecentMemory("Had a thought", 1.01)) {
+            return false;
+        } else {
+            return true;
+        }
 
+        return false;
     };
     idletalk.action = function() {
         dylan.addMemory("Had a thought");
-        dylan.makeSpeechBubble("I wonder what it's like having a heart");
-        //I want to add several more speech bubbles with a random chance of using any one of them, not sure how yet
+        dylan.makeSpeechBubble(randThoughts.randItem());
     };
-    this.productions = [insanity, curiosity, revenge, fleeing, delerium, distracted, pester, irritated, idletalk];
+
+    this.productions = [authorityResponseGoal, insanity, curiosity, revenge, fleeing, delerium, distracted, pester, irritated, idletalk];
 }
 
 dylan.emotions = new MarkovProcess("Calm");
@@ -215,7 +252,10 @@ dylan.fuel.toString = function() {
 dylan.getStatus = function() {
         var statusString = "Emotion: " + dylan.emotions.current;
         statusString += "\nMotion: " + dylan.currentMotion.description;
-        statusString += "\n" + dylan.fuel.toString();
+        statusString += "\n" + dylan.fuel.getBar("Fuel");
+        statusString += dylan.getPerceptionString();
+        //statusString += dylan.goals.toString();
+        statusString += dylan.getActiveMemoryString();
         return statusString;
     }
     /**
@@ -322,6 +362,13 @@ dylan.eatObject = function(objectToEat) {
      */
 dylan.hear = function(botWhoSpokeToMe, whatTheySaid) {
         dylan.speak(botWhoSpokeToMe, "Alright " + botWhoSpokeToMe.name); // TODO: Make more intelligent responses!
+       /* if (object.name === "jeff") {
+            for (goal of dylan.goals.getArray()) {
+                if (goal.id.startsWith("Respond")) {
+                    dylan.goals.remove(goal.id);
+                }
+            }
+        }*/
     }
     /**
      * React when someone high fives me
@@ -331,4 +378,7 @@ dylan.hear = function(botWhoSpokeToMe, whatTheySaid) {
 dylan.highFived = function(botWhoHighFivedMe) {
     dylan.addMemory("High Fived: " + object.name);
     dylan.speak(botWhoHighFivedMe, "Hey what's up " + botWhoHighFivedMe.name + ".");
+}
+dylan.gotIgnored = function(botWhoIgnoredMe) {
+    dylan.addMemory(botWhoIgnoredMe.name + "Ignored me!");
 }

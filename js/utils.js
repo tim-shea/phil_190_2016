@@ -77,14 +77,14 @@ DecayVariable.prototype.increment = function() {
     this.value = Math.min(this.maxVal, this.value + this.incrementAmount);
 }
 DecayVariable.prototype.add = function(amount) {
-    if (Number.isNaN(amount) || !amount) {
+    if (typeof amount == "undefined" || Number.isNaN(amount)) {
         console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
     this.value = Math.min(this.maxVal, this.value + amount);
 }
 DecayVariable.prototype.subtract = function(amount) {
-    if (Number.isNaN(amount) || !amount) {
+    if (typeof amount == "undefined" || Number.isNaN(amount)) {
         console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
