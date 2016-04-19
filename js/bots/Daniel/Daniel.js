@@ -1,6 +1,9 @@
 var Daniel = new Bot(240, 220, 'Daniel', 'js/bots/Daniel/espeon.png');
 Daniel.currentMotion = Motions.walking;
 Daniel.productionString = "";
+Daniel.stopMotion = false;
+Daniel.botPursuit = "";
+Daniel.vacation = "";
 
 Daniel.init = function() {
     this.body = this.sprite.body;
@@ -60,10 +63,12 @@ Daniel.makeProductions = function() {
     eatFood.action = function() {
         Daniel.findFood(500, Daniel.canEat);
     }
-    this.productions.push(eatFood);
+    if (!Daniel.stopMotion) {
+        this.productions.push(eatFood);
+    }
 
     var sleep = new Production("Sleeping");
-    sleep.priority = Production.priority.Medium;
+    sleep.priority = Production.priority.High;
     sleep.condition = function() {
         return (Daniel.stamina.value < 25 && Daniel.satiated.value > 50);
     }
@@ -72,6 +77,70 @@ Daniel.makeProductions = function() {
         Daniel.play(sounds.snooze);
     }
     this.productions.push(sleep);
+
+    var boredomRoulette = new Production("Decide what to do");
+    boredomRoulette.priority = Production.priority.Low;
+    boredomRoulette.condition = function() {
+        return (Daniel.satiated.value > 50 && Daniel.stamina.value > 50);
+    }
+    boredomRoulette.action = function() {
+        var roulette = Math.random();
+        if (roulette > .5) {
+            Daniel.goals.add("Make a new friend");
+            Daniel.botPursuit = Daniel.getRandomBot();
+        } else {
+            Daniel.goals.add("Travel to distant lands");
+            Daniel.vacation = Daniel.getRandomObject();
+        }
+    }
+    boredomRoulette.probNotFiring = .9;
+    //if (Daniel.goals.contains("Make a new friend!") || Daniel.goals.contains("Travel to distant lands!")) {} else {
+        this.productions.push(boredomRoulette);
+    //}
+
+    var tourism = new Production("Visiting " + Daniel.vacation);
+    tourism.priority = Production.priority.Low;
+    tourism.condition = function() {
+        return (Daniel.goals.contains("Travel to distant lands"));
+    }
+    tourism.action = function() {
+        if (Daniel.containsRecentMemory("Saw " + Daniel.vacation.name, 1.5)) {
+            Daniel.goals.remove("Travel to distant lands");
+            Daniel.vacation = "";
+        } else {
+            Daniel.pursue(Daniel.vacation, 750);
+            Daniel.makeSpeechBubble("Headed towards " + Daniel.vacation.name);
+            game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+                Daniel.goals.checkIfSatisfied("Travel to distant lands");
+            }, this);
+        }
+    }
+    //tourism.probNotFiring = .5;
+    if (!Daniel.stopMotion) {
+        this.productions.push(tourism);
+    }
+
+    var friendMaking = new Production("Greeting " + Daniel.botPursuit);
+    friendMaking.priority = Production.priority.Low;
+    friendMaking.condition = function() {
+        return (Daniel.goals.contains("Make a new friend"));
+    }
+    friendMaking.action = function() {
+        if (Daniel.containsRecentMemory("Saw " + Daniel.botPursuit.name, 1.5)) {
+            Daniel.goals.remove("Make a new friend")
+            Daniel.botPursuit = "";
+        } else {
+            Daniel.pursue(Daniel.botPursuit, 750);
+            Daniel.makeSpeechBubble("Saying hello to " + Daniel.botPursuit.name);
+            game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+                Daniel.goals.checkIfSatisfied("Make a new friend");
+            }, this);
+        }
+    }
+    //friendMaking.probNotFiring = .5;
+    if (!Daniel.stopMotion) {
+        this.productions.push(friendMaking);
+    }
 }
 
 //
@@ -150,8 +219,14 @@ Daniel.getStatus = function() {
 }
 
 Daniel.update = function() {
-    this.currentMotion.apply(Daniel);
-    Daniel.genericUpdate();
+    if (!Daniel.stopMotion) {
+        this.currentMotion.apply(Daniel);
+        Daniel.genericUpdate();
+    }
+    if (Daniel.botPursuit.name == "Daniel") {
+        Daniel.botPursuit = "";
+        Daniel.goals.remove("Make a new friend")
+    }
 };
 
 Daniel.updateOneSecond = function() {
@@ -166,7 +241,9 @@ Daniel.updateOneSecond = function() {
         Daniel.stamina.decrement();
     }
     Daniel.emotion.update();
-    Daniel.setMotion();
+    if (!Daniel.stopMotion) {
+        //Daniel.setMotion();
+    }
     let firedProductions = fireProductions(Daniel.productions);
     Daniel.productionString = getProductionString(firedProductions);
 }
