@@ -7,12 +7,18 @@ rey.init = function() {
     this.body = this.sprite.body;
     this.body.rotation = 100;
     this.body.speed = 100;
+    rey.stopMotion = false;
 
 
     game.time.events.loop(Phaser.Timer.SECOND * 1, rey.update1Sec, this);
     game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, rey.update2min, this);
 
     this.makeProductions();
+
+
+//Make goals
+    this.goals = new GoalSet();
+
 
 }
 
@@ -39,14 +45,33 @@ rey.utilityFunction = function(object) {
 }
 
 rey.makeProductions = function() {
-   var eatingProduction1 = new Production("eating",
-        Production.priority.High,
-        function() {
-            return (rey.hunger.value > 10 && rey.hunger.value < 20);
-        },
-        function() {
-            rey.makeSpeechBubble("Yum!");
-        });
+
+this.productions = []; // The production array
+
+
+   var eatingGoal = new Production("eat when starving");
+        eatingGoal.priority = Production.priority.Medium;
+        eatingGoal.condition = function() {
+            return (rey.hunger.value === 40);
+     };
+        eatingGoal.action = function() {
+            rey.addMemory("I'm going to eat the first thing I see!");
+            rey.goals.add("Look around for some food!");
+            rey.makeSpeechBubble("SOMEONE GET ME FOOD", 1200);
+        };
+    this.productions.push(eatingGoal);
+
+    var gohometosleepGoal = new Production("I'm going to bed");
+        gohometosleepGoal.priority = Production.priority.High;
+        gohometosleepGoal.condition = function () {
+            return (rey.emotions.current == "Sleepy");
+        };
+        gohometosleepGoal.action = function() {
+            rey.addMemory("I need to go rest now..");
+            rey.goals.add("I am going home now");
+            rey.makeSpeechBubble("GOOD NIGHT", 1200);
+        }
+    this.productions.push(gohometosleepGoal);
 
    var fleeingProduction = new Production("fleeing",
         Production.priority.High,
@@ -130,7 +155,6 @@ rey.makeProductions = function() {
         function() {
             rey.currentMotion = Motions.sonicSpeed;
             rey.productionText = "goood night";
-            // rey.orientTowards("stray dog"); <-- Does not take a string but an object.  We can fix together.
         });
 
   var avoidance = new Production("please leave me alone for now",
@@ -144,6 +168,31 @@ rey.makeProductions = function() {
             rey.makeSpeechBubble("No one will get close to me if I am close to sharAI");
         });
 
+
+ var social = new Production("talking to other bots");
+    social.priority = Production.priority.Medium;
+    social.condition = function() {
+        let d = rey.getDistanceTo(sharAI);
+        if ((d > 0) && (d < 500)) {
+            if(rey.containsRecentMemory("Everyone run away!", 1.01)) {
+                return false; 
+            } else {
+                return true;
+            }
+        };
+        return false;
+    };
+    social.action = function() {
+        rey.speak(sharAI, "Get away please!", 2000);
+        rey.addMemory("I said get away please!!");
+        rey.orientTowards(sharAI);
+    };
+    social.probNotFiring = .7;
+    this.productions.push(social);
+
+
+
+
    var social = new Production("Does anyone want to talk?",
         Production.priority.High,
         function() {
@@ -153,12 +202,22 @@ rey.makeProductions = function() {
         function() {
             var nearbyBots = rey.getNearbyBots(800);
             if (nearbyBots.length > 0) {
-                rey.pursue(nearbyBots[0], 500);
-                rey.speak(nearbyBots[0], "let's hang out! " + nearbyBots[0].name, 1500);
+                if(rey.containsRecentMemory("What are you doing? ", 1.01)) {
+                return false; 
+            } else {
+                return true;
+            }
             }
         });
+    // social.action = function() {
+    //     rey.speak(nearbyBots, "How's it going?", 2000);
+    //     rey.addMemory("Said How's it going?");
+    //     rey.orientTowards(nearbyBots.name);
+    // };
+    // social.probNotFiring = .7;
+    // this.productions.push(social);
 
-    this.productions = [eatingProduction1, fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood, goHome, avoidance, social];
+    this.productions = [fleeingProduction, dancingProduction, lookingforfoodProduction, playingProduction, sleepingProduction, fight, seekFood, goHome, avoidance, social];
 }
 
 
@@ -201,7 +260,10 @@ rey.hunger.toString = function() {
 rey.getStatus = function() {
     var statusString = "Emotion: " + rey.emotions.current;
     statusString += "\nMotion: " + rey.currentMotion.description;
-    statusString += "\n" + rey.hunger.toString();
+    statusString += "\n" + rey.hunger.getBar("Hunger");
+     statusString += "\n" + rey.hunger.toString();
+    statusString += "\n" + rey.goals.toString();
+    statusString += "\n" + rey.getActiveMemoryString();
     return statusString;
 }
 
@@ -243,7 +305,8 @@ rey.update1Sec = function() {
     rey.hunger.increment();
     rey.emotions.update();
     rey.setMotion();
-    fireProductions(rey.productions);
+  let firedProductions = fireProductions(rey.productions);
+    rey.productionString = getProductionString(firedProductions); 
 }
 
 
@@ -253,11 +316,15 @@ rey.update2min = function() {}
 
 rey.collision = function(object) {
     rey.addMemory("Saw " + object.name);
-    rey.moveAwayFrom(object);
+   // rey.moveAwayFrom(object);
     if (rey.canEat(object)  && (rey.hunger.value > 40)) {
         rey.eatObject(object);
 
 }
+    rey.addMemory("Hugged " + object.name);
+    if (object.name != "sharAI") {
+        //rey.addMemory("Don't eat me!");
+    }
 
 
 rey.eatObject = function(objectToEat) {
