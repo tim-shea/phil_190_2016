@@ -43,9 +43,9 @@ troi.init = function() {
     // Initialize Timed Updates //
     //////////////////////////////
     // game.time.events.loop(Phaser.Timer.SECOND * 10, troi.update10Sec, this); //main loop (1/sec) for status <-- Troi this is not defined!
-    game.time.events.loop(Phaser.Timer.SECOND * 15, troi.update15Sec, this); //loop every 15 secs for status
-    game.time.events.loop(Phaser.Timer.SECOND * .1, troi.updateTenthSec, this); //loops (10/sec) for updating the stamina
-    game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, troi.update_1_30_sec, this); //loops every 2 minutes to update for hunger
+    // game.time.events.loop(Phaser.Timer.SECOND * 15, troi.update15Sec, this); //loop every 15 secs for status
+    // game.time.events.loop(Phaser.Timer.SECOND * .1, troi.updateTenthSec, this); //loops (10/sec) for updating the stamina
+    // game.time.events.loop(Phaser.Timer.SECOND * 60 * 2, troi.update_1_30_sec, this); //loops every 2 minutes to update for hunger
 
 
     //////////////////////
