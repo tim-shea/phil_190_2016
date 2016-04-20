@@ -107,7 +107,7 @@ sharAI.makeProductions = function() {
         return (sharAI.energyLevel == "Anxious" || sharAI.health.value < 25);
     }
     returnHome.action = function() {
-        sharAI.orientTowards(web);
+        //sharAI.orientTowards(web); <-- Web undefined
         sharAI.goHome();
     }
 
