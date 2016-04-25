@@ -351,6 +351,13 @@ Bot.prototype.getNearbyObjects = function(radius = 250) {
             nearbyObjects.push(entity);
         }
     }, this);
+	foods.forEach(function(entity) {
+		let distance = Phaser.Math.distance(entity.sprite.x, entity.sprite.y, this.sprite.x, this.sprite.y);
+        if (distance <= radius) {
+            entity.temp_distance = distance;
+            nearbyObjects.push(entity);
+        }
+	}, this);
     nearbyObjects = nearbyObjects.sort(
         function(a, b) {
             return (a.temp_distance < b.temp_distance);

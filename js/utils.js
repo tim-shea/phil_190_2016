@@ -232,7 +232,7 @@ function addFoodItem(image_id, description, calories) {
         return;
     }
     let location = findEmptyLocation();
-    addFood(image_id, location, description, calories);
+    addFood(image_id, description, calories, location);
 }
 
 
@@ -255,8 +255,8 @@ function addFood(image_id, description, calories, location) {
     food.calories = calories;
     food.isEdible = true;
     foods.push(food);
-    food.eat = function() {
-        if (!this || !this.sprite) {
+    food.eat = function(bot) {
+        /*if (!this || !this.sprite) {
             console.log("Problem with " + this.name);
             return;
         }
@@ -272,9 +272,13 @@ function addFood(image_id, description, calories, location) {
                 let location = findEmptyLocation();
                 tempSprite.reset(location[0], location[1]);
                 tempSprite.visible = true;
-            });
-        }
+            }, food);
+        }*/
+		bot.hunger.value -= 25;
     }
+	food.affordances = [
+		new Affordance('Eat Food', function(bot) { return true; }, food.eat, food)
+	];
 }
 
 
@@ -473,3 +477,19 @@ GoalSet.prototype.toString = function() {
     }
     return retString;
 }
+
+/**
+ * An Affordance is an opportunity to take an action granted by an entity
+ * in the environment, e.g. a cupcake affords you the opportunity to eat
+ */
+function Affordance(name, condition, action, source) {
+	this.name = name;
+	this.condition = condition;
+	this.action = action;
+	this.source = source;
+}
+
+Affordance.prototype.toString = function() {
+	return this.name + "(" + this.source.name + ")";
+};
+

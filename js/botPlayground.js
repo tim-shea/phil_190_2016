@@ -21,7 +21,7 @@ var botGroup, entityGroup;
 
 // Arrays and dictionaries
 //
-var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey, dummy];
+var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey, tim];
 var sprites = [];
 var entities = [];
 var foods = [];
