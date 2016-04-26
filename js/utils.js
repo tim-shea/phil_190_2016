@@ -70,25 +70,32 @@ function DecayVariable(initialVal, incrementAmount, minVal, maxVal) {
     this.minVal = minVal;
     this.maxVal = maxVal;
 }
+DecayVariable.prototype.clamp = function() {
+	this.value = Math.max(Math.min(this.value, this.maxVal), this.minVal);
+}
 DecayVariable.prototype.decrement = function() {
-    this.value = Math.max(this.minVal, this.value - this.incrementAmount);
+	this.value -= this.incrementAmount;
+	this.clamp();
 }
 DecayVariable.prototype.increment = function() {
-    this.value = Math.min(this.maxVal, this.value + this.incrementAmount);
+    this.value += this.incrementAmount;
+	this.clamp();
 }
 DecayVariable.prototype.add = function(amount) {
     if (typeof amount == "undefined" || Number.isNaN(amount)) {
         console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
-    this.value = Math.min(this.maxVal, this.value + amount);
+    this.value += amount;
+	this.clamp();
 }
 DecayVariable.prototype.subtract = function(amount) {
     if (typeof amount == "undefined" || Number.isNaN(amount)) {
         console.log("You are probably trying to eat something that does not have calories defined!");
         return;
     }
-    this.value = Math.max(this.minVal, this.value - amount);
+    this.value -= amount;
+	this.clamp();
 }
 DecayVariable.prototype.getBar = function(prefix = "", showVal = false, numTicks = 10, minCharLengthOfMinMaxText = undefined) {
     var string_minVal = this.minVal.toString();
@@ -255,29 +262,21 @@ function addFood(image_id, description, calories, location) {
     food.calories = calories;
     food.isEdible = true;
     foods.push(food);
-    food.eat = function(bot) {
-        /*if (!this || !this.sprite) {
-            console.log("Problem with " + this.name);
-            return;
-        }
-        // console.log("Eating " + this.description + " with " + this.calories + " calories");
-        var tempSprite = this.sprite;
-        tempSprite.reset(-10, -10);
-        tempSprite.visible = false;
-        // Respawn food in 5 seconds.
-        //  TODO: Note that sprite.kill(), .exists, and body.   all failed...
-        //   So I place the sprite off screen then bring it back
-        if (!tempSprite.visible) {
-            game.time.events.add(Phaser.Timer.SECOND * 1, function() {
-                let location = findEmptyLocation();
-                tempSprite.reset(location[0], location[1]);
-                tempSprite.visible = true;
-            }, food);
-        }*/
-		bot.hunger.value -= 25;
-    }
 	food.affordances = [
-		new Affordance('Eat Food', function(bot) { return true; }, food.eat, food)
+		new Affordance('Eat',
+			function(bot) { return true; },
+			function(bot, source) {
+				source.sprite.reset(-800, -800);
+				source.sprite.visible = false;
+				if (!source.sprite.visible) {
+					game.time.events.add(Phaser.Timer.SECOND * 30, function() {
+						let location = findEmptyLocation();
+						source.sprite.reset(location[0], location[1]);
+						source.sprite.visible = true;
+					}, source);
+				}
+				bot.hunger.subtract(source.calories / 10);
+			}, food)
 	];
 }
 
@@ -481,6 +480,19 @@ GoalSet.prototype.toString = function() {
 /**
  * An Affordance is an opportunity to take an action granted by an entity
  * in the environment, e.g. a cupcake affords you the opportunity to eat
+ *
+ * Name is a unique string that identifies the affordance e.g. 'Eat'.
+ *
+ * Condition is a function that takes a bot and returns true if the bot
+ * can *currently* use the affordance, or false otherwise. For example,
+ * if you must be at least four feet tall to ride the carousel, then a cat
+ * does not qualify.
+ *
+ * Action is a function that takes the bot and the source of the affordance.
+ * It applies the effect of the affordance to the bot and source. It will be
+ * called automatically when the affordance is selected.
+ *
+ * Source is the entity or bot that provides this affordance.
  */
 function Affordance(name, condition, action, source) {
 	this.name = name;

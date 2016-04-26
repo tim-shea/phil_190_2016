@@ -1,169 +1,40 @@
 /**
- * Reinforcement Learning Bot Template
+ * Tim's cat
  */
+var cat = CreateTemplateBot(600, 570, 'cat', 'js/bots/tim/cat.png');
+
+cat.affordances = [
+	new Affordance('Pet',
+		function(bot) { return true; },
+		function(bot, source) {
+			source.makeSpeechBubble('Purr, purr');
+			source.sociality.add(15);
+			bot.makeSpeechBubble('Soft kitty, warm kitty, little ball of fur');
+			bot.sociality.add(5);
+		}, cat),
+	new Affordance('Attack',
+		function(bot) { return true; },
+		function(bot, source) {
+			source.makeSpeechBubble('Mrow!');
+			source.health.subtract(5);
+			bot.sociality.subtract(5);
+		}, cat)
+];
 
 /**
- * Greedy action selection
+ * Cat's value being alive, being petted, and eating
  */
-function selectActionGreedily(bot) {
-	var selectedAffordance = bot.doNothing;
-	var selectedPrediction = bot.policy[bot.doNothing.name];
-	for (affordance of bot.getAffordances()) {
-		var prediction = 0;
-		if (affordance.name in bot.policy)
-			prediction = bot.policy[affordance.name];
-		if (prediction >= selectedPrediction) {
-			selectedAffordance = affordance;
-			selectedPrediction = prediction;
-		}
-	}
-	return selectedAffordance;
+cat.getUtility = function() {
+	return this.health.value - this.hunger.value + this.sociality.value;
 }
 
 /**
- * Exploratory action selection
+ * Do something random
  */
-function selectActionRandomly(bot) {
-	var affordances = bot.getAffordances();
+cat.selectAction = function() {
+	var affordances = this.getAffordances();
 	if (affordances.length == 0)
-		return bot.doNothing;
+		return this.doNothing;
 	else
 		return affordances[Math.floor(Math.random() * affordances.length)];
 }
-
-function CreateTemplateBot(x, y, name, image) {
-	var templateBot = new Bot(x, y, name, image);
-	
-	/**
-	 * Initialize bot
-	 *
-	 * @override
-	 */
-	templateBot.init = function() {
-		this.body = this.sprite.body;
-		this.body.rotation = 100;
-		this.body.speed = 0;
-		this.stopMotion = false;
-		this.currentMotion = Motions.still;
-		this.hunger = new DecayVariable(0, 1, 0, 100);
-		this.sociality = new DecayVariable(0, -1, -50, 50);
-		this.policy = {'Do Nothing': 0};
-		this.affordanceRange = 500;
-		this.doNothing = new Affordance(
-			"Do Nothing",
-			function(bot) { return true; },
-			function(bot) {},
-			templateBot);
-		this.selectedAffordance = this.doNothing;
-		this.pastAction = 'Do Nothing';
-		this.pastUtility = this.getUtility();
-		game.time.events.loop(Phaser.Timer.SECOND * 1, this.update1Sec, this);
-	};
-
-	/**
-	 * Populate the status field
-	 *
-	 * @override
-	 */
-	templateBot.getStatus = function() {
-		var status = "Ready"
-		status += "\n" + this.hunger.getBar("Hunger");
-		status += "\n" + this.sociality.getBar("Sociality");
-		status += "\nSpeed: " + this.body.speed;
-		status += "\nAngle: " + this.body.rotation;
-		status += "\nAction: " + this.selectedAffordance.name;
-		status += "\nPolicy: " + JSON.stringify(this.policy);
-		status += "\nAffordances: " + this.getAffordances();
-		return status;
-	}
-
-	/**
-	 * Set the current motion state, updated every second.
-	 */
-	templateBot.setMotion = function() {
-		this.body.rotation = this.body.rotation + this.getRandom(-1, 1);
-	};
-
-	//////////////////////
-	// Update Functions //
-	//////////////////////
-
-	/**
-	 * Main update called by the phaser game object (about 40 times / sec. on my machine).
-	 *
-	 * @override
-	 */
-	templateBot.update = function() {
-		if (this.stopMotion) {
-			this.currentMotion = Motions.still;
-		} else {
-			this.currentMotion = Motions.walking;
-			this.currentMotion.apply(this);
-		    this.genericUpdate();
-		}
-	};
-
-	/**
-	 * Called every second
-	 */
-	templateBot.update1Sec = function() {
-		this.hunger.increment();
-		this.sociality.increment();
-		this.applyPolicy();
-	};
-	
-	templateBot.doNothing = new Affordance(
-		"Do Nothing",
-		function(bot) { return true; },
-		function(bot) {},
-		templateBot);
-	
-	templateBot.getUtility = function() {
-		return 100 - this.hunger.value + this.sociality.value;
-	};
-	
-	/**
-	 * Apply the learned policy to action selection
-	 */
-	templateBot.applyPolicy = function() {
-		// Update our policy based on the prediction error of the last action we selected
-		var temporalDifference = this.getUtility() - this.pastUtility;
-		var prediction = this.policy[this.pastAction];
-		var predictionError = prediction - temporalDifference;
-		this.policy[this.pastAction] = prediction - 0.25 * predictionError;
-		this.pastUtility = this.getUtility();
-		// Select an action greedily based on the learned policy
-		this.selectedAffordance = selectActionRandomly(this);
-		// Apply the selection
-		if (!(this.selectedAffordance.name in this.policy))
-			this.policy[this.selectedAffordance.name] = 0;
-		this.selectedAffordance.action(this);
-		this.pastAction = this.selectedAffordance.name;
-	}
-	
-	templateBot.getAffordances = function() {
-		var affordances = [];
-		for (entity of this.getNearbyObjects(this.affordanceRange)) {
-			if (!entity.affordances)
-				continue;
-			for (affordance of entity.affordances)
-				if (affordance.condition(this))
-					affordances.push(affordance);
-		}
-		return affordances;
-	}
-	
-	return templateBot;
-}
-
-var tim = CreateTemplateBot(600, 570, 'tim', 'js/bots/tim/cat.png');
-tim.affordances = [
-	new Affordance('Pet the kitty',
-		function(bot) { return true; },
-		function(bot) {
-			bot.speak('Soft kitty, warm kitty, little ball of fur');
-			bot.sociality.value += 5;
-		},
-		tim)
-];
-

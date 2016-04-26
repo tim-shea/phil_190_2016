@@ -21,7 +21,7 @@ var botGroup, entityGroup;
 
 // Arrays and dictionaries
 //
-var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey, tim];
+var bots = [jeff, sharAI, troi, yang, faust, maria, dylan, Daniel, duyen, rey, cat];
 var sprites = [];
 var entities = [];
 var foods = [];
@@ -166,7 +166,26 @@ function create() {
     entities.push(new Entity(50, 300, 'grassyrock'));
     entities.push(new Entity(-100, -100, 'cave', game));
     entities.push(new Entity(1000, 1350, 'princessCastle'));
-    entities.push(new Entity(600, 1200, 'carousel'));
+	
+	var carousel = new Entity(600, 1200, 'carousel');
+	carousel.inUse = false;
+	carousel.affordances = [
+		new Affordance('Ride',
+			function(bot) {
+				return !carousel.inUse && bot.name != 'cat';
+			},
+			function(bot, source) {
+				bot.currentMotion = Motions.tantrum;
+				carousel.inUse = true;
+				game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+					bot.makeSpeechBubble('Whee!');
+					bot.entertainment.add(15);
+					bot.currentMotion = Motions.walking;
+					carousel.inUse = false;
+				}, carousel);
+			}, carousel)
+	];
+    entities.push(carousel);
 
     // Set up food items
     setUpFood();
@@ -204,9 +223,6 @@ function create() {
 
     // Update selection box
     document.getElementById("botSelect").selectedIndex = defaultBotIndex;
-
-    // Initialize visibility of show memory checkbox
-    document.getElementById('memoryVisible').checked = true;
 
     // Init network
     botSelect();
@@ -269,25 +285,6 @@ function botSelect() {
     newIndex = e.selectedIndex;
     game.camera.follow(sprites[newIndex]);
     currentBotIndex = newIndex;
-
-    if (!memoryOn) {
-        return;
-    }
-    // Update memory net each time bot is selected
-    memoryData = {
-        nodes: bots[currentBotIndex].nodes,
-        edges: bots[currentBotIndex].edges
-    };
-
-    if (document.getElementById('memoryVisible').checked) {
-        currentNetwork = new vis.Network(document.getElementById('mynetwork'), memoryData, bots[currentBotIndex].options);
-        bots[currentBotIndex].network = currentNetwork;
-    } else {
-        var node = document.getElementById('mynetwork');
-        while (node.hasChildNodes()) {
-            node.removeChild(node.firstChild);
-        }
-    }
 }
 
 //
