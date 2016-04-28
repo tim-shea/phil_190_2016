@@ -152,7 +152,6 @@ function create() {
     game.add.sprite(2755, 0, 'web');
     entities.push(new Entity(400, 400, 'oakTree'));
     entities.push(new Entity(1000, 2000, 'oakTree'));
-    entities.push(new Entity(2900, 130, 'cocoon'));
     entities.push(new Entity(600, 2198, 'singlerock'));
     entities.push(new Entity(1500, 1500, 'singlerock'));
     entities.push(new Entity(730, 320, 'rock'));
@@ -166,26 +165,38 @@ function create() {
     entities.push(new Entity(50, 300, 'grassyrock'));
     entities.push(new Entity(-100, -100, 'cave', game));
     entities.push(new Entity(1000, 1350, 'princessCastle'));
-	
-	var carousel = new Entity(600, 1200, 'carousel');
-	carousel.inUse = false;
-	carousel.affordances = [
-		new Affordance('Ride',
-			function(bot) {
-				return !carousel.inUse && bot.name != 'cat';
-			},
-			function(bot, source) {
-				bot.currentMotion = Motions.tantrum;
-				carousel.inUse = true;
-				game.time.events.add(Phaser.Timer.SECOND * 3, function() {
-					bot.makeSpeechBubble('Whee!');
-					bot.entertainment.add(15);
-					bot.currentMotion = Motions.walking;
-					carousel.inUse = false;
-				}, carousel);
-			}, carousel)
-	];
+
+    var carousel = new Entity(600, 1200, 'carousel');
+    carousel.inUse = false;
+    carousel.affordances = [
+        new Affordance('Ride',
+            function(bot) {
+                return !carousel.inUse && bot.name != 'cat';
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.tantrum;
+                carousel.inUse = true;
+                game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+                    bot.makeSpeechBubble('Whee!');
+                    bot.entertainment.add(15);
+                    bot.currentMotion = Motions.walking;
+                    carousel.inUse = false;
+                }, carousel);
+            }, carousel)
+    ];
     entities.push(carousel);
+
+    var cocoon = new Entity(2900, 130, 'cocoon');
+    cocoon.affordances = [
+        new Affordance('Hug',
+            function(bot) {
+                return true;
+            },
+            function(bot, source) {
+                bot.sociality.add(5);
+            }, cocoon)
+    ];
+    entities.push(cocoon);
 
     // Set up food items
     setUpFood();
@@ -210,7 +221,7 @@ function create() {
     sounds.snore = game.add.audio('snore');
     sounds.smack_forHighFive = game.add.audio('highFive');
     sounds.rand_BGM = game.add.audio(yang.BGM, undefined, true, undefined);
-    
+
 
     // Code below places bots on top of entities
     // game.world.bringToTop(botGroup);

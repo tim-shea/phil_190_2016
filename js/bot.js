@@ -547,7 +547,7 @@ Bot.prototype.collisionCheck = function() {
  * @param {object} the object collided with
  */
 Bot.prototype.collision = function(object) {
-    console.log(this.name + " collided with " + object.name);
+    //console.log(this.name + " collided with " + object.name);
 }
 
 /**
