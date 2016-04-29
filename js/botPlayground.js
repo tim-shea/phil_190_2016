@@ -155,7 +155,6 @@ function create() {
     entities.push(new Entity(1500, 1500, 'singlerock'));
     entities.push(new Entity(730, 320, 'rock'));
     entities.push(new Entity(600, 2000, 'statue'));
-    entities.push(new Entity(1000, 1000, 'stray dog'));
     entities.push(new Entity(1200, 1200, 'Cherry Blossom Tree'));
     entities.push(new Entity(25, 2700, 'Eastern Castle'));
     entities.push(new Entity(10, 2930, 'Treasure'));
@@ -184,6 +183,26 @@ function create() {
             }, carousel)
     ];
     entities.push(carousel);
+
+    var stray_dog = new Entity(1000, 1000, 'stray dog');
+    stray_dog.inUse = false;
+    stray_dog.affordances = [
+        new Affordance('Pet',
+            function(bot) {
+                return !stray_dog.inUse && bot.name != 'dog';
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.still;
+                stray_dog.inUse = true;
+                game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+                    bot.makeSpeechBubble('woof woof');
+                    bot.entertainment.add(15);
+                    bot.currentMotion = Motions.walking;
+                    stray_dog.inUse = false;
+                }, stray_dog);
+            }, stray_dog)
+    ];
+    entities.push(stray_dog);
 
     var cocoon = new Entity(2900, 130, 'cocoon');
     cocoon.affordances = [
