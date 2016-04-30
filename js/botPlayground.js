@@ -152,7 +152,6 @@ function create() {
     game.add.sprite(2755, 0, 'web');
     entities.push(new Entity(400, 400, 'oakTree'));
     entities.push(new Entity(1000, 2000, 'oakTree'));
-    entities.push(new Entity(600, 2198, 'singlerock'));
     entities.push(new Entity(1500, 1500, 'singlerock'));
     entities.push(new Entity(730, 320, 'rock'));
     entities.push(new Entity(600, 2000, 'statue'));
@@ -197,6 +196,20 @@ function create() {
             }, cocoon)
     ];
     entities.push(cocoon);
+
+    var singlerock = new Entity(600, 2198, 'singlerock');
+    singlerock.affordances = [
+        new Affordance('Stare at the rock',
+            function(bot) {
+                return true;
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.still;
+                bot.entertainment.subtract(10);
+                bot.health.add(15);
+            }, singlerock)
+    ];
+    entities.push(singlerock)
 
     // Set up food items
     setUpFood();
