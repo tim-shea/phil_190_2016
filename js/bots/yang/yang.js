@@ -249,7 +249,6 @@ yang.selectAction = function() {
 		var i = 0;
 		while (i < affordances.length && (!affordances[i].toString() in this.policy)) {
 				i++;
-			}
 		}
 		if (i != affordances.length) {
 			return affordances[i];
@@ -271,4 +270,5 @@ yang.selectAction = function() {
 			}
 			return possible_action[Math.floor(Math.random() * possible_action.length)];
 		}
+	}
 }
