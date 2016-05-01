@@ -242,11 +242,12 @@ yang.getUtility = function() {
  */
 yang.selectAction = function() {
 	var affordances = this.getAffordances();
-	if (affordances.length == 0) {
-		return this.doNothing;
+	//affordances[0] is always donothing
+	if (affordances.length == 1) {
+		return affordances[0]; //basically this.doNothing;
 	} else {
 		// find a choice that is never made! I'm Chaotic
-		var i = 0;
+		var i = 1;
 		while (i < affordances.length && (!affordances[i].toString() in this.policy)) {
 				i++;
 		}
