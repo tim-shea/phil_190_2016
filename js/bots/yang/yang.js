@@ -227,10 +227,14 @@ yang.affordances = [
 ];
 
 /**
- * yang's value being entertainment, being petted, and eating
+ * yang's value being entertainment, not being socially awkward, and be healthy while not too hungery
  */
 yang.getUtility = function() {
-	return (this.entertainment.value + this.sociality.value) / this.hunger.value * this.health.value;
+	var temp = (this.entertainment.value + this.sociality.value) / this.hunger.value * this.health.value;
+	if (Number.isNaN(temp) || Number.isFinite(temp)) {
+	 	temp = (this.entertainment.value + this.sociality.value) * this.health.value;
+	 } 
+	return temp;
 }
 
 /**
