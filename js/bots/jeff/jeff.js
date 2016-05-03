@@ -27,7 +27,7 @@ jeff.affordances = [
 		function(bot) { return true; },
 		function(bot, source) {
 			// Todo: choose from a list of random things, and maybe make the entertainment boost have a random component
-			source.makeSpeechBubble("Better to regret something you haven't done than something you have done");
+			source.makeSpeechBubble("Better to regret something you have done than something you have haven't done");
 			source.entertainment.add(10);
 			bot.entertainment.add(10);
 		}, jeff)
