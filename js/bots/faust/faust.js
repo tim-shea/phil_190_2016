@@ -26,7 +26,7 @@ faust.affordances = [
 		function(bot, source) {
 			source.makeSpeechBubble('Zzzz...');
 			source.health.add(15);
-			source.motions.stop();
+			// source.motions.stop();
 			bot.makeSpeechBubble('Are you awake?')
 			bot.sociality.subtract(5);
 		}, faust),

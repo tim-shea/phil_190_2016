@@ -21,7 +21,7 @@ rey.affordances = [
 			source.makeSpeechBubble('Okay I am pretty tired now. I must rest');
 			bot.sociality.subtract(20);
 			bot.entertainment.subtract(30);
-			ssource.sociality.subtract(15);
+			source.sociality.subtract(15);
 			source.entertainment.subtract(30);
 			source.hunger.add(40);
 		}, rey)
