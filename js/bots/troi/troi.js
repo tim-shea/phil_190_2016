@@ -111,23 +111,25 @@ troi.affordances = [
         },
         function(bot, source) {
             source.currentMotion = Motions.running;
-            troi.inventory.add(Math.floor(Math.random() * 1000));
+            troi.inventory.push(Math.floor(Math.random() * 1000));
             source.hunger.subtract(3);
             source.entertainment.add(5);
             source.sociality.subtract(1);
         },
         troi),
-    
+
     new Affordance('Catalog',
-        function(bot){
+        function(bot) {
             return true;
         },
-        function(bot, source){
-            troi.grimoire.add(bot.name);
+        function(bot, source) {
+            troi.grimoire.push(bot.name);
             source.sociality.add(5);
             source.hunger.subtract(3);
             source.entertainment.add(10);
 
-        },troi)
+        }, troi)
 
 ];
+
+troi.NN = new NeuralNetwork(); 
