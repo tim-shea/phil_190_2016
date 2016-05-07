@@ -155,7 +155,7 @@ function create() {
     entities.push(new Entity(1500, 1500, 'singlerock'));
     entities.push(new Entity(730, 320, 'rock'));
     entities.push(new Entity(600, 2000, 'statue'));
-    entities.push(new Entity(1200, 1200, 'Cherry Blossom Tree'));
+    entities.push(new Entity(1200, 1200, 'Cherry Blossom Tree'))
     entities.push(new Entity(25, 2700, 'Eastern Castle'));
     entities.push(new Entity(10, 2930, 'Treasure'));
     entities.push(new Entity(2700, 2700, 'Treehouse'));
@@ -265,7 +265,7 @@ function create() {
     ];
     entities.push(oakTree2);
 
-    var cherryBlossom = new Entity(1200, 1200, 'cherryBlossom');
+    var cherryBlossom = new Entity(1200, 1200, 'Cherry Blossom Tree');
     cherryBlossom.affordances = [
         new Affordance('Nap',
             function(bot) {
@@ -283,11 +283,11 @@ function create() {
     ];
     entities.push(cherryBlossom);
 
-    var eastCastle = new Entity(25, 2700, "Eastern Castle");
+    var eastCastle = new Entity(25, 2700, 'Eastern Castle');
     eastCastle.affordances = [
         new Affordance('Nap',
             function(bot) {
-                return bot.name === 'troi' && (bot.health.value > 35 && bot.health.value < 95) && (bot.hunger.value < 60);
+                return (bot.name == 'troi') && (bot.health.value > 35 && bot.health.value < 95) && (bot.hunger.value < 60);
             },
             function(bot, source) {
                 bot.currentMotion = Motions.still;
@@ -305,10 +305,37 @@ function create() {
             },
             function(bot, source) {
                 bot.health.subtract(35);
-                bot.entertainment.subtract(20); 
-            })
+                bot.entertainment.subtract(20);
+                bot.makeSpeechBubble("!!!!!!!");
+            },
+            eastCastle)
     ];
     entities.push(eastCastle);
+
+    var treasureChest = new Entity(10, 2930, 'Treasure');
+    treasureChest.affordances = [
+        new Affordance('Defense System',
+            function(bot) {
+                return bot.name != 'troi';
+            },
+            function(bot, source) {
+                bot.health.subtract(35);
+                bot.entertainment.subtract(20);
+                bot.makeSpeechBubble("!!!!!!!");
+            }, treasureChest),
+
+        new Affordance('Satisfy material anxiety',
+            function(bot){
+                return bot.name == 'troi';
+            },
+            function(bot,source){
+                bot.entertainment.add(5);
+                bot.health.add(1);
+                bot.makeSpeechBubble("Phew.");
+            }, treasureChest)
+    ];
+    entities.push(treasureChest);
+
 
     // Set up food items
     setUpFood();
