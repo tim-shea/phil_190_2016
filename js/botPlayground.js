@@ -228,7 +228,87 @@ function create() {
                 bot.health.add(15);
             }, singlerock)
     ];
-    entities.push(singlerock)
+    entities.push(singlerock);
+
+    var oakTree1 = new Entity(400, 400, 'oakTree');
+    oakTree1.affordances = [
+        new Affordance('Nap',
+            function(bot) {
+                return (bot.health.value > 35 && bot.health.value < 95) && (bot.hunger.value < 60);
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.still;
+                bot.hunger.add(5);
+                bot.entertainment.subtract(15);
+                bot.health.add(25);
+                bot.sociality.subtract(10);
+                bot.makeSpeechBubble("...Z Z Z...");
+            }, oakTree1)
+    ];
+    entities.push(oakTree1);
+
+    var oakTree2 = new Entity(1000, 2000, 'oakTree');
+    oakTree2.affordances = [
+        new Affordance('Nap',
+            function(bot) {
+                return (bot.health.value > 35 && bot.health.value < 95) && (bot.hunger.value < 60);
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.still;
+                bot.hunger.add(5);
+                bot.entertainment.subtract(15);
+                bot.health.add(25);
+                bot.sociality.subtract(10);
+                bot.makeSpeechBubble("...Z Z Z...");
+
+            }, oakTree2)
+    ];
+    entities.push(oakTree2);
+
+    var cherryBlossom = new Entity(1200, 1200, 'cherryBlossom');
+    cherryBlossom.affordances = [
+        new Affordance('Nap',
+            function(bot) {
+                return (bot.health.value > 35 && bot.health.value < 95) && (bot.hunger.value < 60);
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.still;
+                bot.hunger.add(5);
+                bot.entertainment.subtract(15);
+                bot.health.add(25);
+                bot.sociality.subtract(10);
+                bot.makeSpeechBubble("...Z Z Z...");
+
+            }, cherryBlossom)
+    ];
+    entities.push(cherryBlossom);
+
+    var eastCastle = new Entity(25, 2700, "Eastern Castle");
+    eastCastle.affordances = [
+        new Affordance('Nap',
+            function(bot) {
+                return bot.name === 'troi' && (bot.health.value > 35 && bot.health.value < 95) && (bot.hunger.value < 60);
+            },
+            function(bot, source) {
+                bot.currentMotion = Motions.still;
+                bot.hunger.add(5);
+                bot.entertainment.subtract(15);
+                bot.health.add(25);
+                bot.sociality.subtract(10);
+                bot.makeSpeechBubble("...Z Z Z...");
+
+            }, eastCastle),
+
+        new Affordance('Castle Defence System',
+            function(bot) {
+                return bot.name != 'troi';
+            },
+            function(bot, source) {
+                bot.health.subtract(35);
+                bot.entertainment.subtract(20); 
+            })
+    ];
+    entities.push(eastCastle);
 
     // Set up food items
     setUpFood();

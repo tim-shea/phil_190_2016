@@ -49,7 +49,7 @@ troi.affordances = [
             } else if (Math.randomq() < 0.5) {
                 console.log("7");
                 bot.gotTo(1200, 1200);
-            } else {*/
+            } else {
             console.log("home");
             source.goHome(7000);
             //}
